@@ -6,5 +6,5 @@ export const degradeSnapshot = (
 ): Snapshot => ({
   ...last,
   events: [],
-  health: { state: last.health.state === 'down' ? 'down' : 'warn', reason },
+  health: { state: 'warn', reason },
 })

@@ -13,9 +13,13 @@ export const createEmitter = (
   let closed = true
   let last: Snapshot | null = null
   let stale: NodeJS.Timeout | undefined
+  let staled = false
 
   const degrade = (reason: 'lagging' | 'stale'): void => {
-    if (!closed && last !== null) sink.publish(degradeSnapshot(last, reason))
+    if (closed || last === null || last.health.state === 'down') return
+    if (reason === 'lagging' && staled) return
+    staled = reason === 'stale'
+    sink.publish(degradeSnapshot(last, reason))
   }
 
   return {
@@ -31,6 +35,7 @@ export const createEmitter = (
       if (closed) return
       const change = transitionEvent(last?.health ?? null, snapshot)
       last = snapshot
+      staled = false
       sink.publish(
         change === null
           ? snapshot

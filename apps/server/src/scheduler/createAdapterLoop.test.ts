@@ -1,24 +1,8 @@
 import type { Snapshot, SnapshotCore } from '@orbit/contract'
 
-import type { Adapter } from '../types/Adapter'
 import { createAdapterLoop } from './createAdapterLoop'
-
-const core = (value: number): SnapshotCore => ({
-  component: 'synthetic',
-  health: { state: 'ok', reason: null },
-  metrics: [{ key: 'synthetic.value', value, at: new Date().toISOString() }],
-  pending: [],
-  events: [],
-  observedAt: new Date().toISOString(),
-})
-
-const adapter = (read: Adapter['read']): Adapter => ({
-  id: 'synthetic',
-  cadenceMs: 1000,
-  timeoutMs: 3000,
-  freshnessMs: 5000,
-  read,
-})
+import { syntheticAdapter } from './syntheticAdapter'
+import { syntheticCore } from './syntheticCore'
 
 describe('createAdapterLoop', () => {
   beforeEach(() => vi.useFakeTimers())
@@ -27,9 +11,9 @@ describe('createAdapterLoop', () => {
   it('publishes each successful read', async () => {
     const published: Snapshot[] = []
     const loop = createAdapterLoop(
-      adapter(async () => {
+      syntheticAdapter(async () => {
         await Promise.resolve()
-        return core(1)
+        return syntheticCore(1)
       }),
       { publish: (s) => published.push(s) },
     )
@@ -43,12 +27,12 @@ describe('createAdapterLoop', () => {
     let active = 0
     let maxActive = 0
     const published: Snapshot[] = []
-    const slow = adapter(async () => {
+    const slow = syntheticAdapter(async () => {
       active += 1
       maxActive = Math.max(maxActive, active)
       await new Promise((resolve) => setTimeout(resolve, 2500))
       active -= 1
-      return core(1)
+      return syntheticCore(1)
     })
     const loop = createAdapterLoop(slow, { publish: (s) => published.push(s) })
     loop.start()
@@ -61,9 +45,9 @@ describe('createAdapterLoop', () => {
   it('times out a read that ignores its signal and keeps the last good snapshot', async () => {
     let calls = 0
     const published: Snapshot[] = []
-    const flaky = adapter(async () => {
+    const flaky = syntheticAdapter(async () => {
       calls += 1
-      if (calls === 1) return core(7)
+      if (calls === 1) return syntheticCore(7)
       return new Promise<SnapshotCore>(() => undefined)
     })
     const loop = createAdapterLoop(flaky, { publish: (s) => published.push(s) })
@@ -81,7 +65,7 @@ describe('createAdapterLoop', () => {
     let maxActive = 0
     let calls = 0
     const published: Snapshot[] = []
-    const late = adapter(async () => {
+    const late = syntheticAdapter(async () => {
       calls += 1
       active += 1
       maxActive = Math.max(maxActive, active)
@@ -89,7 +73,7 @@ describe('createAdapterLoop', () => {
         setTimeout(resolve, calls === 1 ? 6000 : 10),
       )
       active -= 1
-      return core(calls)
+      return syntheticCore(calls)
     })
     const loop = createAdapterLoop(late, { publish: (s) => published.push(s) })
     loop.start()
@@ -103,9 +87,9 @@ describe('createAdapterLoop', () => {
   it('marks data stale when nothing new arrives within freshnessMs', async () => {
     let calls = 0
     const published: Snapshot[] = []
-    const once = adapter(async () => {
+    const once = syntheticAdapter(async () => {
       calls += 1
-      if (calls === 1) return core(1)
+      if (calls === 1) return syntheticCore(1)
       return new Promise<SnapshotCore>(() => undefined)
     })
     const loop = createAdapterLoop(
@@ -120,7 +104,7 @@ describe('createAdapterLoop', () => {
 
   it('backs off after failures', async () => {
     let calls = 0
-    const failing = adapter(async () => {
+    const failing = syntheticAdapter(async () => {
       calls += 1
       await Promise.resolve()
       throw new Error('down')
@@ -141,7 +125,7 @@ describe('createAdapterLoop lifecycle', () => {
   it('leaves no timers behind and aborts the pending read on stop', async () => {
     let seen: AbortSignal | undefined
     const published: Snapshot[] = []
-    const hung = adapter(async (signal) => {
+    const hung = syntheticAdapter(async (signal) => {
       seen = signal
       return new Promise<SnapshotCore>(() => undefined)
     })
@@ -158,10 +142,10 @@ describe('createAdapterLoop lifecycle', () => {
   it('clears the pending next-read timer on stop', async () => {
     let calls = 0
     const loop = createAdapterLoop(
-      adapter(async () => {
+      syntheticAdapter(async () => {
         calls += 1
         await Promise.resolve()
-        return core(calls)
+        return syntheticCore(calls)
       }),
       { publish: () => undefined },
     )
@@ -176,11 +160,11 @@ describe('createAdapterLoop lifecycle', () => {
   it('adds a recovered event when a failing adapter heals', async () => {
     let calls = 0
     const published: Snapshot[] = []
-    const healing = adapter(async () => {
+    const healing = syntheticAdapter(async () => {
       calls += 1
       await Promise.resolve()
       if (calls === 1) throw new Error('down')
-      return core(calls)
+      return syntheticCore(calls)
     })
     const loop = createAdapterLoop(healing, {
       publish: (s) => published.push(s),

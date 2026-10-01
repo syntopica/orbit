@@ -1,59 +1,60 @@
-import type { SnapshotCore } from '@orbit/contract'
-
 import type { Adapter } from '../types/Adapter'
 import type { LoopHandle } from '../types/LoopHandle'
 import type { SnapshotSink } from '../types/SnapshotSink'
 import { backoffDelay } from './backoffDelay'
 import { createEmitter } from './createEmitter'
-import { downSnapshot } from './downSnapshot'
+import { createRecorder } from './createRecorder'
 import { guardedRead } from './guardedRead'
-import { reasonOf } from './reasonOf'
 
 export const createAdapterLoop = (
   adapter: Adapter,
   sink: SnapshotSink,
 ): LoopHandle => {
   const emitter = createEmitter(adapter, sink)
-  let stopped = true
-  let failures = 0
-  let lastGood: SnapshotCore | null = null
+  const recorder = createRecorder(adapter, emitter)
+  let running = false
+  let generation = 0
   let next: NodeJS.Timeout | undefined
   let controller: AbortController | undefined
+  let inflight: Promise<void> = Promise.resolve()
 
-  const record = (result: PromiseSettledResult<SnapshotCore>): void => {
-    if (result.status === 'fulfilled') {
-      lastGood = result.value
-      failures = 0
-      emitter.emit({ ...result.value, lastGood: null })
-      return
-    }
-    failures += 1
-    emitter.emit(downSnapshot(adapter.id, reasonOf(result.reason), lastGood))
-  }
+  const current = (own: number): boolean => running && own === generation
 
-  const readOnce = async (): Promise<void> => {
+  const readOnce = async (own: number): Promise<void> => {
     controller = new AbortController()
-    await guardedRead(adapter, emitter, controller, record)
-    if (stopped) return
+    await guardedRead(adapter, emitter, controller, (result) => {
+      if (current(own)) recorder.record(result)
+    })
+    if (!current(own)) return
     const delay =
-      failures === 0
+      recorder.failures() === 0
         ? adapter.cadenceMs
-        : backoffDelay(adapter.cadenceMs, failures)
-    next = setTimeout(tick, delay)
+        : backoffDelay(adapter.cadenceMs, recorder.failures())
+    next = setTimeout(() => {
+      tick(own)
+    }, delay)
   }
 
-  const tick = (): void => {
-    void readOnce()
+  const tick = (own: number): void => {
+    inflight = readOnce(own)
+  }
+
+  const begin = async (own: number): Promise<void> => {
+    await inflight
+    if (current(own)) tick(own)
   }
 
   return {
     start: () => {
-      stopped = false
+      if (running) return
+      running = true
+      generation += 1
+      recorder.reset()
       emitter.open()
-      tick()
+      void begin(generation)
     },
     stop: () => {
-      stopped = true
+      running = false
       clearTimeout(next)
       emitter.close()
       controller?.abort()
