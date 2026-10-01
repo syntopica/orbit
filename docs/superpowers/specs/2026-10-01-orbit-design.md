@@ -1,6 +1,6 @@
 # orbit - design
 
-Status: draft, revision 3 (after adversarial review rounds 1 and 2). Scope: sub-project
+Status: draft, revision 4 (after adversarial review rounds 1 to 3). Scope: sub-project
 0 (Base) and sub-project 1 (Memory). Later sub-projects get their own specs.
 
 ## 1. Purpose
@@ -63,7 +63,7 @@ output.
 | Component | Role in the memory stack | Read surface |
 | --- | --- | --- |
 | agents | Owns the canonical conversation archive | via atrium status (archive age) |
-| atrium | Disposable index and retrieval over archive, synthesis and notes | `atrium/status.json` written by atrium (section 4), `atrium doctor --json`, `atrium context --json` |
+| atrium | Disposable index and retrieval over archive, synthesis and notes | `atrium/status/{refresh,synthesis}.json` written by atrium (section 4), `atrium doctor --json`, `atrium context --json` |
 | brain | Curated markdown pages with `[[links]]` | `brain lint --json`, `brain doctor --json`, `brain graph --json` |
 | clips | Capture-to-cited-pages pipeline | `clips status --json`, `clips doctor --json` |
 | capture | Phone URL inbox, a remote service | its HTTP API, count endpoint (section 4) |
@@ -126,7 +126,8 @@ a file at the end of work it already does, and orbit reads the file.
 
 | Engine | Surface | Shape (minimum) | How it meets the budget |
 | --- | --- | --- | --- |
-| atrium | `atrium/status.json`, written at the end of each refresh and synthesis pass | records per source; archive, refresh and content ages; per-population registry/intended/indexed; last synthesis pass (synthesized, deferred, at) | written by jobs that already run; orbit reads a file |
+| atrium | `atrium/status/refresh.json`, written only by the refresh job at its end | records per source; archive, refresh and content ages; per-population registry/intended/indexed; `writtenAt` | written by a job that already runs; orbit reads a file |
+| atrium | `atrium/status/synthesis.json`, written only by the synthesis job at its end | last pass: synthesized, deferred, started, finished; `writtenAt` | same |
 | atrium | `atrium doctor --json` | checks `name`, `ok`, `code` | benchmarked; on-demand only if over budget |
 | atrium | `atrium context --json` | existing contract | on-demand detail call only |
 | brain | `brain lint --json` | issues `page`, `code`; `indexStale` | benchmarked |
@@ -137,6 +138,12 @@ a file at the end of work it already does, and orbit reads the file.
 | clips | `clips status --json` | counts per state; intake per day | benchmarked |
 | clips | `clips doctor --json` | checks `name`, `ok`, `code` | benchmarked |
 | capture | `GET /api/captures/count?drained=false` (bearer) | `{ "count": n, "oldestAt": t }` | one indexed query on the service |
+
+Each status file has exactly one writer and is published atomically: written
+to a temporary file in the same directory, `fsync`ed, then renamed over the
+target. orbit therefore never reads partial JSON, and no job can overwrite the
+other's fields. A file whose `writtenAt` is older than its freshness policy is
+reported `stale`.
 
 Doctor checks carry a `code`, not free text, so orbit can display and store
 them without content (section 6.6).
@@ -192,13 +199,15 @@ An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, 
   running is skipped, never queued, and the snapshot is marked `lagging`.
 - **Backoff.** After a failed read the next attempt waits cadence x 2^n,
   capped at 10 x cadence; a success resets it.
-- **Bounded subprocesses.** Two pools: polling (3 slots) and detail calls (2
-  slots), so detail requests can never starve polling. Within a pool, waiting
-  work is FIFO and its timeout counts from enqueue.
-- **Isolation test.** With at most 2 adapters hung (fewer than the polling
-  slots), every other adapter's tick starts within 100 ms of schedule. When the
-  polling pool is saturated, late ticks are skipped and marked `lagging`
-  rather than queued.
+- **Bounded subprocesses, no shared polling slot.** Polling is already capped
+  at one subprocess per adapter by single flight, so polling needs no shared
+  pool: the total is bounded by the number of adapters, and one adapter's hang
+  can only skip its own ticks. Detail calls have their own pool of 2 slots,
+  FIFO, timeout counted from enqueue, and never touch polling.
+- **Isolation test.** With any number of other adapters hung, every healthy
+  adapter's tick starts within 100 ms of schedule. A hung adapter's skipped
+  ticks mark it `lagging`, and its data turns `stale` once past its freshness
+  target.
 
 ### 5.3 Subprocesses
 
