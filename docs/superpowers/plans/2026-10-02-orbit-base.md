@@ -1386,6 +1386,10 @@ import { ProcessError } from './ProcessError'
 
 export const runProcess = (request: RunRequest): Promise<RunResult> =>
   new Promise((resolve, reject) => {
+    if (request.signal?.aborted === true) {
+      reject(new ProcessError('timeout'))
+      return
+    }
     const child = spawn(request.file, [...request.args], {
       env: request.env,
       detached: true,
@@ -3216,7 +3220,7 @@ pnpm gate && git push
   - `LabelEntry` = one registry row from `orbit.json` (`component`, `label`, `role`, `plist`).
   - `LabelReading = { entry: LabelEntry; loaded: boolean; state: LaunchctlState | null }`
   - `readLabel(deps, entry, signal): Promise<LabelReading>` — `launchctl print gui/<uid>/<label>`; a non-zero exit means not loaded.
-  - `LaunchdSchedule = { intervalS: number | null; calendar: boolean; keepAlive: boolean }`; `readSchedule(deps, plist, signal): Promise<LaunchdSchedule>` via `plutil -convert json -o - <plist>`.
+  - `LaunchdSchedule = { intervalS: number | null; calendar: boolean; keepAlive: boolean }` — `intervalS` is the longest expected gap between runs: `StartInterval` when present, otherwise the period `calendarPeriodS` derives from `StartCalendarInterval` (the coarsest key set in an entry decides it: `Month` 366 d, `Day` 31 d, `Weekday` 7 d, `Hour` 1 d, `Minute` 1 h, empty 1 min; with several entries the shortest wins), so calendar jobs are also checked for missed runs; `readSchedule(deps, plist, signal): Promise<LaunchdSchedule>` via `plutil -convert json -o - <plist>`.
   - `summarizeLaunchd(readings, now: Date): Pick<SnapshotCore, 'health' | 'metrics' | 'pending'>` — failing = not loaded, or no pid with a non-zero last exit; health `warn`/`check_failed` when any fail.
   - `diffLaunchd(previous: Map<string, LabelReading>, readings, now: Date): OrbitEvent[]` — `launchd.exit_changed` (`label`, `exit`), `launchd.started` (`label`), `launchd.stopped` (`label`).
   - `LaunchdAdapterDeps = { launchctl: string; plutil: string; labels: readonly LabelEntry[]; uid: number; run: (request: RunRequest) => Promise<RunResult>; record: (observation: LaunchdObservation) => void; cadenceMs: number }`
@@ -3593,6 +3597,7 @@ import { buildChildEnv } from '../../process/buildChildEnv'
 import { ProcessError } from '../../process/ProcessError'
 import type { LaunchdAdapterDeps } from '../../types/LaunchdAdapterDeps'
 import type { LaunchdSchedule } from '../../types/LaunchdSchedule'
+import { calendarPeriodS } from './calendarPeriodS'
 
 export const readSchedule = async (
   deps: LaunchdAdapterDeps,
@@ -3612,12 +3617,59 @@ export const readSchedule = async (
     .object({ StartInterval: z.number().int().optional(), StartCalendarInterval: z.unknown().optional(), KeepAlive: z.unknown().optional() })
     .parse(JSON.parse(result.stdout))
   return {
-    intervalS: parsed.StartInterval ?? null,
+    intervalS: parsed.StartInterval ?? calendarPeriodS(parsed.StartCalendarInterval),
     calendar: parsed.StartCalendarInterval !== undefined,
     keepAlive: parsed.KeepAlive !== undefined && parsed.KeepAlive !== false,
   }
 }
 ```
+
+`apps/server/src/adapters/launchd/calendarPeriodS.ts`:
+
+```ts
+import { z } from 'zod'
+
+export const calendarPeriodS = (value: unknown): number | null => {
+  const entry = z.object({
+    Minute: z.number().optional(),
+    Hour: z.number().optional(),
+    Day: z.number().optional(),
+    Weekday: z.number().optional(),
+    Month: z.number().optional(),
+  })
+  const parsed = z.union([entry, z.array(entry).min(1)]).safeParse(value)
+  if (!parsed.success) return null
+  const entries = Array.isArray(parsed.data) ? parsed.data : [parsed.data]
+  const scale = [
+    ['Month', 366 * 86_400],
+    ['Day', 31 * 86_400],
+    ['Weekday', 7 * 86_400],
+    ['Hour', 86_400],
+    ['Minute', 3_600],
+  ] as const
+  return Math.min(...entries.map((e) => scale.find(([key]) => e[key] !== undefined)?.[1] ?? 60))
+}
+```
+
+`apps/server/src/adapters/launchd/calendarPeriodS.test.ts`:
+
+```ts
+import { calendarPeriodS } from './calendarPeriodS'
+
+describe('calendarPeriodS', () => {
+  it.each([
+    [{ Minute: 0 }, 3_600],
+    [{ Hour: 3, Minute: 0 }, 86_400],
+    [{ Weekday: 1, Hour: 9 }, 604_800],
+    [{ Day: 1 }, 2_678_400],
+    [[{ Hour: 3 }, { Minute: 30 }], 3_600],
+    [{}, 60],
+  ])('%j repeats at most every %i s', (value, period) => expect(calendarPeriodS(value)).toBe(period))
+  it('returns null without a calendar', () => expect(calendarPeriodS(undefined)).toBeNull())
+})
+```
+
+Add both files to this task's file list.
 
 `apps/server/src/adapters/launchd/summarizeLaunchd.ts`:
 
@@ -3718,6 +3770,7 @@ export const createLaunchdAdapter = (deps: LaunchdAdapterDeps): Adapter => {
 ```ts
 import type { LaunchdAdapterDeps } from '../../types/LaunchdAdapterDeps'
 import type { LaunchdCatalog } from '../../types/LaunchdCatalog'
+import { ProcessError } from '../../process/ProcessError'
 import type { LaunchdSchedule } from '../../types/LaunchdSchedule'
 import { readSchedule } from './readSchedule'
 
@@ -3734,6 +3787,7 @@ export const createLaunchdCatalog = (deps: LaunchdAdapterDeps): LaunchdCatalog =
     rows: async (signal) => {
       const rows = []
       for (const entry of deps.labels) {
+        if (signal.aborted) throw new ProcessError('timeout')
         rows.push({ component: entry.component, label: entry.label, role: entry.role, schedule: await scheduleOf(entry.plist, signal) })
       }
       return rows
@@ -4735,7 +4789,7 @@ export const getSnapshots =
     c.json({ lastId: hub.lastId(), snapshots: hub.snapshots(), events: hub.recentEvents() })
 ```
 
-Detail work (anything a request triggers, as opposed to polling) goes through one FIFO pool of 2 slots, timeout counted from enqueue (spec 5.2). Polling never touches it.
+Detail work (anything a request triggers, as opposed to polling) goes through one FIFO pool of 2 slots, timeout counted from enqueue (spec 5.2). Polling never touches it. At the deadline the caller gets `timeout` at once, but the slot stays taken until the work really settles, so a stuck job cannot multiply.
 
 `apps/server/src/types/DetailPool.ts`:
 
@@ -4750,6 +4804,7 @@ export type DetailPool = {
 ```ts
 import { ProcessError } from '../process/ProcessError'
 import type { DetailPool } from '../types/DetailPool'
+import { raceAbort } from './raceAbort'
 
 export const createDetailPool = (slots: number): DetailPool => {
   let running = 0
@@ -4780,12 +4835,15 @@ export const createDetailPool = (slots: number): DetailPool => {
         clearTimeout(timer)
         throw error
       }
-      try {
-        return await work(controller.signal)
-      } finally {
+      const job = work(controller.signal)
+      void job.then(
+        () => undefined,
+        () => undefined,
+      ).finally(() => {
         clearTimeout(timer)
         release()
-      }
+      })
+      return raceAbort(job, controller.signal)
     },
   }
 }
@@ -4821,6 +4879,20 @@ describe('createDetailPool', () => {
     expect(order).toEqual([1, 2, 3])
     expect(maxActive).toBe(2)
     expect(await lateResult).toMatchObject({ reason: 'timeout' })
+  })
+
+  it('answers at the deadline but keeps the slot until a stuck job settles', async () => {
+    const pool = createDetailPool(1)
+    let finish: () => void = () => undefined
+    const stuck = pool.run(() => new Promise<void>((resolve) => (finish = resolve)), 100).catch((e: unknown) => e)
+    const next = vi.fn(async () => 'ran')
+    const queued = pool.run(next, 10_000)
+    await vi.advanceTimersByTimeAsync(200)
+    expect(await stuck).toMatchObject({ reason: 'timeout' })
+    expect(next).not.toHaveBeenCalled()
+    finish()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(await queued).toBe('ran')
   })
 })
 ```
@@ -5583,12 +5655,17 @@ export const checkTailscaleServe: DoctorCheck = async (state) => {
     raw = null
   }
   const status = z
-    .object({ Web: z.record(z.string(), z.object({ Handlers: z.record(z.string(), z.object({ Proxy: z.string().optional() })) })).optional() })
+    .object({
+      Web: z.record(z.string(), z.object({ Handlers: z.record(z.string(), z.object({ Proxy: z.string().optional() })) })).optional(),
+      AllowFunnel: z.record(z.string(), z.boolean()).optional(),
+    })
     .safeParse(raw)
-  const published = Object.entries(status.success ? (status.data.Web ?? {}) : {})
-    .filter(([, web]) => Object.values(web.Handlers).some((h) => h.Proxy?.endsWith(`127.0.0.1:${port}`) === true))
-    .map(([hostPort]) => hostPort.replace(/:443$/, ''))
-  if (published.length === 0) return { name: 'tailscale serve', level: 'fail', detail: `nothing proxies to 127.0.0.1:${port}` }
+  const data = status.success ? status.data : {}
+  const served = Object.entries(data.Web ?? {}).filter(([, web]) => web.Handlers['/']?.Proxy?.endsWith(`127.0.0.1:${port}`) === true)
+  const funnelled = served.filter(([hostPort]) => data.AllowFunnel?.[hostPort] === true).map(([hostPort]) => hostPort)
+  if (funnelled.length > 0) return { name: 'tailscale serve', level: 'fail', detail: `Funnel exposes orbit publicly: ${funnelled.join(', ')}` }
+  const published = served.map(([hostPort]) => hostPort.replace(/:443$/, ''))
+  if (published.length === 0) return { name: 'tailscale serve', level: 'fail', detail: `no root handler proxies to 127.0.0.1:${port}` }
   const unlisted = published.filter((host) => !allowedHosts.includes(host))
   return unlisted.length === 0
     ? { name: 'tailscale serve', level: 'ok', detail: `published as ${published.join(', ')}` }
@@ -5596,7 +5673,7 @@ export const checkTailscaleServe: DoctorCheck = async (state) => {
 }
 ```
 
-If `complexity` or `max-lines-per-function` objects to `checkTailscaleServe`, extract the parse-and-filter part as `readServeHosts(stdout: string, port: number): string[]` in `apps/server/src/cli/checks/readServeHosts.ts`.
+Only the `/` handler counts (a host that proxies only `/other` to orbit does not serve it), and Funnel on that host is a failure: spec 4 keeps orbit off the public internet. `checkTailscaleServe` will exceed the function-length and complexity limits as written; extract the parse step as `readServeStatus(stdout: string): ServeStatus` in `apps/server/src/cli/checks/readServeStatus.ts` (type `ServeStatus` in `types/`). Test it with two status documents: one serving `/` to the port (ok), one with `AllowFunnel` true for that host (fail), and one proxying only `/other` (fail).
 
 `apps/server/src/cli/checks/doctorChecks.ts`:
 
@@ -8492,7 +8569,7 @@ const row = { component: 'worker' as const, label: 'com.example.job', role: 'sch
 describe('system formatters', () => {
   it('describes a schedule', () => {
     expect(formatSchedule({ ...row, schedule: { intervalS: 3_600, calendar: false, keepAlive: false } })).toBe('every 1h')
-    expect(formatSchedule({ ...row, schedule: { intervalS: null, calendar: true, keepAlive: false } })).toBe('calendar')
+    expect(formatSchedule({ ...row, schedule: { intervalS: 86_400, calendar: true, keepAlive: false } })).toBe('calendar')
     expect(formatSchedule({ ...row, role: 'keepalive', schedule: { intervalS: null, calendar: false, keepAlive: true } })).toBe('kept alive')
     expect(formatSchedule({ ...row, schedule: null })).toBe('schedule unknown')
   })
@@ -8863,8 +8940,8 @@ import { formatDuration } from './formatDuration'
 export const formatSchedule = (row: LaunchdRow): string => {
   const schedule = row.schedule
   if (schedule === null) return 'schedule unknown'
-  if (schedule.intervalS !== null) return `every ${formatDuration(schedule.intervalS * 1000)}`
   if (schedule.calendar) return 'calendar'
+  if (schedule.intervalS !== null) return `every ${formatDuration(schedule.intervalS * 1000)}`
   return schedule.keepAlive ? 'kept alive' : 'on demand'
 }
 ```
