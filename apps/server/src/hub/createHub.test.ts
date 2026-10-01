@@ -1,0 +1,138 @@
+import type { Snapshot, StreamMessage } from '@orbit/contract'
+
+import { createHub } from './createHub'
+
+const snap = (value: number, events: Snapshot['events'] = []): Snapshot => ({
+  component: 'synthetic',
+  health: { state: 'ok', reason: null },
+  metrics: [{ key: 'synthetic.value', value, at: '2026-10-02T10:00:00.000Z' }],
+  pending: [],
+  events,
+  observedAt: new Date().toISOString(),
+  lastGood: null,
+})
+
+const tick = {
+  at: '2026-10-02T10:00:00.000Z',
+  component: 'synthetic',
+  kind: 'synthetic.tick',
+  severity: 'info',
+  refs: { n: 1 },
+} as const
+
+const newHub = (recentEvents = 5) =>
+  createHub({ ringSize: 10, recentEvents, firstId: 100 })
+
+describe('createHub', () => {
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+  it('sends a snapshot only when it changes, and events separately', () => {
+    const hub = createHub({ ringSize: 10, recentEvents: 5, firstId: 100 })
+    const seen: StreamMessage[] = []
+    hub.subscribe((m) => {
+      seen.push(m)
+    })
+    hub.publish(snap(1))
+    hub.publish(snap(1))
+    hub.publish(snap(2, [tick]))
+    expect(seen.map((m) => [m.type, m.id])).toEqual([
+      ['snapshot', 100],
+      ['snapshot', 101],
+      ['event', 102],
+    ])
+    expect(hub.snapshots()[0]?.events).toEqual([])
+    expect(hub.recentEvents()).toHaveLength(1)
+    expect(hub.lastId()).toBe(102)
+    expect(hub.replayAfter(100)?.map((m) => m.id)).toEqual([101, 102])
+  })
+  it('stops delivering after unsubscribe and caps recent events', () => {
+    const hub = createHub({ ringSize: 10, recentEvents: 2, firstId: 0 })
+    const seen: StreamMessage[] = []
+    const off = hub.subscribe((m) => {
+      seen.push(m)
+    })
+    off()
+    hub.publish(snap(1, [tick, tick, tick]))
+    expect(seen).toEqual([])
+    expect(hub.recentEvents()).toHaveLength(2)
+  })
+  it('keeps the latest snapshot even when it is not sent', () => {
+    const hub = newHub()
+    hub.publish({ ...snap(1), observedAt: 'a' })
+    hub.publish({ ...snap(1), observedAt: 'b' })
+    expect(hub.snapshots()[0]?.observedAt).toBe('b')
+    expect(hub.lastId()).toBe(100)
+  })
+  it('resends an unchanged snapshot only after 30 seconds', () => {
+    vi.useFakeTimers()
+    const hub = newHub()
+    const seen: StreamMessage[] = []
+    hub.subscribe((m) => {
+      seen.push(m)
+    })
+    hub.publish(snap(1))
+    vi.advanceTimersByTime(29_999)
+    hub.publish(snap(1))
+    expect(seen).toHaveLength(1)
+    vi.advanceTimersByTime(1)
+    hub.publish(snap(1))
+    expect(seen).toHaveLength(2)
+  })
+  it('tracks each component separately', () => {
+    const hub = newHub()
+    const seen: StreamMessage[] = []
+    hub.subscribe((m) => {
+      seen.push(m)
+    })
+    hub.publish(snap(1))
+    hub.publish({ ...snap(1), component: 'worker' })
+    expect(seen).toHaveLength(2)
+    expect(hub.snapshots()).toHaveLength(2)
+  })
+  it('survives a throwing listener without skipping others or corrupting state', () => {
+    const hub = newHub()
+    const seen: StreamMessage[] = []
+    hub.subscribe(() => {
+      throw new Error('boom')
+    })
+    hub.subscribe((m) => {
+      seen.push(m)
+    })
+    expect(() => {
+      hub.publish(snap(1, [tick]))
+    }).not.toThrow()
+    expect(seen.map((m) => m.id)).toEqual([100, 101])
+    expect(hub.lastId()).toBe(101)
+    expect(hub.replayAfter(99)).toHaveLength(2)
+    expect(hub.recentEvents()).toHaveLength(1)
+  })
+  it('unsubscribe is idempotent and does not remove other listeners', () => {
+    const hub = newHub()
+    const a: StreamMessage[] = []
+    const b: StreamMessage[] = []
+    const offA = hub.subscribe((m) => {
+      a.push(m)
+    })
+    hub.subscribe((m) => {
+      b.push(m)
+    })
+    offA()
+    offA()
+    hub.publish(snap(1))
+    expect(a).toEqual([])
+    expect(b).toHaveLength(1)
+  })
+  it('lets a listener unsubscribe itself during delivery', () => {
+    const hub = newHub()
+    const seen: StreamMessage[] = []
+    const off = hub.subscribe(() => {
+      off()
+    })
+    hub.subscribe((m) => {
+      seen.push(m)
+    })
+    hub.publish(snap(1, [tick]))
+    expect(seen).toHaveLength(2)
+  })
+})
