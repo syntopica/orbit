@@ -2838,10 +2838,10 @@ git commit -m "feat(server): host, origin, csrf, tailnet and session guards"
   - `recordMetrics(db, snapshot: Snapshot): void` — inserts a metric only when its value differs from the last stored value for `(component, key)`.
   - `LaunchdObservation = { label: string; pid: number | null; runs: number | null; lastExit: number | null; at: number }`; `recordLaunchdObservation(db, observation): void` — inserts only when `pid`, `runs` or `lastExit` changed for the label.
   - `startRun(db, now): number` (returns `started`); `touchRun(db, started, now): void`.
-  - `pruneHistory(db, now): void` — recomputes rollups for the two last complete hours, deletes metric samples older than 7 days, launchd observations older than 30 days, rollups and runs older than 90 days, then `shrinkToCap(db, capBytes = 200 MB)`: checkpoint the WAL and, while the file exceeds the cap, delete the oldest 10 % of metric samples, then of launchd observations, then of rollups, stopping when nothing deletable is left.
+  - `pruneHistory(db, now): void` — recomputes rollups for the two last complete hours, deletes metric samples older than 7 days, launchd observations older than 90 days except each label's latest (the baseline for missed-run windows), rollups and runs older than 90 days, then `shrinkToCap(db, capBytes = 200 MB)`: checkpoint the WAL and, while the file exceeds the cap, delete the oldest 10 % of metric samples, then of launchd observations, then of rollups, stopping when nothing deletable is left.
   - `LaunchdHistory = { observations: LaunchdObservation[]; runs: { started: number; stopped: number }[] }`; `readLaunchdHistory(db, label, from: number): LaunchdHistory` — observations at or after `from` plus the last one before it, and run intervals overlapping `[from, now]`.
 
-Launchd observations are kept 30 days rather than 7 because the System screen's longest range is 30 days; they are written only on change, so they stay small. Task 25 records this in the spec.
+Launchd observations are kept 90 days rather than 7, and each label's latest one is never pruned: the System screen's longest range is 30 days and a monthly calendar job's missed-run window reaches 46.5 days before it, so both the baseline and the coverage must survive. They are written only on change, so they stay small. Task 25 records this in the spec.
 
 - [ ] **Step 1: Test scaffolding**
 
@@ -2929,14 +2929,20 @@ describe('pruneHistory', () => {
     insert.run('worker', 'worker.queued', 2, now - hour)
     insert.run('worker', 'worker.queued', 6, now - hour + 60_000)
     insert.run('worker', 'worker.queued', 9, now - 8 * day)
-    db.prepare('INSERT INTO launchd_observations (label, pid, runs, last_exit, at) VALUES (?, ?, ?, ?, ?)').run('a', null, 1, 0, now - 31 * day)
+    const observe = db.prepare('INSERT INTO launchd_observations (label, pid, runs, last_exit, at) VALUES (?, ?, ?, ?, ?)')
+    observe.run('a', null, 1, 0, now - 95 * day)
+    observe.run('a', null, 2, 0, now - 92 * day)
+    observe.run('b', null, 1, 0, now - 120 * day)
     db.prepare('INSERT INTO runs (started, stopped) VALUES (?, ?)').run(now - 91 * day, now - 91 * day)
     pruneHistory(db, now)
     pruneHistory(db, now)
     const rollup = db.prepare('SELECT min, max, sum, count FROM metric_rollups').all()
     expect(rollup).toEqual([{ min: 2, max: 6, sum: 8, count: 2 }])
     expect(db.prepare('SELECT count(*) AS n FROM metric_samples').get()).toEqual({ n: 2 })
-    expect(db.prepare('SELECT count(*) AS n FROM launchd_observations').get()).toEqual({ n: 0 })
+    expect(db.prepare('SELECT label, runs FROM launchd_observations ORDER BY label').all()).toEqual([
+      { label: 'a', runs: 2 },
+      { label: 'b', runs: 1 },
+    ])
     expect(db.prepare('SELECT count(*) AS n FROM runs').get()).toEqual({ n: 0 })
   })
 })
@@ -9618,7 +9624,7 @@ git push
 Add a "Revision 5 (implementation of sub-project 0)" note at the top of the spec's change log and apply each change in its section:
 
 1. Section 9 / 13: launchd heartbeat strips are SVG rectangles, not uPlot. uPlot stays the choice for dense metric charts in later sub-projects.
-2. Section 8: launchd observations are kept 30 days (they are written only on change, and the System screen's longest range is 30 days); metric samples stay at 7 days.
+2. Section 8: launchd observations are kept 90 days and each label's latest one is never pruned (they are written only on change; missed-run windows for monthly calendar jobs reach 46.5 days before the 30-day range); metric samples stay at 7 days. Yearly calendar jobs are never claimed missed.
 3. Section 6.4: the SSE heartbeat is a named `ping` event every 15 s, not a comment line, so the client watchdog can see it.
 4. Section 5.3: the engine command table in `orbit.json` is deferred to sub-project 1, where the first engine CLIs (atrium, brain, clips) are read; sub-project 0 runs only `launchctl` and `plutil`, with paths in `launchd.launchctl` and `launchd.plutil`.
 5. Section 11: the Vite dev server proxies `/api` to the running server and rewrites `Origin` to the server's own origin, because the server accepts only its own origins.
