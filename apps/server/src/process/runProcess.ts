@@ -1,10 +1,11 @@
 import type { ReasonCode } from '@orbit/contract'
-import { spawn } from 'node:child_process'
 
 import type { RunRequest } from '../types/RunRequest'
 import type { RunResult } from '../types/RunResult'
+import { collectOutput } from './collectOutput'
 import { killGroup } from './killGroup'
 import { ProcessError } from './ProcessError'
+import { spawnGroup } from './spawnGroup'
 
 export const runProcess = async (request: RunRequest): Promise<RunResult> =>
   new Promise((resolve, reject) => {
@@ -12,46 +13,39 @@ export const runProcess = async (request: RunRequest): Promise<RunResult> =>
       reject(new ProcessError('timeout'))
       return
     }
-    const child = spawn(request.file, [...request.args], {
-      env: request.env,
-      detached: true,
-      shell: false,
-      stdio: ['ignore', 'pipe', 'ignore'],
-    })
-    const chunks: Buffer[] = []
-    let size = 0
-    let failure: ReasonCode | null = null
-    const fail = (reason: ReasonCode): void => {
-      if (failure !== null) return
-      failure = reason
-      if (child.pid !== undefined) killGroup(child.pid, 5000)
+    const child = spawnGroup(request)
+    let settled = false
+    const onAbort = (): void => {
+      stop('timeout')
     }
-    const timer = setTimeout(() => {
-      fail('timeout')
-    }, request.timeoutMs)
-    request.signal?.addEventListener(
-      'abort',
-      () => {
-        fail('timeout')
-      },
-      { once: true },
-    )
-    child.stdout.on('data', (chunk: Buffer) => {
-      size += chunk.length
-      if (size > request.maxBytes) fail('output_too_large')
-      else chunks.push(chunk)
-    })
-    child.on('error', () => {
+    const timer = setTimeout(onAbort, request.timeoutMs)
+    const finish = (action: () => void): void => {
+      if (settled) return
+      settled = true
       clearTimeout(timer)
-      reject(new ProcessError('not_found'))
+      request.signal?.removeEventListener('abort', onAbort)
+      action()
+    }
+    const stop = (reason: ReasonCode): void => {
+      finish(() => {
+        if (child.pid !== undefined) killGroup(child.pid, 5000)
+        child.stdout.destroy()
+        reject(new ProcessError(reason))
+      })
+    }
+    request.signal?.addEventListener('abort', onAbort, { once: true })
+    const output = collectOutput(child.stdout, request.maxBytes, () => {
+      stop('output_too_large')
+    })
+    child.on('error', (error: NodeJS.ErrnoException) => {
+      finish(() => {
+        const reason = error.code === 'ENOENT' ? 'not_found' : 'check_failed'
+        reject(new ProcessError(reason))
+      })
     })
     child.on('close', (code) => {
-      clearTimeout(timer)
-      if (failure === null)
-        resolve({
-          code: code ?? -1,
-          stdout: Buffer.concat(chunks).toString('utf8'),
-        })
-      else reject(new ProcessError(failure))
+      finish(() => {
+        resolve({ code: code ?? -1, stdout: output() })
+      })
     })
   })
