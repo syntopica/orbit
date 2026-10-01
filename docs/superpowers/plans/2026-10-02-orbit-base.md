@@ -3130,7 +3130,10 @@ export const pruneHistory = (db: DatabaseSync, now: number, capBytes = 200 * 102
   const day = 86_400_000
   rollupHours(db, now)
   db.prepare('DELETE FROM metric_samples WHERE at < ?').run(now - 7 * day)
-  db.prepare('DELETE FROM launchd_observations WHERE at < ?').run(now - 30 * day)
+  db.prepare(
+    `DELETE FROM launchd_observations WHERE at < ?
+       AND at < (SELECT max(o.at) FROM launchd_observations o WHERE o.label = launchd_observations.label)`,
+  ).run(now - 90 * day)
   db.prepare('DELETE FROM metric_rollups WHERE hour < ?').run(Math.floor((now - 90 * day) / 3_600_000))
   db.prepare('DELETE FROM runs WHERE stopped < ?').run(now - 90 * day)
   shrinkToCap(db, capBytes)
@@ -3220,7 +3223,7 @@ pnpm gate && git push
   - `LabelEntry` = one registry row from `orbit.json` (`component`, `label`, `role`, `plist`).
   - `LabelReading = { entry: LabelEntry; loaded: boolean; state: LaunchctlState | null }`
   - `readLabel(deps, entry, signal): Promise<LabelReading>` — `launchctl print gui/<uid>/<label>`; a non-zero exit means not loaded.
-  - `LaunchdSchedule = { intervalS: number | null; calendar: boolean; keepAlive: boolean }` — `intervalS` is the longest expected gap between runs: `StartInterval` when present, otherwise the period `calendarPeriodS` derives from `StartCalendarInterval` (the coarsest key set in an entry decides it: `Month` 366 d, `Day` 31 d, `Weekday` 7 d, `Hour` 1 d, `Minute` 1 h, empty 1 min; with several entries the shortest wins), so calendar jobs are also checked for missed runs; `readSchedule(deps, plist, signal): Promise<LaunchdSchedule>` via `plutil -convert json -o - <plist>`.
+  - `LaunchdSchedule = { intervalS: number | null; calendar: boolean; keepAlive: boolean }` — `intervalS` is the longest expected gap between runs: `StartInterval` when present, otherwise the period `calendarPeriodS` derives from `StartCalendarInterval` (the coarsest key set in an entry decides it: `Month` 366 d, `Day` 31 d, `Weekday` 7 d, `Hour` 1 d, `Minute` 1 h, empty 1 min; with several entries the shortest wins), so calendar jobs are also checked for missed runs. Missed detection needs history 1.5 periods back: observations and run intervals are kept 90 days and the latest observation of each label is never pruned, and the history endpoint returns 47 days before the requested range, so jobs up to monthly are covered. A `Month` (yearly) schedule is never claimed missed: orbit cannot have watched its 549-day window, and an unwatched window is not a miss (spec 5.8); `readSchedule(deps, plist, signal): Promise<LaunchdSchedule>` via `plutil -convert json -o - <plist>`.
   - `summarizeLaunchd(readings, now: Date): Pick<SnapshotCore, 'health' | 'metrics' | 'pending'>` — failing = not loaded, or no pid with a non-zero last exit; health `warn`/`check_failed` when any fail.
   - `diffLaunchd(previous: Map<string, LabelReading>, readings, now: Date): OrbitEvent[]` — `launchd.exit_changed` (`label`, `exit`), `launchd.started` (`label`), `launchd.stopped` (`label`).
   - `LaunchdAdapterDeps = { launchctl: string; plutil: string; labels: readonly LabelEntry[]; uid: number; run: (request: RunRequest) => Promise<RunResult>; record: (observation: LaunchdObservation) => void; cadenceMs: number }`
@@ -4935,7 +4938,8 @@ export const getLaunchdHistory =
     const label = c.req.query('label')
     const rows = catalog === null ? [] : await pool.run((signal) => catalog.rows(signal), 15_000).catch(() => [])
     if (!rows.some((row) => row.label === label) || label === undefined) return c.json({ error: 'not_found' }, 404)
-    return c.json(readLaunchdHistory(historyDb, label, now() - span))
+    // 47 extra days: a monthly calendar job's missed-run window is 1.5 x 31 days before the range starts.
+    return c.json(readLaunchdHistory(historyDb, label, now() - span - 47 * 86_400_000))
   }
 ```
 
