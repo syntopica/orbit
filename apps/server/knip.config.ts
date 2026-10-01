@@ -6,10 +6,8 @@ export default createKnipConfig({
   framework: 'ts-package',
   entry: ['src/cli/main.ts'],
   ignoreDependencies: [
-    '@orbit/contract',
     'hono',
     '@hono/node-server',
-    'zod',
     'qrcode-terminal',
     '@types/qrcode-terminal',
   ],
