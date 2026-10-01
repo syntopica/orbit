@@ -1,4 +1,4 @@
-import type { Snapshot, SnapshotCore } from '@orbit/contract'
+import type { Snapshot } from '@orbit/contract'
 
 import type { Adapter } from '../types/Adapter'
 import { createAdapterLoop } from './createAdapterLoop'
@@ -58,29 +58,63 @@ describe('createAdapterLoop restart', () => {
     expect(published.every((s) => s.health.state === 'ok')).toBe(true)
   })
 
-  it('does not carry the stop abort into the backoff count', async () => {
-    let calls = 0
+  it('resets the backoff count when restarted', async () => {
     const starts: number[] = []
     const failing = syntheticAdapter(async () => {
-      calls += 1
       starts.push(Date.now())
       await Promise.resolve()
       throw new Error('down')
     })
-    const hung = syntheticAdapter(
-      async () => new Promise<SnapshotCore>(() => undefined),
-    )
-    const loop = createAdapterLoop(hung, { publish: () => undefined })
+    const loop = createAdapterLoop(failing, { publish: () => undefined })
+    const t0 = Date.now()
+    loop.start()
+    await vi.advanceTimersByTimeAsync(2100)
+    loop.stop()
+    loop.start()
+    await vi.advanceTimersByTimeAsync(2100)
+    loop.stop()
+    expect(starts.map((t) => t - t0)).toEqual([0, 2000, 2100, 4100])
+  })
+
+  it('keeps the running read when start() is called again', async () => {
+    let calls = 0
+    const published: Snapshot[] = []
+    const slow = syntheticAdapter(async () => {
+      calls += 1
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      return syntheticCore(calls)
+    })
+    const loop = createAdapterLoop(slow, { publish: (s) => published.push(s) })
+    loop.start()
+    await vi.advanceTimersByTimeAsync(100)
+    loop.start()
+    await vi.advanceTimersByTimeAsync(450)
+    loop.stop()
+    expect(calls).toBe(1)
+    expect(published).toHaveLength(1)
+  })
+
+  it('survives a sink that throws and still reads after a restart', async () => {
+    let calls = 0
+    let publishes = 0
+    const reading = syntheticAdapter(async () => {
+      calls += 1
+      await Promise.resolve()
+      return syntheticCore(calls)
+    })
+    const loop = createAdapterLoop(reading, {
+      publish: () => {
+        publishes += 1
+        if (publishes <= 2) throw new Error('sink')
+      },
+    })
     loop.start()
     await vi.advanceTimersByTimeAsync(10)
     loop.stop()
+    loop.start()
     await vi.advanceTimersByTimeAsync(10)
-    const again = createAdapterLoop(failing, { publish: () => undefined })
-    again.start()
-    await vi.advanceTimersByTimeAsync(2100)
-    again.stop()
+    loop.stop()
     expect(calls).toBe(2)
-    expect((starts[1] ?? 0) - (starts[0] ?? 0)).toBe(2000)
   })
 })
 

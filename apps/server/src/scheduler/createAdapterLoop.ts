@@ -17,27 +17,25 @@ export const createAdapterLoop = (
   let next: NodeJS.Timeout | undefined
   let controller: AbortController | undefined
   let inflight: Promise<void> = Promise.resolve()
-
   const current = (own: number): boolean => running && own === generation
-
   const readOnce = async (own: number): Promise<void> => {
     controller = new AbortController()
-    await guardedRead(adapter, emitter, controller, (result) => {
-      if (current(own)) recorder.record(result)
-    })
+    try {
+      await guardedRead(adapter, emitter, controller, (result) => {
+        if (current(own)) recorder.record(result)
+      })
+    } catch {
+      return
+    }
     if (!current(own)) return
-    const delay =
-      recorder.failures() === 0
-        ? adapter.cadenceMs
-        : backoffDelay(adapter.cadenceMs, recorder.failures())
-    next = setTimeout(() => {
-      tick(own)
-    }, delay)
+    next = setTimeout(
+      tick,
+      backoffDelay(adapter.cadenceMs, recorder.failures()),
+      own,
+    )
   }
 
-  const tick = (own: number): void => {
-    inflight = readOnce(own)
-  }
+  const tick = (own: number): void => void (inflight = readOnce(own))
 
   const begin = async (own: number): Promise<void> => {
     await inflight
