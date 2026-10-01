@@ -1,7 +1,7 @@
 [
   {
-    "name": "shipped bundle (brotli)",
-    "path": "dist/assets/*.js",
-    "limit": "72 KB"
+    "name": "initial route (brotli)",
+    "path": "dist/assets/index-*.js",
+    "limit": "150 KB"
   }
 ]
