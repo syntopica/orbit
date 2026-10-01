@@ -1,0 +1,9 @@
+[extend]
+useDefault = true
+
+# The plan quotes an obviously fake pairing fragment in a test example.
+[[allowlists]]
+description = "fake pairing fragment in the implementation plan"
+paths = ['''docs/superpowers/plans/.*\.md''']
+regexTarget = "line"
+regexes = ['''abcdefghijk\.0123456789abcdefghijkl''']

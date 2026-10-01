@@ -1,0 +1,11 @@
+{
+  "extends": "@syntopica/tsconfig/node.json",
+  "compilerOptions": {
+    "types": ["node", "vitest/globals"],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["src/**/*", "scripts/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
