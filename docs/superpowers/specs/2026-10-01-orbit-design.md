@@ -1,6 +1,6 @@
 # orbit - design
 
-Status: draft, revision 2 (after adversarial review round 1). Scope: sub-project
+Status: draft, revision 3 (after adversarial review rounds 1 and 2). Scope: sub-project
 0 (Base) and sub-project 1 (Memory). Later sub-projects get their own specs.
 
 ## 1. Purpose
@@ -44,8 +44,8 @@ Sub-projects 0 and 1 are **read-only**. orbit writes only its own state
 
 | # | Sub-project | Content |
 | --- | --- | --- |
-| 0 | Base | Repository and gate, contract, adapter runtime, server, auth and pairing, SSE, history store, shell UI, Orbit home, System screen; adapters: launchd, worker summary, capture summary, synthetic |
-| 1 | Memory | Engine `--json` prerequisites; adapters atrium, brain, clips; screens Memory flow, Atrium, Brain, Clips |
+| 0 | Base | Repository and gate, contract, adapter runtime, server, auth and pairing, SSE, history store, shell UI, Orbit home, System screen; adapters: launchd, worker summary, synthetic |
+| 1 | Memory | Engine prerequisites; adapters atrium, brain, clips, capture; screens Memory flow, Atrium, Brain, Clips |
 | 2 | Worker | Jobs, failures, results with content view and `secret` reveal, nodes, executors, costs, worker actions |
 | 3 | Pending | One triage board over TODOs, inboxes, curation proposals, lint |
 | 4 | Remote | Mobile polish, phone-specific layouts beyond the responsive shell |
@@ -66,7 +66,7 @@ output.
 | atrium | Disposable index and retrieval over archive, synthesis and notes | `atrium/status.json` written by atrium (section 4), `atrium doctor --json`, `atrium context --json` |
 | brain | Curated markdown pages with `[[links]]` | `brain lint --json`, `brain doctor --json`, `brain graph --json` |
 | clips | Capture-to-cited-pages pipeline | `clips status --json`, `clips doctor --json` |
-| capture | Phone URL inbox, a remote service | its HTTP API (undrained count) |
+| capture | Phone URL inbox, a remote service | its HTTP API, count endpoint (section 4) |
 | worker | Job processor running the AI passes | its HTTP API `GET /v1/status` |
 | launchd | Scheduled and kept-alive jobs | `launchctl print`, the plists named in orbit's label registry |
 
@@ -76,7 +76,7 @@ output.
 | --- | --- | --- | --- |
 | launchd | 0 | 10 s | 20 s |
 | worker (summary: health, queue counts, cooldowns) | 0 | 5 s | 10 s |
-| capture (undrained count) | 0 | 120 s | 240 s |
+| capture (undrained count) | 1 | 120 s | 240 s |
 | atrium | 1 | 60 s (reads a file) | 2 x the engine's own refresh interval for index data; 120 s for orbit's read |
 | brain | 1 | 60 s | 120 s |
 | clips | 1 | 60 s | 120 s |
@@ -133,8 +133,10 @@ a file at the end of work it already does, and orbit reads the file.
 | brain | `brain doctor --json` | checks `name`, `ok`, `code` | benchmarked |
 | brain | `brain graph --json --no-html` | read-only: nodes (`id`, `type`, `degree`), edges, orphans, dangling; never writes `graph.html` | benchmarked; related-unlinked pairs excluded |
 | brain | `brain graph --json --related --limit N` | top N related-unlinked pairs | on-demand detail call; benchmarked separately |
+| brain | `brain page --json --id <id>` | one page's frontmatter, body and links; `id` validated against the configured page roots, no path traversal, body capped at 1 MB | on-demand detail call |
 | clips | `clips status --json` | counts per state; intake per day | benchmarked |
 | clips | `clips doctor --json` | checks `name`, `ok`, `code` | benchmarked |
+| capture | `GET /api/captures/count?drained=false` (bearer) | `{ "count": n, "oldestAt": t }` | one indexed query on the service |
 
 Doctor checks carry a `code`, not free text, so orbit can display and store
 them without content (section 6.6).
@@ -175,9 +177,12 @@ type Snapshot = { component: ComponentId; health: Health; metrics: Metric[];
 
 `MetricKey`, `PendingKey` and `EventKind` are closed enums per component.
 Labels, units, explanations and "where to resolve" hints are UI strings keyed
-by those enums, not data from engines. Event `refs` hold ids, counts and codes
-only, validated by a per-kind schema with string values capped at 64
-characters and matching `^[A-Za-z0-9._:/-]+$`.
+by those enums, not data from engines. Event `refs` hold opaque ids (job ids, attempt
+ids, launchd labels from the registry), counts and closed codes only,
+validated by a per-kind schema with string values capped at 64 characters and
+matching `^[A-Za-z0-9._:-]+$`. Path-derived identifiers such as brain page ids
+are content: they are never streamed, and are resolved only through
+authenticated detail endpoints.
 
 An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, signal) }`.
 
@@ -187,17 +192,22 @@ An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, 
   running is skipped, never queued, and the snapshot is marked `lagging`.
 - **Backoff.** After a failed read the next attempt waits cadence x 2^n,
   capped at 10 x cadence; a success resets it.
-- **Bounded subprocesses.** At most 3 engine subprocesses run at once across
-  all adapters and detail calls; the rest wait in a FIFO with their own
-  timeout counting.
-- **Isolation test.** One adapter hanging until its timeout does not delay any
-  other adapter's tick by more than 100 ms.
+- **Bounded subprocesses.** Two pools: polling (3 slots) and detail calls (2
+  slots), so detail requests can never starve polling. Within a pool, waiting
+  work is FIFO and its timeout counts from enqueue.
+- **Isolation test.** With at most 2 adapters hung (fewer than the polling
+  slots), every other adapter's tick starts within 100 ms of schedule. When the
+  polling pool is saturated, late ticks are skipped and marked `lagging`
+  rather than queued.
 
 ### 5.3 Subprocesses
 
-- The executable is resolved once at start to an absolute path from
-  `engines.<name>.path` in the instance config; a missing or non-executable
-  file is `not_found`.
+- `engines.<name>.path` in the instance config is the engine's checkout
+  directory, not an executable. orbit's engine table in `orbit.json` names,
+  per engine, the command (a path relative to that checkout, or an absolute
+  path) and the subcommands orbit may run; anything else is refused. The
+  command is resolved once at start to an absolute path; a missing or
+  non-executable file is `not_found`.
 - `spawn` with `shell: false`, a fixed argument list, `detached: true` so the
   child leads its own process group; on timeout or abort the whole group gets
   `SIGTERM`, then `SIGKILL` after 5 s.
@@ -301,12 +311,14 @@ Files are created `0600`, the directory `0700`.
 
 ### 6.3 Pairing
 
-- `orbit pair` (local CLI only) creates a 128-bit random code, stores its hash
-  with a 5-minute expiry, and prints a QR code of
-  `https://<tailnet-name>/pair#<code>` plus the same URL as text. The code is
-  in the fragment so it never reaches proxies or logs.
-- Redemption is atomic: one transaction marks the code used and creates the
-  session. A code accepts at most 5 failed attempts before it is invalidated.
+- `orbit pair` (local CLI only) creates an invitation: a public 64-bit id and
+  a 128-bit secret, both random, stored as id plus secret hash with a 5-minute
+  expiry. It prints a QR code of `https://<tailnet-name>/pair#<id>.<secret>`
+  plus the same URL as text. Both parts are in the fragment so they never reach
+  proxies or logs; the page posts them to `POST /api/pair`.
+- Failed secrets are counted against the invitation id; after 5 failures the
+  invitation is invalidated. Redemption is atomic: one transaction checks the
+  secret, marks the invitation used and creates the session.
 
 ### 6.4 Rate limits
 
@@ -371,7 +383,9 @@ indicator (live, stale, offline), and a toast when a component turns `down`.
    upstream stage is stale. Selecting a stage opens a side panel with a
    plain-language explanation, its metrics, pending items and launchd label.
 4. **Atrium.** Records per source, index/archive/refresh freshness, synthesis
-   history (synthesized vs deferred per pass, from the history store),
+   trend (synthesized and deferred as sampled from the status file at each
+   read; a per-pass history needs a durable pass ledger in atrium and is out of
+   scope),
    populations not in the index, doctor checks, and a context inspector:
    a query box running `atrium context --json`, showing what a session would
    receive as labelled blocks with their sizes.
