@@ -134,7 +134,7 @@ In each package `package.json`: set `name` (`@orbit/contract`, `@orbit/server`, 
 ```
 
 `packages/contract/package.json` also gets `"exports": { ".": "./src/index.ts" }` and `"dependencies": { "zod": "^4.6.5" }`.
-`apps/server/package.json` gets `"dependencies": { "@orbit/contract": "workspace:*", "hono": "^4.13.12", "@hono/node-server": "^2.1.3", "zod": "^4.6.5", "qrcode-terminal": "^0.12.0" }`, devDependencies `"esbuild": "^0.28.2", "@types/qrcode-terminal": "^0.12.2"`, `"bin": { "orbit": "./dist/orbit.mjs" }`, and script `"build": "esbuild src/cli/main.ts --bundle --platform=node --format=esm --target=node26 --packages=external --outfile=dist/orbit.mjs"`.
+`apps/server/package.json` gets `"dependencies": { "@orbit/contract": "workspace:*", "hono": "^4.13.12", "@hono/node-server": "^2.1.3", "zod": "^4.6.5", "qrcode-terminal": "^0.12.0" }`, devDependencies `"esbuild": "^0.28.2", "@types/qrcode-terminal": "^0.12.2"`, `"bin": { "orbit": "./dist/orbit.mjs" }`, and script `"build": "esbuild src/cli/main.ts --bundle --platform=node --format=esm --target=node26 --external:hono --external:@hono/node-server --external:zod --external:qrcode-terminal --outfile=dist/orbit.mjs"`. The registry dependencies stay external; `@orbit/contract` is deliberately bundled, because it exports TypeScript source with extensionless imports that Node cannot load at runtime. Add every new runtime dependency of the server to this `--external` list.
 `apps/web/package.json` gets `"@orbit/contract": "workspace:*"` in dependencies sets `"size": "vite build && size-limit"` (size-limit measures built files, and `check:ci` never builds), then appends `&& pnpm size` to `check:ci`.
 
 - [ ] **Step 4: Raise coverage to 90**
@@ -1446,7 +1446,7 @@ git commit -m "feat(server): bounded subprocess runner with process-group kill"
   - `SnapshotSink = { publish(snapshot: Snapshot): void }`
   - `createAdapterLoop(adapter: Adapter, sink: SnapshotSink): LoopHandle` with `LoopHandle = { start(): void; stop(): void }`
   - `createScheduler(adapters: readonly Adapter[], sink: SnapshotSink): LoopHandle`
-  - Behaviour: single flight (next read is scheduled only after the previous settles); a read still running after `cadenceMs` publishes the last snapshot degraded to `lagging`; a read is aborted and rejected with `timeout` at `timeoutMs` even if the adapter ignores its signal; failures publish `down` with `lastGood` and back off `min(cadence * 2^n, 10 * cadence)`; no publish for `freshnessMs` degrades the last snapshot to `stale`; health transitions to and from `down` add a `component.down` / `component.recovered` event.
+  - Behaviour: single flight (next read is scheduled only after the previous settles); a read still running after `cadenceMs` publishes the last snapshot degraded to `lagging`; a read is aborted and reported as `timeout` at `timeoutMs` even if the adapter ignores its signal, but the next read starts only once the timed-out one has really settled (every subprocess adapter settles on abort, because `runProcess` kills the process group), so reads never overlap; failures publish `down` with `lastGood` and back off `min(cadence * 2^n, 10 * cadence)`; no publish for `freshnessMs` degrades the last snapshot to `stale`; health transitions to and from `down` add a `component.down` / `component.recovered` event.
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -1555,6 +1555,28 @@ describe('createAdapterLoop', () => {
     expect(down?.health.reason).toBe('timeout')
     expect(down?.lastGood?.metrics[0]?.value).toBe(7)
     expect(down?.events.map((e) => e.kind)).toContain('component.down')
+  })
+
+  it('does not start a new read until a timed-out one settles', async () => {
+    let active = 0
+    let maxActive = 0
+    let calls = 0
+    const published: Snapshot[] = []
+    const late = adapter(async () => {
+      calls += 1
+      active += 1
+      maxActive = Math.max(maxActive, active)
+      await new Promise((resolve) => setTimeout(resolve, calls === 1 ? 6000 : 10))
+      active -= 1
+      return core(calls)
+    })
+    const loop = createAdapterLoop(late, { publish: (s) => published.push(s) })
+    loop.start()
+    await vi.advanceTimersByTimeAsync(9000)
+    loop.stop()
+    expect(published.some((s) => s.health.reason === 'timeout')).toBe(true)
+    expect(maxActive).toBe(1)
+    expect(calls).toBeGreaterThan(1)
   })
 
   it('marks data stale when nothing new arrives within freshnessMs', async () => {
@@ -1796,8 +1818,9 @@ export const createAdapterLoop = (adapter: Adapter, sink: SnapshotSink): LoopHan
     const lag = setTimeout(() => {
       if (last !== null) sink.publish(degradeSnapshot(last, 'lagging'))
     }, adapter.cadenceMs)
+    const work = adapter.read(controller.signal)
     try {
-      const core = await raceAbort(adapter.read(controller.signal), controller.signal)
+      const core = await raceAbort(work, controller.signal)
       lastGood = core
       failures = 0
       emit({ ...core, lastGood: null })
@@ -1808,6 +1831,7 @@ export const createAdapterLoop = (adapter: Adapter, sink: SnapshotSink): LoopHan
       clearTimeout(timeout)
       clearTimeout(lag)
     }
+    await work.catch(() => undefined)
     if (!stopped) next = setTimeout(tick, failures === 0 ? adapter.cadenceMs : backoffDelay(adapter.cadenceMs, failures))
   }
 
@@ -2558,7 +2582,7 @@ git commit -m "feat(server): single-use pairing invitations"
   - `tailnetLogin(config)` → 403 when `Tailscale-User-Login` is present and not allowed
   - `SESSION_COOKIE = '__Host-orbit_session'`
   - `requireSession(db, now: () => number)` → 401 `{"error":"unauthorized"}` unless the cookie names a live session
-  - `sourceKey(c): string` → first `X-Forwarded-For` hop, else the socket address, else `unknown` (forgeable from loopback; the global limit is the real bound, spec 6.4)
+  - `sourceKey(c): string` → last `X-Forwarded-For` hop (the one Tailscale Serve appends; earlier hops are whatever the client sent), else the socket address, else `unknown`. A loopback caller can still forge it; the shared global limit is the real bound (spec 6.4)
 
 - [ ] **Step 1: Write the failing tests**
 
@@ -2777,7 +2801,7 @@ import type { HttpBindings } from '@hono/node-server'
 import type { Context } from 'hono'
 
 export const sourceKey = (c: Context<{ Bindings: HttpBindings }>): string => {
-  const forwarded = c.req.header('X-Forwarded-For')?.split(',')[0]?.trim()
+  const forwarded = c.req.header('X-Forwarded-For')?.split(',').at(-1)?.trim()
   if (forwarded !== undefined && forwarded !== '') return forwarded
   const bindings = c.env as HttpBindings | undefined
   return bindings?.incoming.socket.remoteAddress ?? 'unknown'
@@ -2810,7 +2834,7 @@ git commit -m "feat(server): host, origin, csrf, tailnet and session guards"
   - `recordMetrics(db, snapshot: Snapshot): void` — inserts a metric only when its value differs from the last stored value for `(component, key)`.
   - `LaunchdObservation = { label: string; pid: number | null; runs: number | null; lastExit: number | null; at: number }`; `recordLaunchdObservation(db, observation): void` — inserts only when `pid`, `runs` or `lastExit` changed for the label.
   - `startRun(db, now): number` (returns `started`); `touchRun(db, started, now): void`.
-  - `pruneHistory(db, now): void` — recomputes rollups for the two last complete hours, deletes metric samples older than 7 days, launchd observations older than 30 days, rollups and runs older than 90 days, deletes the oldest 10 % of metric samples while the file exceeds 200 MB (at most 10 rounds), then `PRAGMA wal_checkpoint(TRUNCATE)`.
+  - `pruneHistory(db, now): void` — recomputes rollups for the two last complete hours, deletes metric samples older than 7 days, launchd observations older than 30 days, rollups and runs older than 90 days, then `shrinkToCap(db, capBytes = 200 MB)`: checkpoint the WAL and, while the file exceeds the cap, delete the oldest 10 % of metric samples, then of launchd observations, then of rollups, stopping when nothing deletable is left.
   - `LaunchdHistory = { observations: LaunchdObservation[]; runs: { started: number; stopped: number }[] }`; `readLaunchdHistory(db, label, from: number): LaunchdHistory` — observations at or after `from` plus the last one before it, and run intervals overlapping `[from, now]`.
 
 Launchd observations are kept 30 days rather than 7 because the System screen's longest range is 30 days; they are written only on change, so they stay small. Task 25 records this in the spec.
@@ -3060,34 +3084,74 @@ export const rollupHours = (db: DatabaseSync, now: number): void => {
 }
 ```
 
+`apps/server/src/history/shrinkToCap.ts` (checkpoints first, so the WAL is folded into the measured file; deletes the oldest tenth of the least valuable table that still has rows, round after round, until the file fits or nothing deletable is left):
+
+```ts
+import type { DatabaseSync } from 'node:sqlite'
+
+export const shrinkToCap = (db: DatabaseSync, capBytes: number): void => {
+  const size = (): number => {
+    db.exec('PRAGMA wal_checkpoint(TRUNCATE)')
+    const row = db.prepare('SELECT page_count * page_size AS bytes FROM pragma_page_count(), pragma_page_size()').get()
+    return (row as { bytes: number }).bytes
+  }
+  const order = [
+    ['metric_samples', 'at'],
+    ['launchd_observations', 'at'],
+    ['metric_rollups', 'hour'],
+  ] as const
+  while (size() > capBytes) {
+    const target = order.find(([table]) => (db.prepare(`SELECT count(*) AS n FROM ${table}`).get() as { n: number }).n > 0)
+    if (target === undefined) return
+    const [table, column] = target
+    db.exec(
+      `DELETE FROM ${table} WHERE rowid IN (SELECT rowid FROM ${table} ORDER BY ${column} LIMIT (SELECT count(*) / 10 + 1 FROM ${table}))`,
+    )
+    db.exec('VACUUM')
+  }
+}
+```
+
+Table and column names come from the literal list above, never from input, so the interpolation is safe.
+
 `apps/server/src/history/pruneHistory.ts`:
 
 ```ts
 import type { DatabaseSync } from 'node:sqlite'
 
 import { rollupHours } from './rollupHours'
+import { shrinkToCap } from './shrinkToCap'
 
-export const pruneHistory = (db: DatabaseSync, now: number): void => {
+export const pruneHistory = (db: DatabaseSync, now: number, capBytes = 200 * 1024 * 1024): void => {
   const day = 86_400_000
-  const capBytes = 200 * 1024 * 1024
   rollupHours(db, now)
   db.prepare('DELETE FROM metric_samples WHERE at < ?').run(now - 7 * day)
   db.prepare('DELETE FROM launchd_observations WHERE at < ?').run(now - 30 * day)
   db.prepare('DELETE FROM metric_rollups WHERE hour < ?').run(Math.floor((now - 90 * day) / 3_600_000))
   db.prepare('DELETE FROM runs WHERE stopped < ?').run(now - 90 * day)
-  const size = (): number => {
-    const row = db.prepare('SELECT page_count * page_size AS bytes FROM pragma_page_count(), pragma_page_size()').get()
-    return (row as { bytes: number }).bytes
-  }
-  for (let round = 0; round < 10 && size() > capBytes; round += 1) {
-    db.exec(
-      'DELETE FROM metric_samples WHERE rowid IN (SELECT rowid FROM metric_samples ORDER BY at LIMIT (SELECT count(*) / 10 + 1 FROM metric_samples))',
-    )
-    db.exec('VACUUM')
-  }
-  db.exec('PRAGMA wal_checkpoint(TRUNCATE)')
+  shrinkToCap(db, capBytes)
 }
 ```
+
+Add to `pruneHistory.test.ts`:
+
+```ts
+  it('shrinks to the cap, oldest metric samples first, then observations and rollups', () => {
+    const db = openHistoryDb()
+    const now = Date.now()
+    for (let i = 0; i < 500; i += 1) {
+      db.prepare('INSERT INTO metric_samples (component, key, value, at) VALUES (?, ?, ?, ?)').run('worker', 'worker.queued', i, now - i)
+    }
+    db.prepare('INSERT INTO launchd_observations (label, pid, runs, last_exit, at) VALUES (?, ?, ?, ?, ?)').run('a', 1, 1, 0, now)
+    pruneHistory(db, now, 10 * 1024 * 1024)
+    expect(db.prepare('SELECT count(*) AS n FROM metric_samples').get()).toEqual({ n: 500 })
+    pruneHistory(db, now, 1)
+    expect(db.prepare('SELECT count(*) AS n FROM metric_samples').get()).toEqual({ n: 0 })
+    expect(db.prepare('SELECT count(*) AS n FROM launchd_observations').get()).toEqual({ n: 0 })
+  })
+```
+
+(A 1-byte cap can never be met, so this also proves the loop ends once nothing deletable is left.) Add `shrinkToCap.ts` to this task's file list.
 
 `apps/server/src/types/LaunchdHistory.ts`:
 
@@ -3545,7 +3609,7 @@ export const readSchedule = async (
   })
   if (result.code !== 0) throw new ProcessError('not_found')
   const parsed = z
-    .object({ StartInterval: z.number().int().optional(), StartCalendarInterval: z.unknown(), KeepAlive: z.unknown() })
+    .object({ StartInterval: z.number().int().optional(), StartCalendarInterval: z.unknown().optional(), KeepAlive: z.unknown().optional() })
     .parse(JSON.parse(result.stdout))
   return {
     intervalS: parsed.StartInterval ?? null,
@@ -3745,7 +3809,7 @@ pnpm gate && git push
   - `workerStatusSchema` for `GET /v1/status` of the worker (`queues`, `nodes`, `cooldowns`, `recent_failures`), tolerant of extra fields.
   - `fetchWorkerStatus(deps: WorkerAdapterDeps, signal): Promise<WorkerStatus>` — bearer token read from `tokenFile` at call time; 401/403 → `ProcessError('unauthorized')`; other non-2xx → `ProcessError('unreachable')`.
   - `summarizeWorker(status, now: Date): Pick<SnapshotCore, 'health' | 'metrics' | 'pending'>`
-  - `workerEvents(seen: { failures: Set<string>; cooldowns: Set<string> } | null, status, now): OrbitEvent[]` — nothing on the first read; then `worker.job_failed` (`job`, `queue`, `error` when safe) and `worker.cooldown_started` (`runner`).
+  - `workerEvents(seen: { failures: Set<string>; cooldowns: Set<string> } | null, status, now): OrbitEvent[]` — nothing on the first read; then `worker.job_failed` (`job`, `queue`; the worker's `error` is never copied: it can carry a truncated provider code, which is free text, and spec 6.6 admits only closed values into the stream) and `worker.cooldown_started` (`runner`).
   - `toSafeRef(value: string | null): string | undefined` — returns the value only if it matches the ref pattern and length.
   - `createWorkerAdapter(deps): Adapter` (id `worker`, cadence 5 s, timeout 4 s, freshness 10 s).
   - `createSyntheticAdapter(failFlagPath: string): Adapter` (id `synthetic`, cadence 1 s, timeout 2 s, freshness 5 s): rejects with `ProcessError('unreachable')` while `failFlagPath` exists; otherwise metric `synthetic.value`, pending `synthetic.items`, one `synthetic.tick` event per read.
@@ -3824,7 +3888,7 @@ describe('workerEvents', () => {
     const seen = { failures: new Set(['j1']), cooldowns: new Set(['agy']) }
     const events = workerEvents(seen, status(['j1', 'j2'], ['agy', 'cursor']), now)
     expect(events.map((e) => [e.kind, e.refs])).toEqual([
-      ['worker.job_failed', { job: 'j2', queue: 'q.a', error: 'runner_failed' }],
+      ['worker.job_failed', { job: 'j2', queue: 'q.a' }],
       ['worker.cooldown_started', { runner: 'cursor' }],
     ])
   })
@@ -4074,7 +4138,7 @@ export const workerEvents = (
       kind: 'worker.job_failed',
       severity: 'warn',
       refs: Object.fromEntries(
-        Object.entries({ job: toSafeRef(f.id), queue: toSafeRef(f.queue), error: toSafeRef(f.error) }).filter(
+        Object.entries({ job: toSafeRef(f.id), queue: toSafeRef(f.queue) }).filter(
           (entry): entry is [string, string] => entry[1] !== undefined,
         ),
       ),
@@ -4220,7 +4284,7 @@ pnpm gate && git push
 
 **Files:**
 - Create: `apps/server/src/http/routes/tokenBodySchema.ts`, `pairBodySchema.ts`, `setSessionCookie.ts`, `rateAllowed.ts`, `postSession.ts`, `postPair.ts`, `postLogout.ts`, `getSnapshots.ts`, `getLaunchdRows.ts`, `getLaunchdHistory.ts`, `writeMessage.ts`, `writeOpening.ts`, `flushQueue.ts`, `getStream.ts`
-- Create: `apps/server/src/http/createApp.ts`, `apps/server/src/http/serveWeb.ts`
+- Create: `apps/server/src/http/createApp.ts`, `apps/server/src/http/serveWeb.ts`, `apps/server/src/scheduler/createDetailPool.ts`, `apps/server/src/types/DetailPool.ts`, test `apps/server/src/scheduler/createDetailPool.test.ts`
 - Create: `apps/server/src/types/AuthRouteDeps.ts`, `AppDeps.ts`, `OrbitEnv.ts`
 - Test: `apps/server/src/http/routes/auth.test.ts`, `stream.test.ts`, `launchd.test.ts`, `apps/server/src/http/createApp.test.ts`
 
@@ -4306,12 +4370,14 @@ describe('auth routes', () => {
     expect((await post('/api/pair', invitation)).status).toBe(204)
     expect((await post('/api/pair', invitation)).status).toBe(401)
   })
-  it('requires a session for data routes', async () => {
+  it('requires a session for data routes and unknown API paths alike', async () => {
     const { app } = setup()
-    const res = await app.request('http://127.0.0.1:8790/api/snapshots', {
-      headers: { Host: '127.0.0.1:8790', 'Sec-Fetch-Site': 'same-origin' },
-    })
-    expect(res.status).toBe(401)
+    for (const path of ['/api/snapshots', '/api/no-such-route']) {
+      const res = await app.request(`http://127.0.0.1:8790${path}`, {
+        headers: { Host: '127.0.0.1:8790', 'Sec-Fetch-Site': 'same-origin' },
+      })
+      expect(res.status).toBe(401)
+    }
   })
 })
 ```
@@ -4379,13 +4445,28 @@ describe('GET /api/stream', () => {
     const messages = await readMessages(res, 2)
     expect(messages.map((m) => m.type)).toEqual(['snapshot', 'sync'])
   })
+  it('puts an SSE id only on the closing sync of an opening', async () => {
+    const { app, hub, headers } = setup()
+    hub.publish(snap(1))
+    const res = await app.request('http://127.0.0.1:8790/api/stream', { headers: headers() })
+    const reader = res.body?.getReader()
+    let text = ''
+    while (reader !== undefined && !text.includes('"type":"sync"')) {
+      const chunk = await reader.read()
+      if (chunk.done) break
+      text += new TextDecoder().decode(chunk.value)
+    }
+    await reader?.cancel()
+    const blocks = text.split('\n\n').filter((b) => b.includes('data: '))
+    expect(blocks.map((b) => b.includes('\nid: ') || b.startsWith('id: '))).toEqual([false, true])
+  })
   it('replays after a known id inside the ring', async () => {
     const { app, hub, headers } = setup()
     hub.publish(snap(1))
     hub.publish(snap(2))
     const res = await app.request('http://127.0.0.1:8790/api/stream', { headers: headers({ 'Last-Event-ID': '1' }) })
-    const messages = await readMessages(res, 1)
-    expect(messages.map((m) => [m.type, m.id])).toEqual([['snapshot', 2]])
+    const messages = await readMessages(res, 2)
+    expect(messages.map((m) => [m.type, m.id])).toEqual([['snapshot', 2], ['sync', 2]])
   })
   it('resyncs when the id fell out of the ring', async () => {
     const { app, hub, headers } = setup()
@@ -4554,7 +4635,7 @@ export const rateAllowed = (deps: AuthRouteDeps, c: Context<OrbitEnv>, scope: 's
   const now = deps.now()
   return (
     consumeRateLimit(deps.db, { key: `${scope}:${sourceKey(c)}`, limit: 5 }, now) &&
-    consumeRateLimit(deps.db, { key: `${scope}:global`, limit: 30 }, now)
+    consumeRateLimit(deps.db, { key: 'auth:global', limit: 30 }, now)
   )
 }
 ```
@@ -4654,18 +4735,112 @@ export const getSnapshots =
     c.json({ lastId: hub.lastId(), snapshots: hub.snapshots(), events: hub.recentEvents() })
 ```
 
+Detail work (anything a request triggers, as opposed to polling) goes through one FIFO pool of 2 slots, timeout counted from enqueue (spec 5.2). Polling never touches it.
+
+`apps/server/src/types/DetailPool.ts`:
+
+```ts
+export type DetailPool = {
+  run<T>(work: (signal: AbortSignal) => Promise<T>, timeoutMs: number): Promise<T>
+}
+```
+
+`apps/server/src/scheduler/createDetailPool.ts`:
+
+```ts
+import { ProcessError } from '../process/ProcessError'
+import type { DetailPool } from '../types/DetailPool'
+
+export const createDetailPool = (slots: number): DetailPool => {
+  let running = 0
+  const waiting: { readonly signal: AbortSignal; readonly start: () => void }[] = []
+  const release = (): void => {
+    running -= 1
+    let next = waiting.shift()
+    while (next !== undefined && next.signal.aborted) next = waiting.shift()
+    next?.start()
+  }
+  const acquire = (signal: AbortSignal): Promise<void> => {
+    if (running < slots) {
+      running += 1
+      return Promise.resolve()
+    }
+    return new Promise((resolve, reject) => {
+      waiting.push({ signal, start: () => ((running += 1), resolve()) })
+      signal.addEventListener('abort', () => reject(new ProcessError('timeout')), { once: true })
+    })
+  }
+  return {
+    run: async (work, timeoutMs) => {
+      const controller = new AbortController()
+      const timer = setTimeout(() => controller.abort(), timeoutMs)
+      try {
+        await acquire(controller.signal)
+      } catch (error) {
+        clearTimeout(timer)
+        throw error
+      }
+      try {
+        return await work(controller.signal)
+      } finally {
+        clearTimeout(timer)
+        release()
+      }
+    },
+  }
+}
+```
+
+If the comma expression in `start` trips `no-sequences`, write it as a block: `start: () => { running += 1; resolve() }`.
+
+`apps/server/src/scheduler/createDetailPool.test.ts`:
+
+```ts
+import { createDetailPool } from './createDetailPool'
+
+describe('createDetailPool', () => {
+  beforeEach(() => vi.useFakeTimers())
+  afterEach(() => vi.useRealTimers())
+
+  it('runs two at a time in arrival order and times out from enqueue', async () => {
+    const pool = createDetailPool(2)
+    let active = 0
+    let maxActive = 0
+    const order: number[] = []
+    const job = (n: number, ms: number) => () => {
+      active += 1
+      maxActive = Math.max(maxActive, active)
+      order.push(n)
+      return new Promise<number>((resolve) => setTimeout(() => ((active -= 1), resolve(n)), ms))
+    }
+    const results = [pool.run(job(1, 1000), 5000), pool.run(job(2, 1000), 5000), pool.run(job(3, 10), 5000)]
+    const late = pool.run(job(4, 10), 500)
+    const lateResult = late.catch((error: unknown) => error)
+    await vi.advanceTimersByTimeAsync(2000)
+    expect(await Promise.all(results)).toEqual([1, 2, 3])
+    expect(order).toEqual([1, 2, 3])
+    expect(maxActive).toBe(2)
+    expect(await lateResult).toMatchObject({ reason: 'timeout' })
+  })
+})
+```
+
 `apps/server/src/http/routes/getLaunchdRows.ts`:
 
 ```ts
 import type { Handler } from 'hono'
 
+import type { DetailPool } from '../../types/DetailPool'
 import type { LaunchdCatalog } from '../../types/LaunchdCatalog'
 import type { OrbitEnv } from '../../types/OrbitEnv'
 
 export const getLaunchdRows =
-  (catalog: LaunchdCatalog | null): Handler<OrbitEnv> =>
-  async (c) =>
-    c.json({ rows: catalog === null ? [] : await catalog.rows(AbortSignal.timeout(15_000)) })
+  (catalog: LaunchdCatalog | null, pool: DetailPool): Handler<OrbitEnv> =>
+  async (c) => {
+    if (catalog === null) return c.json({ rows: [] })
+    const rows = await pool.run((signal) => catalog.rows(signal), 15_000).catch(() => null)
+    return rows === null ? c.json({ error: 'unavailable' }, 503) : c.json({ rows })
+  }
 ```
 
 `apps/server/src/http/routes/getLaunchdHistory.ts`:
@@ -4675,17 +4850,18 @@ import type { Handler } from 'hono'
 import type { DatabaseSync } from 'node:sqlite'
 
 import { readLaunchdHistory } from '../../history/readLaunchdHistory'
+import type { DetailPool } from '../../types/DetailPool'
 import type { LaunchdCatalog } from '../../types/LaunchdCatalog'
 import type { OrbitEnv } from '../../types/OrbitEnv'
 
 export const getLaunchdHistory =
-  (historyDb: DatabaseSync, catalog: LaunchdCatalog | null, now: () => number): Handler<OrbitEnv> =>
+  (historyDb: DatabaseSync, catalog: LaunchdCatalog | null, pool: DetailPool, now: () => number): Handler<OrbitEnv> =>
   async (c) => {
     const ranges: Record<string, number> = { '24h': 86_400_000, '7d': 7 * 86_400_000, '30d': 30 * 86_400_000 }
     const span = ranges[c.req.query('range') ?? '']
     if (span === undefined) return c.json({ error: 'bad_request' }, 400)
     const label = c.req.query('label')
-    const rows = catalog === null ? [] : await catalog.rows(AbortSignal.timeout(15_000))
+    const rows = catalog === null ? [] : await pool.run((signal) => catalog.rows(signal), 15_000).catch(() => [])
     if (!rows.some((row) => row.label === label) || label === undefined) return c.json({ error: 'not_found' }, 404)
     return c.json(readLaunchdHistory(historyDb, label, now() - span))
   }
@@ -4697,8 +4873,8 @@ export const getLaunchdHistory =
 import type { StreamMessage } from '@orbit/contract'
 import type { SSEStreamingApi } from 'hono/streaming'
 
-export const writeMessage = (stream: SSEStreamingApi, message: StreamMessage): Promise<void> =>
-  stream.writeSSE({ id: String(message.id), data: JSON.stringify(message) })
+export const writeMessage = (stream: SSEStreamingApi, message: StreamMessage, withId = true): Promise<void> =>
+  stream.writeSSE(withId ? { id: String(message.id), data: JSON.stringify(message) } : { data: JSON.stringify(message) })
 ```
 
 `apps/server/src/http/routes/writeOpening.ts`:
@@ -4714,16 +4890,20 @@ export const writeOpening = async (stream: SSEStreamingApi, hub: Hub, lastEventI
   const replay = requested !== null && Number.isSafeInteger(requested) ? hub.replayAfter(requested) : null
   if (replay !== null && requested !== null) {
     for (const message of replay) await writeMessage(stream, message)
-    return replay.at(-1)?.id ?? requested
+    const last = replay.at(-1)?.id ?? requested
+    await writeMessage(stream, { type: 'sync', id: last }, false)
+    return last
   }
   const id = hub.lastId()
-  if (requested !== null) await writeMessage(stream, { type: 'resync', id })
-  for (const snapshot of hub.snapshots()) await writeMessage(stream, { type: 'snapshot', id, snapshot })
-  for (const event of hub.recentEvents()) await writeMessage(stream, { type: 'event', id, event })
+  if (requested !== null) await writeMessage(stream, { type: 'resync', id }, false)
+  for (const snapshot of hub.snapshots()) await writeMessage(stream, { type: 'snapshot', id, snapshot }, false)
+  for (const event of hub.recentEvents()) await writeMessage(stream, { type: 'event', id, event }, false)
   await writeMessage(stream, { type: 'sync', id })
   return id
 }
 ```
+
+Only the closing `sync` of a full opening carries an SSE `id`. The browser's `Last-Event-ID` therefore moves only once the whole current set has arrived: a connection that drops halfway through the opening reconnects with the previous id (or none) and gets the full set again, instead of resuming from a point that skipped the rest of it. A replay ends with an id-less `sync` so the client knows it is current again. Ids stay monotonic because every id-bearing message is a hub id.
 
 `apps/server/src/http/routes/flushQueue.ts`:
 
@@ -4802,6 +4982,7 @@ export const serveWeb = (app: Hono<OrbitEnv>, webRoot: string): void => {
 ```ts
 import { Hono } from 'hono'
 
+import { createDetailPool } from '../scheduler/createDetailPool'
 import type { AppDeps } from '../types/AppDeps'
 import type { OrbitEnv } from '../types/OrbitEnv'
 import { hostAllowlist } from './hostAllowlist'
@@ -4821,6 +5002,7 @@ import { tailnetLogin } from './tailnetLogin'
 
 export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   const auth = { db: deps.authDb, now: deps.now }
+  const pool = createDetailPool(2)
   const app = new Hono<OrbitEnv>()
   app.use('*', hostAllowlist(deps.guard), securityHeaders(), tailnetLogin(deps.guard))
   app.use('/api/*', requireSameOrigin(deps.guard), requireCsrfHeader())
@@ -4831,10 +5013,10 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   api.post('/logout', postLogout(auth))
   api.get('/snapshots', getSnapshots(deps.hub))
   api.get('/stream', getStream(deps.hub))
-  api.get('/launchd', getLaunchdRows(deps.catalog))
-  api.get('/launchd/history', getLaunchdHistory(deps.historyDb, deps.catalog, deps.now))
+  api.get('/launchd', getLaunchdRows(deps.catalog, pool))
+  api.get('/launchd/history', getLaunchdHistory(deps.historyDb, deps.catalog, pool, deps.now))
+  api.all('*', (c) => c.json({ error: 'not_found' }, 404))
   app.route('/api', api)
-  app.all('/api/*', (c) => c.json({ error: 'not_found' }, 404))
   serveWeb(app, deps.webRoot)
   return app
 }
@@ -5348,6 +5530,74 @@ export const checkWorkerToken: DoctorCheck = async (state) => {
 }
 ```
 
+```ts
+// checkLaunchdLoaded.ts — every registered label exists in launchd (spec 10)
+import { buildChildEnv } from '../../process/buildChildEnv'
+import { runProcess } from '../../process/runProcess'
+import type { DoctorCheck } from '../../types/DoctorCheck'
+
+export const checkLaunchdLoaded: DoctorCheck = async (state) => {
+  const launchd = state.config.launchd
+  if (launchd === undefined) return { name: 'launchd labels', level: 'ok', detail: 'none registered' }
+  const uid = process.getuid?.() ?? 0
+  const missing: string[] = []
+  for (const entry of launchd.labels) {
+    const result = await runProcess({
+      file: launchd.launchctl,
+      args: ['print', `gui/${uid}/${entry.label}`],
+      env: buildChildEnv(process.env, {}),
+      timeoutMs: 5000,
+      maxBytes: 1_048_576,
+    }).catch(() => null)
+    if (result === null || result.code !== 0) missing.push(entry.label)
+  }
+  return missing.length === 0
+    ? { name: 'launchd labels', level: 'ok', detail: `${launchd.labels.length} loaded` }
+    : { name: 'launchd labels', level: 'fail', detail: `not loaded: ${missing.join(', ')}` }
+}
+```
+
+```ts
+// checkTailscaleServe.ts — the name Tailscale Serve publishes is allowed and proxies to this port (spec 10)
+import { z } from 'zod'
+
+import { buildChildEnv } from '../../process/buildChildEnv'
+import { runProcess } from '../../process/runProcess'
+import type { DoctorCheck } from '../../types/DoctorCheck'
+
+export const checkTailscaleServe: DoctorCheck = async (state) => {
+  const { allowedHosts, port } = state.config
+  if (allowedHosts.length === 0) return { name: 'tailscale serve', level: 'ok', detail: 'not published (no allowedHosts)' }
+  const result = await runProcess({
+    file: 'tailscale',
+    args: ['serve', 'status', '--json'],
+    env: buildChildEnv(process.env, {}),
+    timeoutMs: 5000,
+    maxBytes: 1_048_576,
+  }).catch(() => null)
+  if (result === null || result.code !== 0) return { name: 'tailscale serve', level: 'warn', detail: 'tailscale CLI unavailable' }
+  let raw: unknown = null
+  try {
+    raw = JSON.parse(result.stdout)
+  } catch {
+    raw = null
+  }
+  const status = z
+    .object({ Web: z.record(z.string(), z.object({ Handlers: z.record(z.string(), z.object({ Proxy: z.string().optional() })) })).optional() })
+    .safeParse(raw)
+  const published = Object.entries(status.success ? (status.data.Web ?? {}) : {})
+    .filter(([, web]) => Object.values(web.Handlers).some((h) => h.Proxy?.endsWith(`127.0.0.1:${port}`) === true))
+    .map(([hostPort]) => hostPort.replace(/:443$/, ''))
+  if (published.length === 0) return { name: 'tailscale serve', level: 'fail', detail: `nothing proxies to 127.0.0.1:${port}` }
+  const unlisted = published.filter((host) => !allowedHosts.includes(host))
+  return unlisted.length === 0
+    ? { name: 'tailscale serve', level: 'ok', detail: `published as ${published.join(', ')}` }
+    : { name: 'tailscale serve', level: 'fail', detail: `published name not in allowedHosts: ${unlisted.join(', ')}` }
+}
+```
+
+If `complexity` or `max-lines-per-function` objects to `checkTailscaleServe`, extract the parse-and-filter part as `readServeHosts(stdout: string, port: number): string[]` in `apps/server/src/cli/checks/readServeHosts.ts`.
+
 `apps/server/src/cli/checks/doctorChecks.ts`:
 
 ```ts
@@ -5355,8 +5605,10 @@ import type { DoctorCheck } from '../../types/DoctorCheck'
 import { checkAdminToken } from './checkAdminToken'
 import { checkInstance } from './checkInstance'
 import { checkLaunchdLabels } from './checkLaunchdLabels'
+import { checkLaunchdLoaded } from './checkLaunchdLoaded'
 import { checkPort } from './checkPort'
 import { checkTailnet } from './checkTailnet'
+import { checkTailscaleServe } from './checkTailscaleServe'
 import { checkWorkerToken } from './checkWorkerToken'
 
 export const DOCTOR_CHECKS: readonly DoctorCheck[] = [
@@ -5365,6 +5617,8 @@ export const DOCTOR_CHECKS: readonly DoctorCheck[] = [
   checkPort,
   checkTailnet,
   checkLaunchdLabels,
+  checkLaunchdLoaded,
+  checkTailscaleServe,
   checkWorkerToken,
 ]
 ```
@@ -5463,6 +5717,8 @@ pnpm gate && git push
 **Interfaces:**
 - Produces: `renderPlistTemplate(template: string, values: { node: string; orbit: string; data: string }): string`.
 
+`Umask` 63 is octal `077`: launchd opens `orbit.log` before orbit runs, so the plist, not orbit's own `umask`, is what makes the log `0600`.
+
 - [ ] **Step 1: Write the failing test**
 
 `apps/server/src/launchd/renderPlistTemplate.test.ts`:
@@ -5481,6 +5737,7 @@ describe('renderPlistTemplate', () => {
     const template = readFileSync(join(import.meta.dirname, '../../../../launchd/com.syntopica.orbit.plist.template'), 'utf8')
     const rendered = renderPlistTemplate(template, { node: '/usr/local/bin/node', orbit: '/opt/orbit/orbit.mjs', data: '/srv/instance' })
     expect(rendered).not.toContain('__')
+    expect(rendered).toContain('<key>Umask</key>\n  <integer>63</integer>')
     const path = join(await mkdtemp(join(tmpdir(), 'orbit-plist-')), 'orbit.plist')
     await writeFile(path, rendered)
     const lint = await runProcess({ file: '/usr/bin/plutil', args: ['-lint', path], env: {}, timeoutMs: 5000, maxBytes: 4096 })
@@ -5517,6 +5774,8 @@ describe('renderPlistTemplate', () => {
   <true/>
   <key>KeepAlive</key>
   <true/>
+  <key>Umask</key>
+  <integer>63</integer>
   <key>StandardOutPath</key>
   <string>__DATA__/orbit/orbit.log</string>
   <key>StandardErrorPath</key>
@@ -7316,7 +7575,7 @@ Spec 7.1: every component as a satellite around the core, health ring coloured b
   - `CardState = 'ok' | 'warn' | 'down'`; `CardModel = { component; label; state; reason: string | null; headline: string | null; observedAt: string; greyed: boolean }`
   - `selectCards(snapshots): CardModel[]` in `COMPONENT_IDS` order, present components only.
   - `selectHeadline(core: SnapshotCore): string | null` — the component's headline metric from `HEADLINE_METRICS`, formatted with its label (`"3 running"`).
-  - `PendingRow = { component; key; label: string; count: number; oldestAt: string | null }`; `selectPending(snapshots): PendingRow[]` — count above 0, oldest first, unknown age last.
+  - `PendingRow = { component; key; label: string; count: number; oldestAt: string | null; stale: boolean }`; `selectPending(snapshots): PendingRow[]` — count above 0, oldest first, unknown age last; a down component contributes its `lastGood` items with `stale: true`.
   - `formatDuration(ms)` → `"45s" | "12m" | "3h" | "2d"`; `formatAge(iso, now)`; `formatMetric(key, value)`; `formatClock(iso)` → local `HH:MM:SS`.
   - `orbitPosition(index, total, radius): Point` — evenly spaced, first at the top.
   - `useNow(intervalMs): number`, `useMediaQuery(query): boolean`, `useHomeModel(): HomeModel`.
@@ -7414,11 +7673,12 @@ describe('selectCards', () => {
   it('keeps the last good reading of a down component, greyed', () => {
     const good = snapshotOf('worker', 'ok', { metrics: [{ key: 'worker.live', value: 2, at: '2026-10-02T09:00:00.000Z' }] })
     const { lastGood: _ignored, ...core } = good
-    const down = snapshotOf('worker', 'down', { lastGood: core })
+    const down = snapshotOf('worker', 'down', { lastGood: { ...core, observedAt: '2026-10-02T09:00:00.000Z' } })
     expect(selectCards({ worker: down })[0]).toMatchObject({
       state: 'down',
       reason: 'Unreachable',
       headline: '2 running',
+      observedAt: '2026-10-02T09:00:00.000Z',
       greyed: true,
     })
   })
@@ -7448,6 +7708,13 @@ describe('selectPending', () => {
       'worker.failed_jobs',
       'synthetic.items',
     ])
+  })
+  it('keeps the last known items of a down component, marked stale', () => {
+    const { lastGood: _ignored, ...core } = snapshotOf('worker', 'ok', {
+      pending: [{ key: 'worker.failed_jobs', count: 4, oldestAt: null }],
+    })
+    const rows = selectPending({ worker: snapshotOf('worker', 'down', { lastGood: core }) })
+    expect(rows).toMatchObject([{ key: 'worker.failed_jobs', count: 4, stale: true }])
   })
 })
 ```
@@ -7629,6 +7896,7 @@ export type PendingRow = {
   readonly label: string
   readonly count: number
   readonly oldestAt: string | null
+  readonly stale: boolean
 }
 ```
 
@@ -7672,7 +7940,7 @@ export const selectCards = (snapshots: StreamState['snapshots']): CardModel[] =>
         state: snapshot.health.state,
         reason: snapshot.health.reason === null ? null : REASON_LABELS[snapshot.health.reason],
         headline: selectHeadline(source),
-        observedAt: snapshot.observedAt,
+        observedAt: source.observedAt,
         greyed,
       },
     ]
@@ -7689,14 +7957,17 @@ import type { PendingRow } from '../types/PendingRow'
 import type { StreamState } from '../types/StreamState'
 
 export const selectPending = (snapshots: StreamState['snapshots']): PendingRow[] =>
-  COMPONENT_IDS.flatMap((component) =>
-    (snapshots[component]?.pending ?? [])
+  COMPONENT_IDS.flatMap((component) => {
+    const snapshot = snapshots[component]
+    const stale = snapshot?.health.state === 'down' && snapshot.lastGood !== null
+    const items = (stale ? snapshot.lastGood?.pending : snapshot?.pending) ?? []
+    return items
       .filter((item) => item.count > 0)
-      .map((item) => ({ component, key: item.key, label: PENDING_LABELS[item.key], count: item.count, oldestAt: item.oldestAt })),
-  ).sort((a, b) => (a.oldestAt ?? '￿').localeCompare(b.oldestAt ?? '￿'))
+      .map((item) => ({ component, key: item.key, label: PENDING_LABELS[item.key], count: item.count, oldestAt: item.oldestAt, stale }))
+  }).sort((a, b) => (a.oldestAt ?? '\uffff').localeCompare(b.oldestAt ?? '\uffff'))
 ```
 
-ISO timestamps in one format sort correctly as strings; `'￿'` sorts unknown ages last.
+ISO timestamps in one format sort correctly as strings; `'\uffff'` sorts unknown ages last.
 
 - [ ] **Step 4: Hooks**
 
@@ -7762,17 +8033,17 @@ import { useNow } from './useNow'
 import { useStream } from './useStream'
 
 export const useHomeModel = (): HomeModel => {
-  const { snapshots, events } = useStream()
+  const { snapshots, events, synced } = useStream()
   const isPhone = useMediaQuery('(max-width: 767px)')
   const reduced = useMediaQuery('(prefers-reduced-motion: reduce)')
   const now = useNow(1_000)
-  const cards = useMemo(() => selectCards(snapshots), [snapshots])
-  const pending = useMemo(() => selectPending(snapshots), [snapshots])
-  return { cards, pending, events: events.slice(0, 20), isPhone, animate: !reduced, now }
+  const cards = useMemo(() => (synced ? selectCards(snapshots) : []), [snapshots, synced])
+  const pending = useMemo(() => (synced ? selectPending(snapshots) : []), [snapshots, synced])
+  return { cards, pending, events: synced ? events.slice(0, 20) : [], isPhone, animate: !reduced, now }
 }
 ```
 
-(`useMediaQuery` for reduced motion instead of Motion's `useReducedMotion` keeps one source of truth that tests control.)
+(`useMediaQuery` for reduced motion instead of Motion's `useReducedMotion` keeps one source of truth that tests control. Nothing renders until the opening set ends with `sync`, and a `resync` hides it again until the next `sync` (spec 6.4), so the screen never shows half an opening.)
 
 - [ ] **Step 5: Views**
 
@@ -7954,6 +8225,7 @@ export const PendingStrip = ({ rows, now }: PendingStripProps) => (
             className="shrink-0 rounded-xl border border-line bg-panel px-3 py-2 text-sm"
           >
             <span className="font-mono text-lg">{row.count}</span> {COMPONENT_LABELS[row.component]} · {row.label}
+            {row.stale && <span className="block text-xs text-warn">last known</span>}
             {row.oldestAt !== null && <span className="block text-xs text-muted">oldest {formatAge(row.oldestAt, now)}</span>}
           </li>
         ))}
@@ -8085,7 +8357,7 @@ Bucket states, in precedence order:
 1. `unknown` — orbit was not running for the whole bucket (its run intervals, plus 90 s of slack for the 60 s touch cadence, do not cover it). Nothing else can be claimed about a window nobody watched.
 2. `failed` — the job's last exit code at the end of the bucket, or any exit recorded inside it, is non-zero; for a keepalive job, also no pid at the end of the bucket.
 3. `ok` — a scheduled job's run counter increased inside the bucket; a keepalive job had a pid.
-4. `missed` — a scheduled job with a known interval whose last run is at least 1.5 intervals before the bucket's end.
+4. `missed` — a scheduled job with a known interval, where orbit watched the whole window of the last 1.5 intervals before the bucket's end (covered, and a run-counter reading exists at or before the window's start as a baseline) and the counter did not increase inside it (spec 5.8). A job orbit has never seen run is still caught: the baseline is any earlier reading, not an earlier run.
 5. `idle` — covered, nothing wrong, nothing due.
 
 Ranges: `24h` = 48 buckets of 30 min, `7d` = 84 of 2 h, `30d` = 90 of 8 h.
@@ -8093,7 +8365,7 @@ Ranges: `24h` = 48 buckets of 30 min, `7d` = 84 of 2 h, `30d` = 90 of 8 h.
 **Files:**
 - Create: `apps/web/src/schemas/launchdRowsSchema.ts`, `schemas/launchdHistorySchema.ts`
 - Create: `apps/web/src/types/LaunchdRow.ts`, `LaunchdHistory.ts`, `LaunchdObservation.ts`, `HistoryRange.ts`, `SystemSearch.ts`, `BucketState.ts`, `Bucket.ts`, `BucketInput.ts`, `RangeSpec.ts`, `SystemModel.ts`, `LaunchdRowModel.ts`, `RangePickerProps.ts`, `LaunchdRowViewProps.ts`, `HeartbeatStripProps.ts`
-- Create: `apps/web/src/heartbeat/rangeSpecs.ts`, `heartbeat/isCovered.ts`, `heartbeat/listRunTimes.ts`, `heartbeat/isMissed.ts`, `heartbeat/classifyBucket.ts`, `heartbeat/buildHeartbeat.ts`
+- Create: `apps/web/src/heartbeat/rangeSpecs.ts`, `heartbeat/isCovered.ts`, `heartbeat/listRunTimes.ts`, `heartbeat/missWindowFor.ts`, `heartbeat/isMissed.ts`, `heartbeat/classifyBucket.ts`, `heartbeat/buildHeartbeat.ts`
 - Create: `apps/web/src/validators/validateSystemSearch.ts`
 - Create: `apps/web/src/formatters/formatSchedule.ts`, `formatters/formatJobState.ts`
 - Create: `apps/web/src/labels/bucketLabels.ts`
@@ -8106,7 +8378,7 @@ Ranges: `24h` = 48 buckets of 30 min, `7d` = 84 of 2 h, `30d` = 90 of 8 h.
 - Consumes: `GET /api/launchd` → `{ rows }`, `GET /api/launchd/history?label&range` → `{ observations, runs }` (Task 16); `apiJson` (Task 19); `useNow`, `useMediaQuery` (Task 22).
 - Produces:
   - `HistoryRange = '24h' | '7d' | '30d'`; `RANGE_SPECS: Record<HistoryRange, { spanMs: number; buckets: number }>`
-  - `isCovered(runs, start, end): boolean`; `listRunTimes(observations): number[]`; `isMissed(input): boolean`; `classifyBucket(input: BucketInput): BucketState`; `buildHeartbeat(history, row, range, now): Bucket[]`
+  - `isCovered(runs, start, end): boolean`; `listRunTimes(observations): number[]`; `missWindowFor(history, runTimes, intervalMs, end): BucketInput["missWindow"]`; `isMissed(input): boolean`; `classifyBucket(input: BucketInput): BucketState`; `buildHeartbeat(history, row, range, now): Bucket[]`
   - `validateSystemSearch(search: Record<string, unknown>): SystemSearch` — unknown or missing range becomes `24h`.
   - `formatSchedule(row): string`; `formatJobState(observation | null): string`
 
@@ -8130,7 +8402,7 @@ const obs = (at: number, runs: number | null, lastExit: number | null, pid: numb
   lastExit,
   pid,
 })
-const base = { covered: true, role: 'scheduled' as const, intervalMs: H, inBucket: [], atEnd: null, lastRunAt: null, runInBucket: false, end: 10 * H }
+const base = { covered: true, role: 'scheduled' as const, intervalMs: H, inBucket: [], atEnd: null, runInBucket: false, missWindow: null }
 
 describe('isCovered', () => {
   it('needs the whole window inside merged run intervals', () => {
@@ -8164,10 +8436,11 @@ describe('classifyBucket', () => {
   it('marks a run in the bucket as ok', () => {
     expect(classifyBucket({ ...base, runInBucket: true, atEnd: obs(1, 2, 0) })).toBe('ok')
   })
-  it('marks a missed run only after 1.5 intervals', () => {
-    expect(classifyBucket({ ...base, lastRunAt: 10 * H - 1.4 * H })).toBe('idle')
-    expect(classifyBucket({ ...base, lastRunAt: 10 * H - 1.5 * H })).toBe('missed')
-    expect(classifyBucket({ ...base, intervalMs: null, lastRunAt: 0 })).toBe('idle')
+  it('marks a missed run only over a fully watched window with no run', () => {
+    expect(classifyBucket({ ...base, missWindow: { watched: true, ran: false } })).toBe('missed')
+    expect(classifyBucket({ ...base, missWindow: { watched: true, ran: true } })).toBe('idle')
+    expect(classifyBucket({ ...base, missWindow: { watched: false, ran: false } })).toBe('idle')
+    expect(classifyBucket({ ...base, intervalMs: null })).toBe('idle')
   })
 })
 
@@ -8184,6 +8457,12 @@ describe('buildHeartbeat', () => {
     expect(buckets[0]?.state).toBe('unknown')
     expect(buckets.at(-4)?.state).toBe('ok')
     expect(buckets.at(-1)?.state).toBe('missed')
+  })
+  it('marks missed even when orbit never saw the job run', () => {
+    const now = 48 * 30 * 60_000
+    const row: LaunchdRow = { component: 'worker', label: 'com.example.job', role: 'scheduled', schedule: { intervalS: 3_600, calendar: false, keepAlive: false } }
+    const history = { observations: [obs(now - 5 * H, 3, 0)], runs: [{ started: now - 6 * H, stopped: now }] }
+    expect(buildHeartbeat(history, row, '24h', now).at(-1)?.state).toBe('missed')
   })
 })
 ```
@@ -8219,7 +8498,7 @@ describe('system formatters', () => {
   })
   it('describes the current job state', () => {
     expect(formatJobState(null)).toBe('no reading yet')
-    expect(formatJobState({ label: 'x', at: 1, runs: 3, lastExit: 0, pid: 42 })).toBe('running')
+    expect(formatJobState({ label: 'x', at: 1, runs: 3, lastExit: 0, pid: 42 })).toBe('running, pid 42')
     expect(formatJobState({ label: 'x', at: 1, runs: 3, lastExit: 0, pid: null })).toBe('last exit 0')
     expect(formatJobState({ label: 'x', at: 1, runs: 0, lastExit: null, pid: null })).toBe('never exited')
   })
@@ -8377,9 +8656,8 @@ export type BucketInput = {
   readonly intervalMs: number | null
   readonly inBucket: readonly LaunchdObservation[]
   readonly atEnd: LaunchdObservation | null
-  readonly lastRunAt: number | null
   readonly runInBucket: boolean
-  readonly end: number
+  readonly missWindow: { readonly watched: boolean; readonly ran: boolean } | null
 }
 ```
 
@@ -8482,7 +8760,30 @@ A counter that drops (the job was reloaded) is not a run; the next increase from
 import type { BucketInput } from '../types/BucketInput'
 
 export const isMissed = (input: BucketInput): boolean =>
-  input.intervalMs !== null && input.lastRunAt !== null && input.end - input.lastRunAt >= 1.5 * input.intervalMs
+  input.missWindow !== null && input.missWindow.watched && !input.missWindow.ran
+```
+
+`apps/web/src/heartbeat/missWindowFor.ts` (the window is the 1.5 intervals ending at the bucket's end, clipped to now):
+
+```ts
+import type { BucketInput } from '../types/BucketInput'
+import type { LaunchdHistory } from '../types/LaunchdHistory'
+import { isCovered } from './isCovered'
+
+export const missWindowFor = (
+  history: LaunchdHistory,
+  runTimes: readonly number[],
+  intervalMs: number | null,
+  end: number,
+): BucketInput['missWindow'] => {
+  if (intervalMs === null) return null
+  const start = end - 1.5 * intervalMs
+  const baseline = history.observations.some((o) => o.at <= start && o.runs !== null)
+  return {
+    watched: baseline && isCovered(history.runs, start, end),
+    ran: runTimes.some((at) => at > start && at <= end),
+  }
+}
 ```
 
 `apps/web/src/heartbeat/classifyBucket.ts`:
@@ -8512,6 +8813,7 @@ import type { LaunchdRow } from '../types/LaunchdRow'
 import { classifyBucket } from './classifyBucket'
 import { isCovered } from './isCovered'
 import { listRunTimes } from './listRunTimes'
+import { missWindowFor } from './missWindowFor'
 import { RANGE_SPECS } from './rangeSpecs'
 
 export const buildHeartbeat = (history: LaunchdHistory, row: LaunchdRow, range: HistoryRange, now: number): Bucket[] => {
@@ -8520,18 +8822,18 @@ export const buildHeartbeat = (history: LaunchdHistory, row: LaunchdRow, range: 
   const first = now - spanMs
   const runTimes = listRunTimes(history.observations)
   const intervalS = row.schedule?.intervalS ?? null
+  const intervalMs = intervalS === null ? null : intervalS * 1000
   return Array.from({ length: buckets }, (_, index) => {
     const start = first + index * width
     const end = start + width
     const state = classifyBucket({
       covered: isCovered(history.runs, start, Math.min(end, now)),
       role: row.role,
-      intervalMs: intervalS === null ? null : intervalS * 1000,
+      intervalMs,
       inBucket: history.observations.filter((o) => o.at >= start && o.at < end),
       atEnd: history.observations.findLast((o) => o.at < end) ?? null,
-      lastRunAt: runTimes.findLast((at) => at < end) ?? null,
       runInBucket: runTimes.some((at) => at >= start && at < end),
-      end,
+      missWindow: missWindowFor(history, runTimes, intervalMs, Math.min(end, now)),
     })
     return { start, end, state }
   })
@@ -8574,7 +8876,7 @@ import type { LaunchdObservation } from '../types/LaunchdObservation'
 
 export const formatJobState = (observation: LaunchdObservation | null): string => {
   if (observation === null) return 'no reading yet'
-  if (observation.pid !== null) return 'running'
+  if (observation.pid !== null) return `running, pid ${observation.pid}`
   return observation.lastExit === null ? 'never exited' : `last exit ${observation.lastExit}`
 }
 ```
@@ -8710,7 +9012,7 @@ export const LaunchdRowView = ({ row, range }: LaunchdRowViewProps) => {
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <h2 className="font-mono text-sm">{row.label}</h2>
         <span className="text-xs text-muted">
-          {COMPONENT_LABELS[row.component]} · <span>{formatSchedule(row)}</span> · <span>{model.state}</span>
+          {COMPONENT_LABELS[row.component]} · {row.role} · <span>{formatSchedule(row)}</span> · <span>{model.state}</span>
         </span>
       </div>
       {model.buckets !== null && <HeartbeatStrip buckets={model.buckets} summary={model.summary} />}
