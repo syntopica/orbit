@@ -1,0 +1,31 @@
+export const AUTH_SCHEMA_SQL = `
+CREATE TABLE IF NOT EXISTS admin_token (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  hash TEXT NOT NULL,
+  created INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS sessions (
+  hash TEXT PRIMARY KEY,
+  created INTEGER NOT NULL,
+  last_seen INTEGER NOT NULL,
+  expires INTEGER NOT NULL
+);
+CREATE TABLE IF NOT EXISTS invitations (
+  id TEXT PRIMARY KEY,
+  secret_hash TEXT NOT NULL,
+  expires INTEGER NOT NULL,
+  failures INTEGER NOT NULL DEFAULT 0,
+  used INTEGER NOT NULL DEFAULT 0
+);
+CREATE TABLE IF NOT EXISTS rate_limits (
+  key TEXT NOT NULL,
+  window INTEGER NOT NULL,
+  count INTEGER NOT NULL,
+  PRIMARY KEY (key, window)
+);
+CREATE TABLE IF NOT EXISTS audit (
+  at INTEGER NOT NULL,
+  action TEXT NOT NULL,
+  outcome TEXT NOT NULL
+);
+`
