@@ -1,0 +1,57 @@
+{
+  "queues": {
+    "queue.a": {
+      "states": { "queued": 32, "failed": 3, "succeeded": 120 },
+      "oldest_queued_s": 7300,
+      "done_1h": 0,
+      "wasted_1h_s": 0
+    },
+    "queue.b": {
+      "states": { "succeeded": 10 },
+      "oldest_queued_s": null,
+      "done_1h": 0,
+      "wasted_1h_s": 0
+    }
+  },
+  "nodes": {
+    "node-a": {
+      "reason": null,
+      "idle_s": 4,
+      "on_ac": true,
+      "pressure": "normal",
+      "resident": ["model-a:7b"],
+      "unexpected": [],
+      "age_s": 20,
+      "last_release": { "code": "user_active", "age_s": 600 }
+    },
+    "node-b": {
+      "reason": null,
+      "idle_s": 9000,
+      "on_ac": true,
+      "pressure": "normal",
+      "resident": [],
+      "age_s": 36000
+    }
+  },
+  "cooldowns": { "runner-a": 383000 },
+  "recent_failures": [
+    {
+      "id": "aaaaaaaa000000000000000000000001",
+      "queue": "queue.a",
+      "error": "runner_failed",
+      "finished": 1790000000
+    },
+    {
+      "id": "aaaaaaaa000000000000000000000002",
+      "queue": "queue.a",
+      "error": "runner_failed",
+      "finished": 1789999000
+    },
+    {
+      "id": "bbbbbbbb000000000000000000000003",
+      "queue": "queue.a",
+      "error": "timeout",
+      "finished": 1789998000
+    }
+  ]
+}

@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { assertPortFree } from './support/assertPortFree'
 import { E2E } from './support/paths'
 import { runOrbit } from './support/runOrbit'
+import { startFakeWorker } from './support/startFakeWorker'
 
 const waitForServer = async (): Promise<void> => {
   for (let attempt = 0; attempt < 50; attempt += 1) {
@@ -28,6 +29,10 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
     join(E2E.data, 'syntopica.config.json'),
     JSON.stringify({ schemaVersion: 1 }),
   )
+  const workerToken = 'e2e-worker-token'
+  const workerTokenFile = join(E2E.root, 'worker.token')
+  await writeFile(workerTokenFile, workerToken, { mode: 0o600 })
+  const worker = await startFakeWorker(workerToken)
   const plist = (label: string) =>
     join(E2E.fixtures, 'plists', `${label}.plist`)
   await writeFile(
@@ -37,6 +42,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       synthetic: true,
       allowedHosts: ['orbit.example.ts.net'],
       allowedLogins: ['owner@example.com'],
+      worker: { url: worker.url, tokenFile: workerTokenFile },
       launchd: {
         launchctl,
         labels: [
@@ -72,6 +78,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
   })
   const stop = async (): Promise<void> => {
     if (server.pid !== undefined) process.kill(-server.pid, 'SIGTERM')
+    await worker.stop()
   }
   try {
     await waitForServer()

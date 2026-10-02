@@ -17,3 +17,22 @@ test('a phone gets the list and the tab bar', async ({ page }) => {
     ),
   ).toBe(true)
 })
+
+test('a phone gets the worker queues as a list without sideways scroll', async ({
+  page,
+}) => {
+  await signIn(page)
+  await page
+    .getByRole('navigation', { name: 'Tabs' })
+    .getByRole('link', { name: 'Worker' })
+    .click()
+  await expect(page.getByRole('region', { name: 'Queues' })).toContainText(
+    'queue.a',
+  )
+  await expect(page.getByRole('table')).toHaveCount(0)
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= window.innerWidth,
+    ),
+  ).toBe(true)
+})

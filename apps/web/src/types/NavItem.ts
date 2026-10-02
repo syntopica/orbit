@@ -1,1 +1,4 @@
-export type NavItem = { readonly to: '/' | '/system'; readonly label: string }
+export type NavItem = {
+  readonly to: '/' | '/worker' | '/system'
+  readonly label: string
+}

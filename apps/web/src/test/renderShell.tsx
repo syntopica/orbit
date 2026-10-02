@@ -22,13 +22,18 @@ export const renderShell = async (path = '/') => {
     path: '/system',
     component: () => <h1>system page</h1>,
   })
+  const worker = createRoute({
+    getParentRoute: () => root,
+    path: '/worker',
+    component: () => <h1>worker page</h1>,
+  })
   const login = createRoute({
     getParentRoute: () => root,
     path: '/login',
     component: () => <h1>login page</h1>,
   })
   const router = createRouter({
-    routeTree: root.addChildren([home, system, login]),
+    routeTree: root.addChildren([home, worker, system, login]),
     history: createMemoryHistory({ initialEntries: [path] }),
   })
   const view = render(
