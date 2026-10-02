@@ -20,8 +20,14 @@ export const connectStream = (
   const settle = async (): Promise<void> => {
     const authorized = await probeSession()
     if (stopped) return
-    if (authorized) retry = setTimeout(open, retryMs)
+    if (authorized) retry = setTimeout(reopen, retryMs)
     else handlers.onStatus('unauthorized')
+  }
+  const reopen = (): void => {
+    // A fresh EventSource carries no Last-Event-ID: the server replays a full
+    // opening without `resync`, so drop what we hold first.
+    handlers.onMessage({ type: 'resync', id: 0 })
+    open()
   }
   const open = (): void => {
     const current = new EventSource('/api/stream')
@@ -34,6 +40,7 @@ export const connectStream = (
       if (message !== null) handlers.onMessage(message)
     }
     current.onerror = () => {
+      watchdog.stop()
       handlers.onStatus('offline')
       if (current.readyState !== EventSource.CLOSED) return
       void settle()

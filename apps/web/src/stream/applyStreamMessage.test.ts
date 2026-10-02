@@ -49,6 +49,7 @@ describe('applyStreamMessage', () => {
       snapshot,
     })
     state = applyStreamMessage(state, event(2))
+    state = applyStreamMessage(state, { type: 'sync', id: 3 })
     state = applyStreamMessage(state, { type: 'resync', id: 9 })
     expect(state).toEqual({
       snapshots: {},

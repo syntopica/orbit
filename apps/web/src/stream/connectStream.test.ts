@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
+
 import { FakeEventSource } from '../test/FakeEventSource'
 import { connectStream } from './connectStream'
 
@@ -82,6 +83,62 @@ describe('connectStream', () => {
     vi.advanceTimersByTime(2_000)
     expect(onStatus).toHaveBeenLastCalledWith('stale')
     stop()
+    vi.useRealTimers()
+  })
+  it('empties state before a reopened stream replays its opening', async () => {
+    const { onMessage, source, stop } = setup(200)
+    source.emit({ type: 'sync', id: 1 })
+    source.close()
+    source.onerror?.()
+    await vi.waitFor(() => {
+      expect(FakeEventSource.instances).toHaveLength(2)
+    })
+    expect(onMessage).toHaveBeenLastCalledWith({ type: 'resync', id: 0 })
+    stop()
+  })
+  it('stays offline instead of decaying to stale after an error', () => {
+    vi.useFakeTimers()
+    const { onStatus, source, stop } = setup()
+    source.onopen?.()
+    source.onerror?.()
+    vi.advanceTimersByTime(46_000)
+    expect(onStatus).toHaveBeenLastCalledWith('offline')
+    stop()
+    vi.useRealTimers()
+  })
+  it('stays unauthorized instead of decaying to stale', async () => {
+    const { onStatus, source, stop } = setup(401)
+    source.onopen?.()
+    source.close()
+    source.onerror?.()
+    await vi.waitFor(() => {
+      expect(onStatus).toHaveBeenLastCalledWith('unauthorized')
+    })
+    vi.useFakeTimers()
+    vi.advanceTimersByTime(46_000)
+    expect(onStatus).toHaveBeenLastCalledWith('unauthorized')
+    stop()
+    vi.useRealTimers()
+  })
+  it('cancels a pending reconnect on stop', async () => {
+    const { source, stop } = setup(200)
+    source.close()
+    source.onerror?.()
+    await vi.waitFor(() => {
+      expect(fetch).toHaveBeenCalled()
+    })
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    stop()
+    await new Promise((resolve) => setTimeout(resolve, 40))
+    expect(FakeEventSource.instances).toHaveLength(1)
+  })
+  it('stops the silence watchdog on stop', () => {
+    vi.useFakeTimers()
+    const { onStatus, source, stop } = setup()
+    source.onopen?.()
+    stop()
+    vi.advanceTimersByTime(46_000)
+    expect(onStatus).not.toHaveBeenCalledWith('stale')
     vi.useRealTimers()
   })
 })
