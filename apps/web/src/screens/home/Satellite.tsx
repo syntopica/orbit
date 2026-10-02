@@ -27,7 +27,7 @@ export const Satellite = ({ card, at, animate, now }: SatelliteProps) => (
     ) : null}
     <HealthRing state={card.state} />
     <text
-      y={4}
+      y={50}
       textAnchor="middle"
       className="fill-ink text-[11px] font-semibold"
     >
@@ -35,7 +35,7 @@ export const Satellite = ({ card, at, animate, now }: SatelliteProps) => (
     </text>
     {card.headline !== null && (
       <text
-        y={56}
+        y={64}
         textAnchor="middle"
         className="fill-muted font-mono text-[11px]"
       >
@@ -44,7 +44,7 @@ export const Satellite = ({ card, at, animate, now }: SatelliteProps) => (
     )}
     {card.greyed ? (
       <text
-        y={70}
+        y={78}
         textAnchor="middle"
         className="fill-muted font-mono text-[11px]"
       >
