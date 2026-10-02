@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 
 import { FakeEventSource } from '../test/FakeEventSource'
+import type { StreamHandlers } from '../types/StreamHandlers'
 import { connectStream } from './connectStream'
 
 const setup = (probeStatus = 200) => {
@@ -12,7 +13,7 @@ const setup = (probeStatus = 200) => {
       .fn<typeof fetch>()
       .mockResolvedValue(new Response(null, { status: probeStatus })),
   )
-  const onMessage = vi.fn()
+  const onMessage = vi.fn<StreamHandlers['onMessage']>()
   const onStatus = vi.fn()
   const stop = connectStream({ onMessage, onStatus }, 10)
   const source = FakeEventSource.instances[0] as FakeEventSource
@@ -85,7 +86,7 @@ describe('connectStream', () => {
     stop()
     vi.useRealTimers()
   })
-  it('empties state before a reopened stream replays its opening', async () => {
+  it('empties state when a replacement stream opens, before its messages', async () => {
     const { onMessage, source, stop } = setup(200)
     source.emit({ type: 'sync', id: 1 })
     source.close()
@@ -93,7 +94,26 @@ describe('connectStream', () => {
     await vi.waitFor(() => {
       expect(FakeEventSource.instances).toHaveLength(2)
     })
-    expect(onMessage).toHaveBeenLastCalledWith({ type: 'resync', id: 0 })
+    const next = FakeEventSource.instances[1] as FakeEventSource
+    expect(onMessage).toHaveBeenCalledTimes(1)
+    next.onopen?.()
+    next.emit({ type: 'sync', id: 2 })
+    expect(onMessage.mock.calls.map(([message]) => message.type)).toEqual([
+      'sync',
+      'resync',
+      'sync',
+    ])
+    stop()
+  })
+  it('keeps the data when a replacement stream fails before opening', async () => {
+    const { onMessage, source, stop } = setup(200)
+    source.close()
+    source.onerror?.()
+    await vi.waitFor(() => {
+      expect(FakeEventSource.instances).toHaveLength(2)
+    })
+    ;(FakeEventSource.instances[1] as FakeEventSource).onerror?.()
+    expect(onMessage).not.toHaveBeenCalled()
     stop()
   })
   it('stays offline instead of decaying to stale after an error', () => {
@@ -107,14 +127,13 @@ describe('connectStream', () => {
     vi.useRealTimers()
   })
   it('stays unauthorized instead of decaying to stale', async () => {
+    vi.useFakeTimers()
     const { onStatus, source, stop } = setup(401)
     source.onopen?.()
     source.close()
     source.onerror?.()
-    await vi.waitFor(() => {
-      expect(onStatus).toHaveBeenLastCalledWith('unauthorized')
-    })
-    vi.useFakeTimers()
+    await vi.advanceTimersByTimeAsync(0)
+    expect(onStatus).toHaveBeenLastCalledWith('unauthorized')
     vi.advanceTimersByTime(46_000)
     expect(onStatus).toHaveBeenLastCalledWith('unauthorized')
     stop()
