@@ -1,6 +1,6 @@
 import type { OrbitEvent } from '@orbit/contract'
-import { act, screen } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { act, screen, within } from '@testing-library/react'
+import { describe, expect, it, vi } from 'vitest'
 
 import { mediaMatches } from '../../test/mediaMatches'
 import { openStream } from '../../test/openStream'
@@ -64,6 +64,36 @@ describe('HomeScreen states', () => {
     const first = screen.getByTestId('pulse')
     reading(3, '2026-10-02T10:00:30.000Z')
     expect(screen.getByTestId('pulse')).not.toBe(first)
+  })
+  it('dims a down satellite on the map and shows the reading age', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-10-02T10:05:00.000Z'))
+    await renderAt('/')
+    const source = openStream()
+    const { lastGood: _ignored, ...core } = snapshotOf('worker', 'ok', {
+      metrics: [{ key: 'worker.live', value: 2, at: AT }],
+    })
+    act(() => {
+      source.emit({
+        type: 'snapshot',
+        id: 1,
+        snapshot: snapshotOf('worker', 'down', { lastGood: core }),
+      })
+      source.emit({
+        type: 'snapshot',
+        id: 2,
+        snapshot: snapshotOf('launchd', 'ok'),
+      })
+      source.emit({ type: 'sync', id: 3 })
+    })
+    const down = screen.getByRole('img', { name: /^Worker: Down, 2 running/ })
+    expect(down).toHaveAttribute('opacity', '0.5')
+    expect(down).toHaveTextContent('last reading 5m')
+    expect(within(down).queryByTestId('pulse')).toBeNull()
+    const fresh = screen.getByRole('img', { name: /^Scheduled jobs: Healthy/ })
+    expect(fresh).toHaveAttribute('opacity', '1')
+    expect(fresh).not.toHaveTextContent('last reading')
+    vi.useRealTimers()
   })
   it('keeps the last known figures of a down component, greyed', async () => {
     mediaMatches.add('(max-width: 767px)')

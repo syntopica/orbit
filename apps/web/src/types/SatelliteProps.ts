@@ -5,4 +5,5 @@ export type SatelliteProps = {
   readonly card: CardModel
   readonly at: Point
   readonly animate: boolean
+  readonly now: number
 }

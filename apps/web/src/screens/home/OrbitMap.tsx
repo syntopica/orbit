@@ -2,7 +2,7 @@ import { orbitPosition } from '../../geometry/orbitPosition'
 import type { OrbitMapProps } from '../../types/OrbitMapProps'
 import { Satellite } from './Satellite'
 
-export const OrbitMap = ({ cards, animate }: OrbitMapProps) => (
+export const OrbitMap = ({ cards, animate, now }: OrbitMapProps) => (
   <svg
     viewBox="-300 -300 600 600"
     className="mx-auto block w-full max-w-2xl"
@@ -36,6 +36,7 @@ export const OrbitMap = ({ cards, animate }: OrbitMapProps) => (
         card={card}
         at={orbitPosition(index, cards.length, 220)}
         animate={animate}
+        now={now}
       />
     ))}
   </svg>

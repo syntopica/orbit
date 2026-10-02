@@ -4,6 +4,7 @@ import { formatAge } from './formatAge'
 import { formatClock } from './formatClock'
 import { formatDuration } from './formatDuration'
 import { formatMetric } from './formatMetric'
+import { formatReadingAge } from './formatReadingAge'
 
 describe('formatters', () => {
   it.each([
@@ -26,6 +27,12 @@ describe('formatters', () => {
     const now = Date.parse('2026-10-02T10:05:00.000Z')
     expect(formatAge('2026-10-02T10:00:00.000Z', now)).toBe('5m')
     expect(formatAge('2026-10-02T10:06:00.000Z', now)).toBe('0s')
+  })
+  it('words the age of a last reading', () => {
+    const now = Date.parse('2026-10-02T10:05:00.000Z')
+    expect(formatReadingAge('2026-10-02T10:00:00.000Z', now)).toBe(
+      'last reading 5m',
+    )
   })
   it('formats metrics by key', () => {
     expect(formatMetric('worker.queued', 1234)).toBe('1,234')

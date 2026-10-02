@@ -1,6 +1,3 @@
 import type { CardState } from './CardState'
 
-export type HealthRingProps = {
-  readonly state: CardState
-  readonly greyed: boolean
-}
+export type HealthRingProps = { readonly state: CardState }

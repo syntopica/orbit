@@ -1,16 +1,23 @@
+import { formatReadingAge } from '../../formatters/formatReadingAge'
 import { HEALTH_LABELS } from '../../labels/healthLabels'
 import type { SatelliteProps } from '../../types/SatelliteProps'
 import { HealthRing } from './HealthRing'
 
-export const Satellite = ({ card, at, animate }: SatelliteProps) => (
+export const Satellite = ({ card, at, animate, now }: SatelliteProps) => (
   <g
     role="img"
-    aria-label={[`${card.label}: ${HEALTH_LABELS[card.state]}`, card.headline]
+    aria-label={[
+      `${card.label}: ${HEALTH_LABELS[card.state]}`,
+      card.headline,
+      card.greyed ? formatReadingAge(card.observedAt, now) : null,
+    ]
       .filter(Boolean)
       .join(', ')}
+    data-greyed={card.greyed}
+    opacity={card.greyed ? 0.5 : 1}
     transform={`translate(${String(at.x)} ${String(at.y)})`}
   >
-    {animate ? (
+    {animate && !card.greyed ? (
       <circle
         key={card.observedAt}
         data-testid="pulse"
@@ -18,7 +25,7 @@ export const Satellite = ({ card, at, animate }: SatelliteProps) => (
         className="stroke-accent animate-pulse-ring origin-center fill-none transform-fill"
       />
     ) : null}
-    <HealthRing state={card.state} greyed={card.greyed} />
+    <HealthRing state={card.state} />
     <text
       y={4}
       textAnchor="middle"
@@ -35,5 +42,14 @@ export const Satellite = ({ card, at, animate }: SatelliteProps) => (
         {card.headline}
       </text>
     )}
+    {card.greyed ? (
+      <text
+        y={70}
+        textAnchor="middle"
+        className="fill-muted font-mono text-[11px]"
+      >
+        {formatReadingAge(card.observedAt, now)}
+      </text>
+    ) : null}
   </g>
 )

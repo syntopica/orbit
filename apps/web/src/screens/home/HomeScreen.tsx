@@ -19,7 +19,7 @@ export const HomeScreen = () => {
       {model.isPhone ? (
         <ComponentList cards={model.cards} now={model.now} />
       ) : (
-        <OrbitMap cards={model.cards} animate={model.animate} />
+        <OrbitMap cards={model.cards} animate={model.animate} now={model.now} />
       )}
       <PendingStrip rows={model.pending} now={model.now} />
       <EventTicker events={model.events} />
