@@ -12,9 +12,8 @@ export const selectRowModel = (
   history: LaunchdHistory,
   row: LaunchdRow,
   range: HistoryRange,
-  now: number,
 ): LaunchdRowModel => {
-  const buckets = buildHeartbeat(history, row, range, now)
+  const buckets = buildHeartbeat(history, row, range, history.now)
   const counts = (['failed', 'missed', 'unknown'] as const)
     .map(
       (state) =>

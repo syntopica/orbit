@@ -17,6 +17,7 @@ describe('launchd routes', () => {
       lastExit: null,
       at: Date.now(),
     })
+    const clock = Date.now()
     const app = createApp({
       authDb,
       historyDb,
@@ -33,7 +34,7 @@ describe('launchd routes', () => {
       },
       guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
       webRoot: '/nonexistent',
-      now: () => Date.now(),
+      now: () => clock,
     })
     const headers = {
       Host: '127.0.0.1:8790',
@@ -57,7 +58,9 @@ describe('launchd routes', () => {
       'http://127.0.0.1:8790/api/launchd/history?label=com.example.a&range=24h',
       { headers },
     )
-    expect(await ok.json()).toHaveProperty('observations.length', 1)
+    const body = await ok.json()
+    expect(body).toHaveProperty('observations.length', 1)
+    expect(body).toHaveProperty('now', clock)
     const unknown = await app.request(
       'http://127.0.0.1:8790/api/launchd/history?label=com.example.b&range=24h',
       { headers },

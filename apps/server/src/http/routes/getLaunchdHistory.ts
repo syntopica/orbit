@@ -28,7 +28,9 @@ export const getLaunchdHistory =
     if (label === undefined || !rows.some((row) => row.label === label)) {
       return c.json({ error: 'not_found' }, 404)
     }
-    return c.json(
-      readLaunchdHistory(historyDb, label, now() - span - HISTORY_LOOKBACK_MS),
-    )
+    const at = now()
+    return c.json({
+      ...readLaunchdHistory(historyDb, label, at - span - HISTORY_LOOKBACK_MS),
+      now: at,
+    })
   }

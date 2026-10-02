@@ -27,12 +27,23 @@ describe('missWindowFor', () => {
     }
     expect(missWindowFor(history, [], H, end)?.watched).toBe(false)
   })
-  it('counts a run inside (start, end] and nothing outside', () => {
+  it('needs the first half interval of the window covered too', () => {
+    const start = end - 1.5 * H
+    const history = {
+      observations: [obs(0, 1, 0)],
+      runs: [
+        { started: 0, stopped: start - 90_000 },
+        { started: end - H, stopped: end },
+      ],
+    }
+    expect(missWindowFor(history, [], H, end)?.watched).toBe(false)
+  })
+  it('counts a run inside [start, end) and nothing outside', () => {
     const start = end - 1.5 * H
     const history = { observations: [obs(0, 1, 0)], runs }
-    expect(missWindowFor(history, [start], H, end)?.ran).toBe(false)
-    expect(missWindowFor(history, [start + 1], H, end)?.ran).toBe(true)
-    expect(missWindowFor(history, [end], H, end)?.ran).toBe(true)
-    expect(missWindowFor(history, [end + 1], H, end)?.ran).toBe(false)
+    expect(missWindowFor(history, [start - 1], H, end)?.ran).toBe(false)
+    expect(missWindowFor(history, [start], H, end)?.ran).toBe(true)
+    expect(missWindowFor(history, [end - 1], H, end)?.ran).toBe(true)
+    expect(missWindowFor(history, [end], H, end)?.ran).toBe(false)
   })
 })

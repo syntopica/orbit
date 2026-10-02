@@ -1,9 +1,9 @@
 import type { BucketInput } from '../types/BucketInput'
-import type { LaunchdHistory } from '../types/LaunchdHistory'
+import type { HistoryReadings } from '../types/HistoryReadings'
 import { isCovered } from './isCovered'
 
 export const missWindowFor = (
-  history: LaunchdHistory,
+  history: HistoryReadings,
   runTimes: readonly number[],
   intervalMs: number | null,
   end: number,
@@ -15,6 +15,6 @@ export const missWindowFor = (
   )
   return {
     watched: baseline && isCovered(history.runs, start, end),
-    ran: runTimes.some((at) => at > start && at <= end),
+    ran: runTimes.some((at) => at >= start && at < end),
   }
 }

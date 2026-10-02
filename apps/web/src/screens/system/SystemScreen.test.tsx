@@ -4,18 +4,20 @@ import { axe } from 'vitest-axe'
 
 import { renderAt } from '../../test/renderAt'
 
+const JOB = 'com.example.job'
 const rows = [
   {
     component: 'worker',
-    label: 'com.example.job',
+    label: JOB,
     role: 'scheduled',
     schedule: { intervalS: 3_600, calendar: false, keepAlive: false },
   },
 ]
 const history = {
+  now: Date.now(),
   observations: [
     {
-      label: 'com.example.job',
+      label: JOB,
       at: Date.now() - 60_000,
       runs: 4,
       lastExit: 78,
@@ -101,5 +103,35 @@ describe('SystemScreen', () => {
       'aria-pressed',
       'true',
     )
+  })
+  it('draws the newest bucket against the server clock, not the browser clock', async () => {
+    const serverNow = Date.now() - 100_000
+    const lagging = {
+      now: serverNow,
+      observations: [
+        {
+          label: JOB,
+          at: serverNow - 3_600_000,
+          runs: 1,
+          lastExit: 0,
+          pid: null,
+        },
+      ],
+      runs: [{ started: serverNow - 90_000_000, stopped: serverNow - 60_000 }],
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string) =>
+        Promise.resolve(
+          input === '/api/launchd'
+            ? Response.json({ rows: [{ ...rows[0], schedule: null }] })
+            : Response.json(lagging),
+        ),
+      ),
+    )
+    await renderAt('/system')
+    expect(
+      await screen.findByRole('img', { name: /last 24 hours: all healthy/ }),
+    ).toBeInTheDocument()
   })
 })

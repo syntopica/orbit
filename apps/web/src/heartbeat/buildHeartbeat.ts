@@ -1,6 +1,6 @@
 import type { Bucket } from '../types/Bucket'
 import type { HistoryRange } from '../types/HistoryRange'
-import type { LaunchdHistory } from '../types/LaunchdHistory'
+import type { HistoryReadings } from '../types/HistoryReadings'
 import type { LaunchdRow } from '../types/LaunchdRow'
 import { classifyBucket } from './classifyBucket'
 import { isCovered } from './isCovered'
@@ -9,7 +9,7 @@ import { missWindowFor } from './missWindowFor'
 import { RANGE_SPECS } from './rangeSpecs'
 
 export const buildHeartbeat = (
-  history: LaunchdHistory,
+  history: HistoryReadings,
   row: LaunchdRow,
   range: HistoryRange,
   now: number,

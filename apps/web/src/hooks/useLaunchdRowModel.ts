@@ -8,13 +8,11 @@ import { selectRowModel } from '../selectors/selectRowModel'
 import type { HistoryRange } from '../types/HistoryRange'
 import type { LaunchdRow } from '../types/LaunchdRow'
 import type { LaunchdRowModel } from '../types/LaunchdRowModel'
-import { useNow } from './useNow'
 
 export const useLaunchdRowModel = (
   row: LaunchdRow,
   range: HistoryRange,
 ): LaunchdRowModel => {
-  const now = useNow(60_000)
   const query = useQuery({
     queryKey: ['launchd-history', row.label, range],
     queryFn: async () =>
@@ -31,6 +29,6 @@ export const useLaunchdRowModel = (
         : SYSTEM_LABELS.loading
       return { buckets: null, state, summary: '' }
     }
-    return selectRowModel(query.data, row, range, now)
-  }, [query.data, query.isError, row, range, now])
+    return selectRowModel(query.data, row, range)
+  }, [query.data, query.isError, row, range])
 }

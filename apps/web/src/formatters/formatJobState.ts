@@ -1,11 +1,13 @@
+import { SYSTEM_LABELS } from '../labels/systemLabels'
 import type { LaunchdObservation } from '../types/LaunchdObservation'
 
 export const formatJobState = (
   observation: LaunchdObservation | null,
 ): string => {
-  if (observation === null) return 'no reading yet'
-  if (observation.pid !== null) return `running, pid ${String(observation.pid)}`
+  if (observation === null) return SYSTEM_LABELS.noReading
+  if (observation.pid !== null)
+    return `${SYSTEM_LABELS.runningPid} ${String(observation.pid)}`
   return observation.lastExit === null
-    ? 'never exited'
-    : `last exit ${String(observation.lastExit)}`
+    ? SYSTEM_LABELS.neverExited
+    : `${SYSTEM_LABELS.lastExit} ${String(observation.lastExit)}`
 }

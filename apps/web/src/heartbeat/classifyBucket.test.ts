@@ -80,9 +80,19 @@ describe('classifyBucket failures', () => {
       classifyBucket({ ...base, role: 'keepalive', atEnd: obs(1, 1, 0, 42) }),
     ).toBe('ok')
   })
-  it('fails a keepalive job with a pid but a non-zero exit', () => {
+  it('ignores a stale non-zero exit on a keepalive job that has a pid', () => {
     expect(
-      classifyBucket({ ...base, role: 'keepalive', atEnd: obs(1, 1, 78, 42) }),
+      classifyBucket({
+        ...base,
+        role: 'keepalive',
+        inBucket: [obs(1, 1, 9, 42)],
+        atEnd: obs(2, 1, 9, 42),
+      }),
+    ).toBe('ok')
+  })
+  it('fails a keepalive job without a pid whatever its exit code', () => {
+    expect(
+      classifyBucket({ ...base, role: 'keepalive', atEnd: obs(1, 1, 0, null) }),
     ).toBe('failed')
   })
   it('never calls a keepalive job missed or idle', () => {
