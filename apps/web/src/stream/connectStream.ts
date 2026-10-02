@@ -24,12 +24,14 @@ export const connectStream = (
     else handlers.onStatus('unauthorized')
   }
   const open = (replacement = false): void => {
+    let fresh = replacement
     const current = new EventSource('/api/stream')
     source = current
     current.onopen = () => {
       // A fresh EventSource carries no Last-Event-ID: the server replays a full
       // opening without `resync`, so drop what we hold once it really opens.
-      if (replacement) handlers.onMessage({ type: 'resync', id: 0 })
+      if (fresh) handlers.onMessage({ type: 'resync', id: 0 })
+      fresh = false
       alive()
     }
     current.addEventListener('ping', alive)

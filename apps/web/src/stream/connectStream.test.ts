@@ -105,6 +105,20 @@ describe('connectStream', () => {
     ])
     stop()
   })
+  it('resyncs only on the first open of a replacement stream', async () => {
+    const { onMessage, source, stop } = setup(200)
+    source.close()
+    source.onerror?.()
+    await vi.waitFor(() => {
+      expect(FakeEventSource.instances).toHaveLength(2)
+    })
+    const next = FakeEventSource.instances[1] as FakeEventSource
+    next.onopen?.()
+    next.onerror?.()
+    next.onopen?.()
+    expect(onMessage).toHaveBeenCalledTimes(1)
+    stop()
+  })
   it('keeps the data when a replacement stream fails before opening', async () => {
     const { onMessage, source, stop } = setup(200)
     source.close()
