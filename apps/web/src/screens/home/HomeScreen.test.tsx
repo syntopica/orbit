@@ -53,6 +53,7 @@ describe('HomeScreen', () => {
       screen.getByRole('listitem', { name: /Worker failed jobs/ }),
     ).toHaveTextContent('64')
     expect(screen.getByText('job failed')).toBeInTheDocument()
+    expect(screen.getByText('job j1')).toBeInTheDocument()
     expect(screen.getAllByTestId('pulse').length).toBeGreaterThan(0)
     expect(
       within(screen.getByRole('main')).queryByRole('status', {
