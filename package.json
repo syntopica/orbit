@@ -10,7 +10,7 @@
     "e2e": "pnpm build && playwright test --config e2e/playwright.config.ts",
     "format:check": "prettier --check .",
     "secrets:check": "gitleaks detect --no-banner --redact",
-    "gate": "pnpm -r --workspace-concurrency=1 run gate:pkg && pnpm format:check && pnpm secrets:check"
+    "gate": "pnpm -r --workspace-concurrency=1 run gate:pkg && pnpm format:check && pnpm secrets:check && pnpm e2e"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.3",

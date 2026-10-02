@@ -9,3 +9,6 @@ coverage/
 .env.*
 !.env.example
 *.local
+e2e/.tmp/
+test-results/
+playwright-report/
