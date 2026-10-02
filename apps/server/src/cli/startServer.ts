@@ -1,4 +1,4 @@
-import { createHub } from '../hub/createHub'
+import { createServerHub } from '../hub/createServerHub'
 import type { OrbitState } from '../types/OrbitState'
 import { assertWebRoot } from './assertWebRoot'
 import { buildHandler } from './buildHandler'
@@ -14,11 +14,7 @@ export const startServer = async (
   options: { webRoot: string; signal: AbortSignal },
 ): Promise<{ port: number }> => {
   await assertWebRoot(options.webRoot)
-  const hub = createHub({
-    ringSize: 1000,
-    recentEvents: 50,
-    firstId: Date.now() * 1000,
-  })
+  const hub = createServerHub()
   const { server, port } = await listenLoopback(state.config.port, (actual) =>
     buildHandler(state, hub, options.webRoot, actual),
   )
