@@ -66,11 +66,11 @@ This repository is public: entries describe engine behaviour only.
       (`packages/contract/src`). Cap it and add the case.
 - [ ] `streamMessageSchema` variants and `snapshotCore` caps are untested
       (`packages/contract/src`). Add one test per variant and cap.
-- [ ] Record the dropped Lighthouse check and its five advisory ids in the
-      contract package's documentation.
 
 ## Web
 
+- [ ] Record the dropped Lighthouse check and its five advisory ids in the web
+      app's documentation (`apps/web`).
 - [ ] No `aria-live` container for toasts
       (`apps/web/src/components/shell/Shell.tsx`, `hooks/useDownToasts.ts`). Add
       a polite live region.
