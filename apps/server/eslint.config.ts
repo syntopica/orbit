@@ -22,7 +22,11 @@ export default [
   },
   {
     // Static web files: the path is checked by isUnsafeWebPath and realpath-confined to webRoot.
-    files: ['src/http/resolveWebFile.ts', 'src/http/serveWeb.ts'],
+    files: [
+      'src/http/resolveWebFile.ts',
+      'src/http/resolveWebRoot.ts',
+      'src/http/serveWeb.ts',
+    ],
     rules: { 'security/detect-non-literal-fs-filename': 'off' },
   },
 ]

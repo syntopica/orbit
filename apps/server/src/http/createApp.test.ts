@@ -1,4 +1,4 @@
-import { mkdtemp, symlink, writeFile } from 'node:fs/promises'
+import { mkdir, mkdtemp, symlink, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -67,6 +67,17 @@ describe('createApp static files', () => {
       expect(res.status).toBe(404)
       expect(await res.text()).not.toContain('outside')
     }
+  })
+  it('refuses a sibling directory that shares the web root name as a prefix', async () => {
+    const webRoot = await makeWebRoot()
+    await mkdir(`${webRoot}-evil`)
+    await writeFile(join(`${webRoot}-evil`, 'secret.txt'), 'outside')
+    await symlink(`${webRoot}-evil`, join(webRoot, 'sibling'))
+    const res = await buildTestApp({ webRoot }).get('/sibling/secret.txt', {
+      Accept: '*/*',
+    })
+    expect(res.status).toBe(404)
+    expect(await res.text()).not.toContain('outside')
   })
   it('never serves static files under /api', async () => {
     const { get } = buildTestApp({ webRoot: await makeWebRoot() })

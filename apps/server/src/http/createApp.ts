@@ -4,6 +4,7 @@ import { createDetailPool } from '../scheduler/createDetailPool'
 import type { AppDeps } from '../types/AppDeps'
 import type { OrbitEnv } from '../types/OrbitEnv'
 import { hostAllowlist } from './hostAllowlist'
+import { refuseHead } from './refuseHead'
 import { requireCsrfHeader } from './requireCsrfHeader'
 import { requireSameOrigin } from './requireSameOrigin'
 import { requireSession } from './requireSession'
@@ -23,6 +24,9 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   const auth = { db: deps.authDb, now: deps.now }
   const pool = createDetailPool(2)
   const app = new Hono<OrbitEnv>()
+  // Fixed JSON only: the error itself is never logged or returned (spec 8).
+  app.onError((_error, c) => c.json({ error: 'internal' }, 500))
+  app.notFound((c) => c.json({ error: 'not_found' }, 404))
   // securityHeaders first, so every refusal below carries the headers too.
   app.use(
     '*',
@@ -37,7 +41,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   api.use('*', requireSession(deps.authDb, deps.now))
   api.post('/logout', postLogout(auth))
   api.get('/snapshots', getSnapshots(deps.hub))
-  api.get('/stream', getStream(deps.hub))
+  api.get('/stream', refuseHead(), getStream(deps.hub, deps.now))
   api.get('/launchd', getLaunchdRows(deps.catalog, pool))
   api.get(
     '/launchd/history',

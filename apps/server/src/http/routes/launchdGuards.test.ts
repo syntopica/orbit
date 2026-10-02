@@ -70,7 +70,7 @@ describe('launchd history guards', () => {
       observations: [49, 47, 41].map((days) => ({ at: NOW - days * DAY })),
     })
   })
-  it('answers 404 when there is no catalog or it fails', async () => {
+  it('answers 404 without a catalog and 503 when it fails', async () => {
     expect(
       (await buildTestApp().get(history('label=com.example.a&range=24h')))
         .status,
@@ -86,7 +86,7 @@ describe('launchd history guards', () => {
           history('label=com.example.a&range=24h'),
         )
       ).status,
-    ).toBe(404)
+    ).toBe(503)
   })
 })
 

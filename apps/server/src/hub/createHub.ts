@@ -35,6 +35,7 @@ export const createHub = (options: {
     send({ type: 'snapshot', id: nextId++, snapshot: stored })
   }
   return {
+    ringSize: options.ringSize,
     publish: (snapshot) => {
       publishSnapshot(snapshot)
       for (const event of snapshot.events) {

@@ -23,7 +23,8 @@ export const getLaunchdHistory =
     const rows =
       catalog === null
         ? []
-        : await readCatalogRows(catalog, pool).catch(() => [])
+        : await readCatalogRows(catalog, pool).catch(() => null)
+    if (rows === null) return c.json({ error: 'unavailable' }, 503)
     if (label === undefined || !rows.some((row) => row.label === label)) {
       return c.json({ error: 'not_found' }, 404)
     }

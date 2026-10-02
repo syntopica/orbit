@@ -1,7 +1,7 @@
 import type { Snapshot } from '@orbit/contract'
 
-import { createHub } from '../../hub/createHub'
 import { buildTestApp } from '../../test/buildTestApp'
+import { createCountingHub } from '../../test/createCountingHub'
 import { readSseBlocks } from '../../test/readSseBlocks'
 import type { Hub } from '../../types/Hub'
 
@@ -16,24 +16,6 @@ const snap = (value: number): Snapshot => ({
   observedAt: '2026-10-02T10:00:00.000Z',
   lastGood: null,
 })
-
-const countingHub = () => {
-  const hub = createHub({ ringSize: 10, recentEvents: 5, firstId: 1 })
-  const active = new Set<object>()
-  const counted: Hub = {
-    ...hub,
-    subscribe: (listener) => {
-      const token = {}
-      active.add(token)
-      const unsubscribe = hub.subscribe(listener)
-      return () => {
-        active.delete(token)
-        unsubscribe()
-      }
-    },
-  }
-  return { hub: counted, active }
-}
 
 const hasSync = (blocks: string[]) =>
   blocks.some((b) => b.includes('"type":"sync"'))
@@ -67,7 +49,7 @@ describe('GET /api/stream lifecycle', () => {
     ])
   })
   it('forwards live messages with their id and unsubscribes on disconnect', async () => {
-    const { hub, active } = countingHub()
+    const { hub, active } = createCountingHub()
     const { get } = buildTestApp({ hub })
     const res = await get(STREAM)
     const reader: ReadableStreamDefaultReader<Uint8Array> | undefined =
@@ -85,26 +67,24 @@ describe('GET /api/stream lifecycle', () => {
       expect(active.size).toBe(0)
     })
   })
-  it('pings every 15 s', async () => {
+  it('sends a heartbeat comment every 15 s on the injected clock', async () => {
     vi.useFakeTimers()
     try {
-      const { get } = buildTestApp()
+      const { get } = buildTestApp({ now: () => Date.now() })
       const res = await get(STREAM)
       const reader: ReadableStreamDefaultReader<Uint8Array> | undefined =
         res.body?.getReader()
       await reader?.read()
       await vi.advanceTimersByTimeAsync(15_500)
       const chunk = await reader?.read()
-      expect(new TextDecoder().decode(chunk?.value)).toBe(
-        'event: ping\ndata: \n\n',
-      )
+      expect(new TextDecoder().decode(chunk?.value)).toBe(': ping\n\n')
       await reader?.cancel()
     } finally {
       vi.useRealTimers()
     }
   })
   it('closes quietly and unsubscribes when the hub throws', async () => {
-    const { hub, active } = countingHub()
+    const { hub, active } = createCountingHub()
     const failing: Hub = {
       ...hub,
       snapshots: () => {

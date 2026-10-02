@@ -3,6 +3,7 @@ import type { OrbitEvent, Snapshot, StreamMessage } from '@orbit/contract'
 import type { SnapshotSink } from './SnapshotSink'
 
 export type Hub = SnapshotSink & {
+  readonly ringSize: number
   snapshots(): Snapshot[]
   recentEvents(): OrbitEvent[]
   lastId(): number
