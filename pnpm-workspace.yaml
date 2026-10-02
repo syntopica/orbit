@@ -5,8 +5,3 @@ allowBuilds:
   lefthook: true
   unrs-resolver: true
   esbuild: true
-minimumReleaseAgeExclude:
-  - framer-motion@13.5.0
-  - motion-dom@13.5.0
-  - motion-utils@13.5.0
-  - motion@13.5.0
