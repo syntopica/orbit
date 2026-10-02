@@ -1,5 +1,6 @@
 import { Command } from 'cmdk'
 
+import { trapTab } from '../../handlers/trapTab'
 import { useCommandPalette } from '../../hooks/useCommandPalette'
 import { useFocusOnOpen } from '../../hooks/useFocusOnOpen'
 import { PaletteList } from './PaletteList'
@@ -25,6 +26,7 @@ export const CommandPalette = () => {
         label="Command palette"
         onKeyDown={(event) => {
           if (event.key === 'Escape') palette.setOpen(false)
+          trapTab(event)
         }}
         className="border-line bg-panel fixed inset-x-4 top-24 z-50 mx-auto max-w-lg rounded-2xl border p-2 shadow-2xl"
       >

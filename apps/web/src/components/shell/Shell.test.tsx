@@ -123,6 +123,22 @@ describe('Shell', () => {
       expect(palette()).toBeNull()
     })
   })
+  it('keeps Tab inside the palette and restores focus on close', async () => {
+    await renderShell()
+    const link = screen.getAllByRole('link', {
+      name: 'System',
+    })[0] as HTMLElement
+    link.focus()
+    fireEvent.keyDown(document, { key: 'k', metaKey: true })
+    const input = await screen.findByPlaceholderText('Go to…')
+    expect(fireEvent.keyDown(input, { key: 'Tab' })).toBe(false)
+    expect(fireEvent.keyDown(input, { key: 'Tab', shiftKey: true })).toBe(false)
+    expect(input).toHaveFocus()
+    fireEvent.keyDown(input, { key: 'Escape' })
+    await waitFor(() => {
+      expect(link).toHaveFocus()
+    })
+  })
   it('routes to login when the session is gone', async () => {
     vi.stubGlobal(
       'fetch',

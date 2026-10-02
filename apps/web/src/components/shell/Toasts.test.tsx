@@ -76,6 +76,17 @@ describe('Toasts', () => {
     })
     expect(screen.queryByRole('alert')).toBeNull()
   })
+  it('arms one timer per toast and none after unmount', async () => {
+    const view = await renderShell()
+    emit({ type: 'snapshot', id: 1, snapshot: snapshotOf('worker', 'ok') })
+    emit({ type: 'sync', id: 2 })
+    const armed = vi.getTimerCount()
+    down('worker', 3)
+    down('brain', 4)
+    expect(vi.getTimerCount() - armed).toBe(2)
+    view.unmount()
+    expect(vi.getTimerCount()).toBe(0)
+  })
   it('does not toast components that were already down before a resync', async () => {
     vi.stubGlobal(
       'fetch',

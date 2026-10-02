@@ -5,7 +5,12 @@ export const useFocusOnOpen = (
 ): RefObject<HTMLInputElement | null> => {
   const ref = useRef<HTMLInputElement>(null)
   useEffect(() => {
-    if (open) ref.current?.focus()
+    if (!open) return undefined
+    const previous = document.activeElement
+    ref.current?.focus()
+    return () => {
+      if (previous instanceof HTMLElement) previous.focus()
+    }
   }, [open])
   return ref
 }
