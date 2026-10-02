@@ -1,0 +1,6 @@
+gui/501/com.example.server = {
+	state = running
+	runs = 2
+	pid = 86643
+	last terminating signal = Terminated: 15
+}

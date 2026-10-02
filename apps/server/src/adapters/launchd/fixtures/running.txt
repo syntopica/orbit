@@ -1,0 +1,13 @@
+gui/501/com.example.keepalive = {
+	active count = 1
+	path = /Users/example/Library/LaunchAgents/com.example.keepalive.plist
+	type = LaunchAgent
+	state = running
+
+	program = /usr/local/bin/example
+	runs = 26
+	pid = 5627
+	endpoints = {
+		state = active
+	}
+}

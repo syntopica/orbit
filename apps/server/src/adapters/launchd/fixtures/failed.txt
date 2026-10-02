@@ -1,0 +1,5 @@
+gui/501/com.example.broken = {
+	state = spawn scheduled
+	runs = 282
+	last exit code = 78: EX_CONFIG
+}

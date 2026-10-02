@@ -1,0 +1,9 @@
+gui/501/com.example.nightly = {
+	state = not running
+	runs = 38
+	last exit code = 0
+	run interval = 3600 seconds
+	event triggers = {
+		state = active
+	}
+}
