@@ -67,7 +67,7 @@ describe('GET /api/stream lifecycle', () => {
       expect(active.size).toBe(0)
     })
   })
-  it('sends a heartbeat comment every 15 s on the injected clock', async () => {
+  it('sends a named ping event every 15 s on the injected clock', async () => {
     vi.useFakeTimers()
     try {
       let clock = 4_000_000_000_000
@@ -80,7 +80,9 @@ describe('GET /api/stream lifecycle', () => {
       clock += 15_000
       await vi.advanceTimersByTimeAsync(300)
       const chunk = await reader?.read()
-      expect(new TextDecoder().decode(chunk?.value)).toBe(': ping\n\n')
+      expect(new TextDecoder().decode(chunk?.value)).toBe(
+        'event: ping\ndata: 1\n\n',
+      )
       await reader?.cancel()
     } finally {
       vi.useRealTimers()
