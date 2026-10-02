@@ -1,7 +1,29 @@
 # orbit - design
 
-Status: draft, revision 4 (after adversarial review rounds 1 to 3). Scope: sub-project
-0 (Base) and sub-project 1 (Memory). Later sub-projects get their own specs.
+Status: draft, revision 5 (after adversarial review rounds 1 to 3 and the
+implementation of sub-project 0). Scope: sub-project 0 (Base) and sub-project 1
+(Memory). Later sub-projects get their own specs.
+
+### Change log
+
+**Revision 5 (implementation of sub-project 0).** What building the Base
+decided differently from revision 4, applied in place in the sections named:
+
+- 5.1: the ref charset admits `_`.
+- 5.3: the engine command table is deferred to sub-project 1; sub-project 0
+  runs only `launchctl` and `plutil`.
+- 5.5: the SSE heartbeat is a named `ping` event; the client resyncs when it
+  replaces a dropped stream.
+- 5.7: launchd observations are kept 90 days (the latest per label is never
+  pruned); metric samples stay at 7 days.
+- 5.8: missed-run windows, yearly jobs and keepalive health as built.
+- 7.2 (new): heartbeat strips are SVG, with exact bucket states, ranges and
+  precedence; the history route returns the server's `now`; the command
+  palette and home pulse implementation notes.
+- 11, 13: the Vite dev proxy rewrites `Origin`; uPlot is not used in
+  sub-project 0.
+
+**Revision 4.** After adversarial review rounds 1 to 3.
 
 ## 1. Purpose
 
@@ -187,7 +209,7 @@ Labels, units, explanations and "where to resolve" hints are UI strings keyed
 by those enums, not data from engines. Event `refs` hold opaque ids (job ids, attempt
 ids, launchd labels from the registry), counts and closed codes only,
 validated by a per-kind schema with string values capped at 64 characters and
-matching `^[A-Za-z0-9._:-]+$`. Path-derived identifiers such as brain page ids
+matching `^[A-Za-z0-9_.:-]+$`. Path-derived identifiers such as brain page ids
 are content: they are never streamed, and are resolved only through
 authenticated detail endpoints.
 
@@ -211,6 +233,12 @@ An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, 
 
 ### 5.3 Subprocesses
 
+- Sub-project 0 runs only two commands, `launchctl` and `plutil`, whose
+  absolute paths are the `orbit.json` keys `launchd.launchctl` and
+  `launchd.plutil` (defaults `/bin/launchctl` and `/usr/bin/plutil`). The engine
+  command table described below is deferred to sub-project 1, where the first
+  engine CLIs (atrium, brain, clips) are read; it is not part of the
+  sub-project 0 configuration.
 - `engines.<name>.path` in the instance config is the engine's checkout
   directory, not an executable. orbit's engine table in `orbit.json` names,
   per engine, the command (a path relative to that checkout, or an absolute
@@ -246,8 +274,18 @@ cadence, in memory only.
 - On reconnect with `Last-Event-ID` inside the ring (last 1000 messages): the
   missed messages in order. Outside the ring or after a server restart: a
   `resync` message followed by the full snapshot set and `sync`.
-- A snapshot message is sent only when its content hash changes. Heartbeat
-  comment every 15 s.
+- A snapshot message is sent only when its content hash changes. Heartbeat:
+  every 15 s the server sends a named event, `event: ping` with `data: 1` and
+  no `id:` line. It is not a comment line, because comments never reach the
+  client's `EventSource` and so cannot feed its watchdog; an empty data buffer
+  is not dispatched by browsers, hence `data: 1`; and with no `id:` the
+  client's `Last-Event-ID` stays that of the last real message.
+- The client's watchdog marks the stream stale after 45 s without a message or
+  `ping`. When the browser gives up on a stream and the client opens a
+  replacement `EventSource`, that source carries no `Last-Event-ID`, so the
+  server sends a full opening without `resync`. The client therefore applies a
+  synthetic `resync` on that source's first open, which drops the state it
+  holds so the fresh opening never duplicates it.
 - Snapshots and events carry no content (section 6.6).
 
 ### 5.6 orbit's own state
@@ -274,8 +312,12 @@ Files are created `0600`, the directory `0700`.
 - Only enum keys, numbers, codes and timestamps are stored.
 - WAL mode, `PRAGMA wal_autocheckpoint` default, a `wal_checkpoint(TRUNCATE)`
   after each hourly prune.
-- Hourly prune: raw rows older than 7 days, rollups older than 90 days. Hard
-  cap 200 MB: past it, oldest raw rows are deleted first.
+- Hourly prune: metric samples older than 7 days; launchd observations older
+  than 90 days, except that each label's latest observation is never pruned
+  (observations are written only on change, so a quiet label's newest row can
+  be arbitrarily old and is still its baseline); rollups and run intervals
+  older than 90 days. Hard cap 200 MB: past it, oldest raw rows are deleted
+  first.
 - Periods outside an orbit run interval are "no observation" and drawn as
   unknown, never as healthy or failed.
 
@@ -290,8 +332,16 @@ Files are created `0600`, the directory `0700`.
   `schema_invalid` on an unrecognised format.
 - A scheduled run is "missed" only when orbit observed the whole expected
   window and the run count did not increase; otherwise the window is unknown.
+  The expected window is 1.5 x the schedule period (`StartInterval`, or the
+  smallest period implied by `StartCalendarInterval`: a month field 366 days, a
+  day field 31 days, a weekday 7 days, an hour 1 day, a minute 1 hour). A
+  monthly calendar job's window therefore reaches 46.5 days before the end of
+  the bucket, so the history read looks back 47 days before the start of the
+  chosen range. Observations are kept 90 days (section 5.7), so a yearly
+  calendar job's window is never covered and such a job is never claimed
+  missed.
 - A `keepalive` job is healthy while it has a pid; a non-zero last exit with no
-  pid is `down`.
+  pid is `down`. Exit codes are not consulted for keepalive jobs.
 
 ## 6. Security
 
@@ -381,7 +431,7 @@ indicator (live, stale, offline), and a toast when a component turns `down`.
    cards.
 2. **System.** One row per registered launchd label: component, role,
    schedule, pid, and a heartbeat strip of observations coloured by exit code,
-   unknown periods grey, over 24 h / 7 d / 30 d.
+   unknown periods grey, over 24 h / 7 d / 30 d (section 7.2).
 
 **Sub-project 1** (each admitted per section 2)
 
@@ -405,6 +455,40 @@ indicator (live, stale, offline), and a toast when a component turns `down`.
    related-unlinked suggestions load on demand. Side panels: lint, doctor.
 6. **Clips.** Funnel from capture lanes into pending, needs-review and
    reconciled; intake per day; ages of the oldest stuck items.
+
+### 7.2 Shell and System implementation
+
+**Heartbeat strips** are rows of SVG rectangles, one per bucket, built on the
+client from `GET /api/launchd/history`. Ranges and bucket counts: 24 h as
+48 x 30 min, 7 d as 84 x 2 h, 30 d as 90 x 8 h. Bucket edges are half-open,
+`[start, end)`, and the newest bucket ends at the server's `now`.
+
+Each bucket takes exactly one state; the first rule that applies wins:
+
+1. `unknown`: orbit did not run for the whole bucket (the bucket is not covered
+   by run intervals, with 90 s of slack past a run's last touch, because orbit
+   touches its run row every 60 s).
+2. `failed`: for a `keepalive` job, no pid at the end of the bucket; for a
+   `scheduled` job, a non-zero last exit in any observation inside the bucket
+   or the last one before its end. A keepalive job is `ok` otherwise, and exit
+   codes are not consulted for it.
+3. `ok`: a scheduled job's run count increased inside the bucket.
+4. `missed`: the scheduled job's expected window (section 5.8) was fully
+   watched and the run count did not increase in it.
+5. `idle`: none of the above (a scheduled job with nothing due).
+
+`GET /api/launchd/history` returns the server's `now` (epoch ms) with the
+observations and runs, and the strip is built against that value, not the
+client clock. Clock skew, or the 60 s run-interval touch, therefore cannot push
+the newest bucket past the 90 s coverage slack and turn it `unknown`.
+
+**Command palette.** A plain dialog around cmdk's `Command`, not
+`Command.Dialog`: Radix injects a runtime `<style>` element that the CSP
+(`default-src 'self'`) blocks. The dialog traps Tab and restores focus on
+close.
+
+**Home pulse.** The satellite pulse is a CSS keyframe animation, not a Motion
+component, to stay inside the bundle budget (section 11).
 
 ### 7.1 Visual language
 
@@ -476,6 +560,9 @@ indicator (live, stale, offline), and a toast when a component turns `down`.
 - knip and jscpd clean; dependency-cruiser forbids `apps/web -> apps/server`,
   any adapter importing another adapter, and `packages/contract` importing
   `apps/*`.
+- Development: the Vite dev server proxies `/api` to the running server on
+  `127.0.0.1:8790` and rewrites `Origin` to the server's own origin, because
+  the server accepts only its own origins (section 6.5).
 - Bundle budget (size-limit, brotli): initial route at most 150 KB; the graph
   route chunk and the flow route chunk at most 250 KB each, loaded lazily.
   The first plan task measures a prototype with sigma, graphology, React Flow
@@ -524,7 +611,9 @@ Library choices:
 - Graph: sigma 3 with graphology (ForceAtlas2 and Louvain in a web worker,
   neighbourhood queries) through `@react-sigma/core`.
 - Flow diagram: `@xyflow/react` with custom stage nodes and animated edges.
-- Charts: Recharts for panels; uPlot for heartbeat strips and sparklines.
+- Charts: Recharts for panels. Heartbeat strips in sub-project 0 are SVG
+  rectangles (section 7.2); uPlot stays the choice for dense metric charts and
+  sparklines in later sub-projects.
 - Command palette: `cmdk`.
 - Data and routing: TanStack Query and TanStack Router; Motion; Tailwind 4 from
   the template; `react-markdown` without raw HTML.

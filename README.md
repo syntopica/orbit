@@ -54,6 +54,18 @@ Add the machine's tailnet name to `allowedHosts` and your tailnet login to
 }
 ```
 
+## Develop
+
+```bash
+pnpm install
+pnpm --filter @orbit/server build && SYNTOPICA_DATA=/path/to/instance node apps/server/dist/orbit.mjs serve
+pnpm --filter @orbit/web dev      # http://localhost:5173, /api proxied to 127.0.0.1:8790
+pnpm gate                         # everything CI runs, including the Playwright suite
+```
+
+The dev server rewrites `Origin` to the server's own origin, because the server
+accepts only its own origins.
+
 orbit is an engine: this repository holds no instance data. Everything it shows
 is discovered at runtime from the instance under `SYNTOPICA_DATA`.
 
