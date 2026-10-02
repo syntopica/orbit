@@ -3,6 +3,7 @@ import { cleanup } from '@testing-library/react'
 import { afterEach, beforeEach, vi } from 'vitest'
 
 import { FakeEventSource } from './FakeEventSource'
+import { mediaMatches } from './mediaMatches'
 
 beforeEach(() => {
   FakeEventSource.instances = []
@@ -27,4 +28,18 @@ class FakeResizeObserver {
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', FakeResizeObserver)
   Element.prototype.scrollIntoView = () => undefined
+})
+
+beforeEach(() => {
+  mediaMatches.clear()
+  vi.stubGlobal('matchMedia', (query: string) => ({
+    matches: mediaMatches.has(query),
+    media: query,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+    addListener: () => undefined,
+    removeListener: () => undefined,
+    onchange: null,
+    dispatchEvent: () => false,
+  }))
 })
