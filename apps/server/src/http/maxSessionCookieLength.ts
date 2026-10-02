@@ -1,0 +1,1 @@
+export const MAX_SESSION_COOKIE_LENGTH = 64
