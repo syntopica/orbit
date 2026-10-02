@@ -15,7 +15,7 @@ const status = {
       wasted_1h_s: 0,
     },
   },
-  nodes: { n1: {}, n2: {} },
+  nodes: { n1: { age_s: 1 }, n2: { age_s: 2 } },
   cooldowns: { runner: 60 },
   recent_failures: [],
 }

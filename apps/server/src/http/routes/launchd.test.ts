@@ -22,6 +22,7 @@ describe('launchd routes', () => {
       authDb,
       historyDb,
       hub: createHub({ ringSize: 2, recentEvents: 2, firstId: 1 }),
+      worker: null,
       catalog: {
         rows: vi.fn<LaunchdCatalog['rows']>().mockResolvedValue([
           {

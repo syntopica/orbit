@@ -30,6 +30,7 @@ describe('createApp static files', () => {
       historyDb: openHistoryDb(),
       hub: createHub({ ringSize: 2, recentEvents: 2, firstId: 1 }),
       catalog: null,
+      worker: null,
       guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
       webRoot,
       now: () => Date.now(),

@@ -6,7 +6,7 @@ import { readCappedText } from './readCappedText'
 import { readWorkerToken } from './readWorkerToken'
 
 export const fetchWorkerStatus = async (
-  deps: WorkerAdapterDeps,
+  deps: Pick<WorkerAdapterDeps, 'url' | 'tokenFile' | 'fetch'>,
   signal: AbortSignal,
 ): Promise<WorkerStatus> => {
   const token = await readWorkerToken(deps.tokenFile)

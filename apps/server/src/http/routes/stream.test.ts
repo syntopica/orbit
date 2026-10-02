@@ -51,6 +51,7 @@ const setup = () => {
     historyDb: openHistoryDb(),
     hub,
     catalog: null,
+    worker: null,
     guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
     webRoot: '/nonexistent',
     now: () => Date.now(),

@@ -13,6 +13,7 @@ import { getLaunchdHistory } from './routes/getLaunchdHistory'
 import { getLaunchdRows } from './routes/getLaunchdRows'
 import { getSnapshots } from './routes/getSnapshots'
 import { getStream } from './routes/getStream'
+import { getWorker } from './routes/getWorker'
 import { postLogout } from './routes/postLogout'
 import { postPair } from './routes/postPair'
 import { postSession } from './routes/postSession'
@@ -23,6 +24,7 @@ import { tailnetLogin } from './tailnetLogin'
 export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   const auth = { db: deps.authDb, now: deps.now }
   const pool = createDetailPool(2)
+  const workerPool = createDetailPool(2)
   const app = new Hono<OrbitEnv>()
   // Fixed JSON only: the error itself is never logged or returned (spec 8).
   app.onError((_error, c) => c.json({ error: 'internal' }, 500))
@@ -47,6 +49,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
     '/launchd/history',
     getLaunchdHistory(deps.historyDb, deps.catalog, pool, deps.now),
   )
+  api.get('/worker', getWorker(deps.worker, workerPool, deps.now))
   api.all('*', (c) => c.json({ error: 'not_found' }, 404))
   app.route('/api', api)
   serveWeb(app, deps.webRoot)

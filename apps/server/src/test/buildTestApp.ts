@@ -16,6 +16,7 @@ export const buildTestApp = (overrides: Partial<AppDeps> = {}) => {
     historyDb: openHistoryDb(),
     hub: createHub({ ringSize: 10, recentEvents: 5, firstId: 1 }),
     catalog: null,
+    worker: null,
     guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
     webRoot: '/nonexistent',
     ...overrides,

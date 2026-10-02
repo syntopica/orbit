@@ -3,12 +3,14 @@ import type { DatabaseSync } from 'node:sqlite'
 import type { GuardConfig } from './GuardConfig'
 import type { Hub } from './Hub'
 import type { LaunchdCatalog } from './LaunchdCatalog'
+import type { WorkerReader } from './WorkerReader'
 
 export type AppDeps = {
   readonly authDb: DatabaseSync
   readonly historyDb: DatabaseSync
   readonly hub: Hub
   readonly catalog: LaunchdCatalog | null
+  readonly worker: WorkerReader | null
   readonly guard: GuardConfig
   readonly webRoot: string
   readonly now: () => number
