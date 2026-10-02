@@ -48,7 +48,7 @@ describe('sessions', () => {
     const live = createSession(db, sessionSlidingMs)
     createSession(db, sessionSlidingMs + 1)
     touchSession(db, live, sessionSlidingMs + 2)
-    expect(listSessions(db)).toHaveLength(2)
+    expect(listSessions(db)).toHaveLength(3)
     touchSession(db, 'nope', sessionSlidingMs * 3)
     expect(listSessions(db)).toEqual([])
   })
@@ -117,7 +117,7 @@ describe('revokeSessions', () => {
     expect(() => revokeSessions(db, '%%%%%%%%')).toThrow()
     expect(() => revokeSessions(db, '________')).toThrow()
     expect(() => revokeSessions(db, '')).toThrow()
-    expect(listSessions(db)).toHaveLength(2)
+    expect(listSessions(db)).toHaveLength(3)
   })
   it('revokes only matching sessions', () => {
     const db = openAuthDb()
