@@ -20,4 +20,9 @@ export default [
     ],
     rules: { 'security/detect-non-literal-fs-filename': 'off' },
   },
+  {
+    // Static web files: the path is checked by isUnsafeWebPath and realpath-confined to webRoot.
+    files: ['src/http/resolveWebFile.ts', 'src/http/serveWeb.ts'],
+    rules: { 'security/detect-non-literal-fs-filename': 'off' },
+  },
 ]
