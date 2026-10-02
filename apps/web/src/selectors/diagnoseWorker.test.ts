@@ -25,16 +25,19 @@ describe('diagnoseWorker', () => {
       blockers: [],
     })
   })
-  it('is working when something runs', () => {
+  it('is working when something runs, still naming what holds the rest', () => {
     const view = workerView({
       queues: [...waiting, workerQueue({ live: 1 })],
       nodes: [workerNode()],
+      cooldowns: [{ runner: 'runner-a', availableAt: NOW + 60_000 }],
     })
     expect(diagnoseWorker(view)).toEqual({
       state: 'working',
       queued: 5,
       live: 1,
-      blockers: [],
+      blockers: [
+        { kind: 'cooldown', subject: 'runner-a', ms: 60_000, code: null },
+      ],
     })
   })
   it('lists cooldowns against the server clock, never negative', () => {

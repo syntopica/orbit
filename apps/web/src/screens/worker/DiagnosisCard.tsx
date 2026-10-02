@@ -1,6 +1,6 @@
 import { WORKER_LABELS } from '../../labels/workerLabels'
 import type { DiagnosisCardProps } from '../../types/DiagnosisCardProps'
-import { BlockerLine } from './BlockerLine'
+import { BlockerList } from './BlockerList'
 
 export const DiagnosisCard = ({ diagnosis }: DiagnosisCardProps) => (
   <section
@@ -21,6 +21,9 @@ export const DiagnosisCard = ({ diagnosis }: DiagnosisCardProps) => (
         {WORKER_LABELS.waiting}
       </p>
     )}
+    {diagnosis.state === 'working' && diagnosis.blockers.length > 0 && (
+      <BlockerList blockers={diagnosis.blockers} />
+    )}
     {diagnosis.state === 'blocked' && (
       <>
         <p>
@@ -29,14 +32,7 @@ export const DiagnosisCard = ({ diagnosis }: DiagnosisCardProps) => (
         {diagnosis.blockers.length === 0 ? (
           <p className="text-muted">{WORKER_LABELS.noCause}</p>
         ) : (
-          <ul className="list-disc space-y-1 pl-5">
-            {diagnosis.blockers.map((blocker) => (
-              <BlockerLine
-                key={`${blocker.kind}:${blocker.subject ?? ''}`}
-                blocker={blocker}
-              />
-            ))}
-          </ul>
+          <BlockerList blockers={diagnosis.blockers} />
         )}
       </>
     )}
