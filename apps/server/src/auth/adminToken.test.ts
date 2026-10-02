@@ -1,3 +1,5 @@
+import { createHash } from 'node:crypto'
+
 import { openAuthDb } from '../test/openAuthDb'
 import { createAdminToken } from './createAdminToken'
 import { verifyAdminToken } from './verifyAdminToken'
@@ -14,7 +16,8 @@ describe('admin token', () => {
     const stored = db.prepare('SELECT hash FROM admin_token').get() as {
       hash: string
     }
-    expect(stored.hash).not.toContain(second)
+    expect(Buffer.from(second, 'base64url')).toHaveLength(32)
+    expect(stored.hash).toBe(createHash('sha256').update(second).digest('hex'))
   })
   it('rejects empty and near-miss tokens', () => {
     const db = openAuthDb()
