@@ -1,1 +1,55 @@
 @import 'tailwindcss';
+@import '@fontsource/geist-sans/400.css';
+@import '@fontsource/geist-sans/600.css';
+@import '@fontsource/geist-mono/400.css';
+
+@theme {
+  --font-sans: 'Geist Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --color-space: #05070d;
+  --color-panel: #0c111c;
+  --color-line: #1c2536;
+  --color-ink: #e6edf7;
+  --color-muted: #8391a7;
+  --color-accent: #6ee7ff;
+  --color-ok: #34d399;
+  --color-warn: #fbbf24;
+  --color-down: #f87171;
+  --color-unknown: #475569;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-space: #f5f7fb;
+    --color-panel: #ffffff;
+    --color-line: #d8dee9;
+    --color-ink: #0b1220;
+    --color-muted: #4b5568;
+    --color-accent: #0e7490;
+    --color-ok: #047857;
+    --color-warn: #b45309;
+    --color-down: #b91c1c;
+    --color-unknown: #64748b;
+  }
+}
+
+html,
+body {
+  background: var(--color-space);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}

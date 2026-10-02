@@ -1,7 +1,13 @@
 import { createKnipConfig } from '@syntopica/quality-config/knip'
 
-// Placeholder until the web app imports the contract in a later task.
+// @orbit/contract and cmdk are imported by later tasks; the fonts are imported
+// from styles.css, which knip does not follow.
 export default createKnipConfig({
   framework: 'vite-react',
-  ignoreDependencies: ['@orbit/contract'],
+  ignoreDependencies: [
+    '@orbit/contract',
+    'cmdk',
+    '@fontsource/geist-sans',
+    '@fontsource/geist-mono',
+  ],
 })
