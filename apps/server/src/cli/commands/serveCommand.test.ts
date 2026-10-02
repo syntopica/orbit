@@ -89,4 +89,13 @@ describe('serveCommand', () => {
     ])
     expect(out).toEqual([])
   })
+
+  it('--print-plist refuses a relative SYNTOPICA_DATA', async () => {
+    const { io, err, out } = collectIo({ SYNTOPICA_DATA: 'relative/instance' })
+    expect(await serveCommand(['--print-plist'], io)).toBe(1)
+    expect(err).toEqual([
+      'orbit: set SYNTOPICA_DATA to the absolute path of the instance',
+    ])
+    expect(out).toEqual([])
+  })
 })

@@ -11,7 +11,8 @@ pnpm install && pnpm build
 export SYNTOPICA_DATA=/path/to/instance
 node apps/server/dist/orbit.mjs token create      # prints the admin token once
 node apps/server/dist/orbit.mjs doctor
-node apps/server/dist/orbit.mjs serve --print-plist > ~/Library/LaunchAgents/com.syntopica.orbit.plist
+plist=$(mktemp) && node apps/server/dist/orbit.mjs serve --print-plist > "$plist" \
+  && mv "$plist" ~/Library/LaunchAgents/com.syntopica.orbit.plist
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.syntopica.orbit.plist
 ```
 
@@ -27,7 +28,7 @@ tailscale serve --bg --https=443 http://127.0.0.1:8790
 
 Add the machine's tailnet name to `allowedHosts` and your tailnet login to
 `allowedLogins` in `$SYNTOPICA_DATA/orbit/orbit.json`, then pair a phone with
-`orbit pair` and scan the QR code.
+`node apps/server/dist/orbit.mjs pair` and scan the QR code.
 
 `orbit.json` example (placeholders):
 
