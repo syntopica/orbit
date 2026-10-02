@@ -17,3 +17,14 @@ afterEach(() => {
 
 // jsdom does not implement scrolling; the router calls it on navigation.
 window.scrollTo = () => undefined
+
+// jsdom lacks these; cmdk's list measures and scrolls its items.
+class FakeResizeObserver {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+beforeEach(() => {
+  vi.stubGlobal('ResizeObserver', FakeResizeObserver)
+  Element.prototype.scrollIntoView = () => undefined
+})
