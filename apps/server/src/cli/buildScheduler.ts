@@ -1,0 +1,22 @@
+import { buildAdapters } from '../adapters/buildAdapters'
+import { recordLaunchdObservation } from '../history/recordLaunchdObservation'
+import { runProcess } from '../process/runProcess'
+import { createScheduler } from '../scheduler/createScheduler'
+import type { Hub } from '../types/Hub'
+import type { LoopHandle } from '../types/LoopHandle'
+import type { OrbitState } from '../types/OrbitState'
+
+export const buildScheduler = (state: OrbitState, hub: Hub): LoopHandle =>
+  createScheduler(
+    buildAdapters({
+      config: state.config,
+      stateDir: state.stateDir,
+      uid: process.getuid?.() ?? 0,
+      record: (observation) => {
+        recordLaunchdObservation(state.historyDb, observation)
+      },
+      run: runProcess,
+      fetch,
+    }),
+    hub,
+  )

@@ -1,4 +1,4 @@
-import { mkdtemp } from 'node:fs/promises'
+import { mkdir, mkdtemp } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -6,43 +6,49 @@ import { openTestState } from '../../test/openTestState'
 import { writeFakeBin } from '../../test/writeFakeBin'
 import { checkOrbitPlist } from './checkOrbitPlist'
 
-const levelFor = async (plutil: string) => {
-  vi.stubEnv('HOME', await mkdtemp(join(tmpdir(), 'orbit-home-')))
-  const state = await openTestState({ launchd: { plutil } })
+const levelFor = async (makePlutil: (home: string) => Promise<string>) => {
+  const home = await mkdtemp(join(tmpdir(), 'orbit-home-'))
+  const plutil = await makePlutil(home)
+  const state = await openTestState({ launchd: { plutil } }, { HOME: home })
   const result = await checkOrbitPlist(state)
   state.close()
   return result
 }
 
-const printing = async (json: string) =>
+// Answers only for the plist under the HOME the check was given.
+const printing = (json: string) => async (home: string) =>
   writeFakeBin(
     'plutil',
-    `case "$5" in */Library/LaunchAgents/com.syntopica.orbit.plist) ;; *) exit 1;; esac
+    `[ "$5" = '${home}/Library/LaunchAgents/com.syntopica.orbit.plist' ] || exit 1
 echo '${json}'`,
   )
 
 describe('checkOrbitPlist', () => {
-  afterEach(() => {
-    vi.unstubAllEnvs()
-  })
-
   it('passes when the plist carries Umask 63', async () => {
-    expect(await levelFor(await printing('{"Umask":63}'))).toMatchObject({
+    expect(await levelFor(printing('{"Umask":63}'))).toMatchObject({
       level: 'ok',
     })
   })
 
   it('fails when the Umask differs or is absent', async () => {
-    expect((await levelFor(await printing('{"Umask":18}'))).level).toBe('fail')
-    expect((await levelFor(await printing('{}'))).level).toBe('fail')
-    expect((await levelFor(await printing('[]'))).level).toBe('fail')
-    expect((await levelFor(await printing('nope'))).level).toBe('fail')
+    expect((await levelFor(printing('{"Umask":18}'))).level).toBe('fail')
+    expect((await levelFor(printing('{}'))).level).toBe('fail')
+    expect((await levelFor(printing('[]'))).level).toBe('fail')
+    expect((await levelFor(printing('nope'))).level).toBe('fail')
   })
 
   it('warns when the plist is not installed or plutil is missing', async () => {
-    expect((await levelFor(await writeFakeBin('plutil', 'exit 1'))).level).toBe(
-      'warn',
-    )
-    expect((await levelFor('/nonexistent/plutil')).level).toBe('warn')
+    expect(
+      await levelFor(async () => writeFakeBin('plutil', 'exit 1')),
+    ).toMatchObject({ level: 'warn', detail: 'LaunchAgent not installed' })
+    expect(
+      await levelFor(async (home) => {
+        await mkdir(home, { recursive: true })
+        return join(home, 'no-plutil')
+      }),
+    ).toMatchObject({
+      level: 'warn',
+      detail: 'plutil unavailable',
+    })
   })
 })

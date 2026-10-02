@@ -1,22 +1,26 @@
 import type { ServeStatus } from '../../types/ServeStatus'
+import { isOrbitProxy } from './isOrbitProxy'
 import { parseJsonOrNull } from './parseJsonOrNull'
+import { serveEntrySchema } from './serveEntrySchema'
 import { serveHost } from './serveHost'
 import { serveStatusSchema } from './serveStatusSchema'
 
-// Names whose `/` handler proxies to this port, and which of them Funnel
-// exposes. Anything unparseable reads as nothing served.
+// served: names whose `/` handler proxies to this port. funnelled: names
+// Funnel exposes whose handlers (any path) proxy to it. Entries that do not
+// parse are skipped alone; anything unparseable reads as nothing served.
 export const readServeStatus = (stdout: string, port: number): ServeStatus => {
   const parsed = serveStatusSchema.safeParse(parseJsonOrNull(stdout))
   const data = parsed.success ? parsed.data : {}
-  const target = `http://127.0.0.1:${String(port)}`
-  const served = Object.entries(data.Web ?? {}).filter(([, web]) => {
-    const proxy = web.Handlers['/']?.Proxy
-    return proxy === target || proxy === `${target}/`
-  })
-  return {
-    served: served.map(([hostPort]) => serveHost(hostPort)),
-    funnelled: served
-      .filter(([hostPort]) => data.AllowFunnel?.[hostPort] === true)
-      .map(([hostPort]) => serveHost(hostPort)),
+  const served: string[] = []
+  const funnelled: string[] = []
+  for (const [hostPort, raw] of Object.entries(data.Web ?? {})) {
+    const entry = serveEntrySchema.safeParse(raw)
+    if (!entry.success) continue
+    const handlers = entry.data.Handlers
+    const host = serveHost(hostPort)
+    if (isOrbitProxy(handlers['/']?.Proxy, port)) served.push(host)
+    const any = Object.values(handlers).some((h) => isOrbitProxy(h.Proxy, port))
+    if (any && data.AllowFunnel?.[hostPort] === true) funnelled.push(host)
   }
+  return { served, funnelled }
 }

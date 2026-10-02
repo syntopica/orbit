@@ -15,10 +15,6 @@ const launchctl = `[ -n "$ORBIT_PROBE_SECRET" ] && exit 9
 [ "$1" = print ] && [ "$2" = "gui/${uid}/com.example.loaded" ]`
 
 describe('checkLaunchdLoaded', () => {
-  afterEach(() => {
-    vi.unstubAllEnvs()
-  })
-
   it('passes when nothing is registered', async () => {
     const state = await openTestState()
     expect((await checkLaunchdLoaded(state)).level).toBe('ok')
@@ -26,13 +22,15 @@ describe('checkLaunchdLoaded', () => {
   })
 
   it('names the labels launchd does not know, and passes the loaded ones', async () => {
-    vi.stubEnv('ORBIT_PROBE_SECRET', 'leak')
-    const state = await openTestState({
-      launchd: {
-        launchctl: await writeFakeBin('launchctl', launchctl),
-        labels: [entry('com.example.loaded'), entry('com.example.gone')],
+    const state = await openTestState(
+      {
+        launchd: {
+          launchctl: await writeFakeBin('launchctl', launchctl),
+          labels: [entry('com.example.loaded'), entry('com.example.gone')],
+        },
       },
-    })
+      { ORBIT_PROBE_SECRET: 'leak' },
+    )
     expect(await checkLaunchdLoaded(state)).toMatchObject({
       level: 'fail',
       detail: 'not loaded: com.example.gone',

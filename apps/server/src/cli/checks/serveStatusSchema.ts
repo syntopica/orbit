@@ -1,16 +1,7 @@
 import { z } from 'zod'
 
+// Entries are validated one by one, so one malformed host never hides the rest.
 export const serveStatusSchema = z.object({
-  Web: z
-    .record(
-      z.string(),
-      z.object({
-        Handlers: z.record(
-          z.string(),
-          z.object({ Proxy: z.string().optional() }),
-        ),
-      }),
-    )
-    .optional(),
-  AllowFunnel: z.record(z.string(), z.boolean()).optional(),
+  Web: z.record(z.string(), z.unknown()).optional(),
+  AllowFunnel: z.record(z.string(), z.unknown()).optional(),
 })

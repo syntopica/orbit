@@ -33,10 +33,18 @@ describe('openState', () => {
     state.close()
   })
 
-  it('sets the process umask to 077 before it opens anything', async () => {
+  it('leaves the process umask at 077', async () => {
     const state = await openState({ SYNTOPICA_DATA: await tempInstance() })
     expect(process.umask(0o077)).toBe(0o077)
     state.close()
+  })
+
+  it('closes twice without failing', async () => {
+    const state = await openState({ SYNTOPICA_DATA: await tempInstance() })
+    state.close()
+    expect(() => {
+      state.close()
+    }).not.toThrow()
   })
 
   it('closes both databases', async () => {

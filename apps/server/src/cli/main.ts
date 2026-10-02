@@ -1,6 +1,6 @@
-import { runCli } from './runCli'
+import { runMain } from './runMain'
 
-process.exitCode = await runCli(process.argv.slice(2), {
+process.exitCode = await runMain(process.argv.slice(2), {
   out: (line) => process.stdout.write(`${line}\n`),
   err: (line) => process.stderr.write(`${line}\n`),
   env: process.env,

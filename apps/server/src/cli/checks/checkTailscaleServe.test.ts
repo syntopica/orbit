@@ -15,6 +15,8 @@ const web = (path: string, port: number, funnel = false): string =>
 
 // Puts a fake `tailscale` first on PATH that prints the given status, and
 // fails when the parent's variables leak into its environment.
+let env: NodeJS.ProcessEnv = {}
+
 const fakeTailscale = async (stdout: string, code = 0): Promise<void> => {
   const bin = await writeFakeBin(
     'tailscale',
@@ -24,23 +26,22 @@ ${stdout}
 JSON
 exit ${String(code)}`,
   )
-  vi.stubEnv(
-    'PATH',
-    `${bin.replace(/\/tailscale$/, '')}:${process.env['PATH'] ?? ''}`,
-  )
-  vi.stubEnv('ORBIT_PROBE_SECRET', 'leak')
+  env = {
+    PATH: `${bin.replace(/\/tailscale$/, '')}:${process.env['PATH'] ?? ''}`,
+    ORBIT_PROBE_SECRET: 'leak',
+  }
 }
 
 const check = async (allowedHosts: string[]) => {
-  const state = await openTestState({ allowedHosts, port: 8790 })
+  const state = await openTestState({ allowedHosts, port: 8790 }, env)
   const result = await checkTailscaleServe(state)
   state.close()
   return result
 }
 
 describe('checkTailscaleServe', () => {
-  afterEach(() => {
-    vi.unstubAllEnvs()
+  beforeEach(() => {
+    env = {}
   })
 
   it('passes without running tailscale when nothing is published', async () => {
@@ -58,6 +59,11 @@ describe('checkTailscaleServe', () => {
   it('fails when Funnel exposes the served name', async () => {
     await fakeTailscale(web('/', 8790, true))
     expect(await check([HOST])).toMatchObject({ level: 'fail' })
+    expect((await check([HOST])).detail).toContain('Funnel')
+  })
+
+  it('fails when Funnel exposes a host that proxies orbit from a sub-path', async () => {
+    await fakeTailscale(web('/other', 8790, true))
     expect((await check([HOST])).detail).toContain('Funnel')
   })
 
@@ -80,7 +86,7 @@ describe('checkTailscaleServe', () => {
   })
 
   it('warns when the tailscale CLI is absent', async () => {
-    vi.stubEnv('PATH', '/nonexistent')
+    env = { PATH: '/nonexistent' }
     expect((await check([HOST])).level).toBe('warn')
   })
 })

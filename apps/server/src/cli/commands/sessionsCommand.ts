@@ -1,3 +1,4 @@
+import { InvalidPrefixError } from '../../auth/InvalidPrefixError'
 import { listSessions } from '../../auth/listSessions'
 import { revokeSessions } from '../../auth/revokeSessions'
 import type { CliIo } from '../../types/CliIo'
@@ -22,8 +23,12 @@ export const sessionsCommand = async (
       try {
         io.out(`revoked ${String(revokeSessions(state.authDb, args[1]))}`)
         return 0
-      } catch {
-        io.err('refused: the prefix must be at least 8 hex characters')
+      } catch (error) {
+        io.err(
+          error instanceof InvalidPrefixError
+            ? 'refused: the prefix must be at least 8 hex characters'
+            : 'orbit: failed',
+        )
         return 1
       }
     }

@@ -78,4 +78,12 @@ describe('startHistory', () => {
     vi.advanceTimersByTime(3_600_000)
     expect(count(db, 'metric_samples')).toBe(1)
   })
+
+  it('survives a database error in the run touch or the prune', () => {
+    const db = openHistoryDb()
+    const hub = createHub({ ringSize: 10, recentEvents: 5, firstId: 1 })
+    startHistory(db, hub)
+    db.close()
+    expect(() => vi.advanceTimersByTime(3_600_000)).not.toThrow()
+  })
 })

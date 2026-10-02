@@ -6,6 +6,7 @@ export type OrbitState = {
   readonly dataDir: string
   readonly stateDir: string
   readonly config: OrbitConfig
+  readonly env: NodeJS.ProcessEnv
   readonly authDb: DatabaseSync
   readonly historyDb: DatabaseSync
   close(): void

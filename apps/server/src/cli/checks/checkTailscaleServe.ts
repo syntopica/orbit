@@ -14,7 +14,7 @@ export const checkTailscaleServe: DoctorCheck = async (state) => {
   const result = await runProcess({
     file: 'tailscale',
     args: ['serve', 'status', '--json'],
-    env: buildChildEnv(process.env, {}),
+    env: buildChildEnv(state.env, {}),
     timeoutMs: 5000,
     maxBytes: 1_048_576,
   }).catch(() => null)

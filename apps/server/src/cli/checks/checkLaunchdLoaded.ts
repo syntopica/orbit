@@ -14,7 +14,7 @@ export const checkLaunchdLoaded: DoctorCheck = async (state) => {
     const result = await runProcess({
       file: launchd.launchctl,
       args: ['print', `gui/${String(uid)}/${entry.label}`],
-      env: buildChildEnv(process.env, {}),
+      env: buildChildEnv(state.env, {}),
       timeoutMs: 5000,
       maxBytes: 1_048_576,
     }).catch(() => null)

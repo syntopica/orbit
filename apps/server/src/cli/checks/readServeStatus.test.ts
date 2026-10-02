@@ -59,4 +59,43 @@ describe('readServeStatus', () => {
     expect(readServeStatus('not json', 8790).served).toEqual([])
     expect(readServeStatus('{"Web":5}', 8790).served).toEqual([])
   })
+
+  it('marks Funnel on a host that proxies orbit from any path', () => {
+    const json = status(
+      { '/': { Proxy: 'http://127.0.0.1:9999' }, '/app': { Proxy: PROXY } },
+      { [HOST_PORT]: true },
+    )
+    expect(readServeStatus(json, 8790)).toEqual({
+      served: [],
+      funnelled: [HOST],
+    })
+  })
+
+  it('does not mark Funnel on a host that never proxies orbit', () => {
+    const json = status(
+      { '/': { Proxy: 'http://127.0.0.1:9999' } },
+      { [HOST_PORT]: true },
+    )
+    expect(readServeStatus(json, 8790).funnelled).toEqual([])
+  })
+
+  it('accepts localhost and 127.0.0.1 as orbit proxies', () => {
+    const json = status({ '/': { Proxy: 'http://localhost:8790' } })
+    expect(readServeStatus(json, 8790).served).toEqual([HOST])
+  })
+
+  it('skips a malformed entry alone and still evaluates the others', () => {
+    const json = JSON.stringify({
+      Web: {
+        'bad.example.ts.net:443': { Handlers: 5 },
+        'worse.example.ts.net:443': 'nope',
+        [HOST_PORT]: { Handlers: { '/': { Proxy: PROXY } } },
+      },
+      AllowFunnel: { [HOST_PORT]: true, 'bad.example.ts.net:443': 'yes' },
+    })
+    expect(readServeStatus(json, 8790)).toEqual({
+      served: [HOST],
+      funnelled: [HOST],
+    })
+  })
 })

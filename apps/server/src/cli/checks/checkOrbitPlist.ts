@@ -11,7 +11,7 @@ import { readPlistUmask } from './readPlistUmask'
 export const checkOrbitPlist: DoctorCheck = async (state) => {
   const name = 'orbit plist'
   const plist = join(
-    process.env['HOME'] ?? homedir(),
+    state.env['HOME'] ?? homedir(),
     'Library',
     'LaunchAgents',
     'com.syntopica.orbit.plist',
@@ -19,11 +19,14 @@ export const checkOrbitPlist: DoctorCheck = async (state) => {
   const result = await runProcess({
     file: state.config.launchd?.plutil ?? '/usr/bin/plutil',
     args: ['-convert', 'json', '-o', '-', plist],
-    env: buildChildEnv(process.env, {}),
+    env: buildChildEnv(state.env, {}),
     timeoutMs: 5000,
     maxBytes: 1_048_576,
   }).catch(() => null)
-  if (result === null || result.code !== 0) {
+  if (result === null) {
+    return { name, level: 'warn', detail: 'plutil unavailable' }
+  }
+  if (result.code !== 0) {
     return { name, level: 'warn', detail: 'LaunchAgent not installed' }
   }
   return readPlistUmask(result.stdout) === 63

@@ -27,11 +27,13 @@ export const openState = async (
     dataDir,
     stateDir,
     config,
+    env,
     authDb,
     historyDb,
+    // Idempotent: a failed start and its caller may both close.
     close: () => {
-      authDb.close()
-      historyDb.close()
+      if (authDb.isOpen) authDb.close()
+      if (historyDb.isOpen) historyDb.close()
     },
   }
 }

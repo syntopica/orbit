@@ -1,4 +1,5 @@
 import { createSession } from '../../auth/createSession'
+import { listSessions } from '../../auth/listSessions'
 import { collectIo } from '../../test/collectIo'
 import { tempInstance } from '../../test/tempInstance'
 import { openState } from '../openState'
@@ -39,5 +40,19 @@ describe('sessionsCommand', () => {
     expect(await sessionsCommand([], io)).toBe(2)
     expect(await sessionsCommand(['revoke'], io)).toBe(2)
     expect(err).toHaveLength(2)
+  })
+
+  it('answers a database failure with a fixed line, not the prefix message', async () => {
+    const env = { SYNTOPICA_DATA: await tempInstance() }
+    const state = await openState(env)
+    createSession(state.authDb, Date.now())
+    const prefix = listSessions(state.authDb)[0]?.prefix ?? ''
+    state.authDb.exec(
+      "CREATE TRIGGER no_delete BEFORE DELETE ON sessions BEGIN SELECT RAISE(ABORT, 'locked'); END",
+    )
+    state.close()
+    const { io, err } = collectIo(env)
+    expect(await sessionsCommand(['revoke', prefix], io)).toBe(1)
+    expect(err).toEqual(['orbit: failed'])
   })
 })
