@@ -69,4 +69,24 @@ describe('serveCommand', () => {
     expect(await serveCommand([], io)).toBe(1)
     expect(err).toEqual(['orbit could not start'])
   })
+
+  it('--print-plist prints the rendered plist and exits 0 without starting', async () => {
+    const { io, out } = collectIo({ SYNTOPICA_DATA: '/srv/instance' })
+    expect(await serveCommand(['--print-plist'], io)).toBe(0)
+    const text = out.join('\n')
+    expect(text).toContain('<string>/srv/instance</string>')
+    expect(text).toContain(`<string>${process.execPath}</string>`)
+    expect(text).toContain('<integer>63</integer>')
+    expect(text).not.toContain('__')
+    expect(startServer).not.toHaveBeenCalled()
+  })
+
+  it('--print-plist without SYNTOPICA_DATA reports it and exits 1', async () => {
+    const { io, err, out } = collectIo({})
+    expect(await serveCommand(['--print-plist'], io)).toBe(1)
+    expect(err).toEqual([
+      'orbit: set SYNTOPICA_DATA to the absolute path of the instance',
+    ])
+    expect(out).toEqual([])
+  })
 })

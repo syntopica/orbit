@@ -4,11 +4,13 @@ import { fileURLToPath } from 'node:url'
 import type { CliIo } from '../../types/CliIo'
 import { openState } from '../openState'
 import { startServer } from '../startServer'
+import { printPlistCommand } from './printPlistCommand'
 
 export const serveCommand = async (
-  _args: readonly string[],
+  args: readonly string[],
   io: CliIo,
 ): Promise<number> => {
+  if (args[0] === '--print-plist') return printPlistCommand(io)
   const state = await openState(io.env)
   const controller = new AbortController()
   const webRoot = join(dirname(fileURLToPath(import.meta.url)), 'public')

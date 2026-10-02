@@ -12,6 +12,7 @@ export default [
     // State paths derive from SYNTOPICA_DATA, never request input.
     files: [
       'src/fs/readJsonFile.ts',
+      'src/launchd/readPlistTemplate.ts',
       'src/adapters/worker/readWorkerToken.ts',
       'src/adapters/synthetic/createSyntheticAdapter.ts',
       'src/state/ensureStateDir.ts',
