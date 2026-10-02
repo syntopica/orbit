@@ -70,12 +70,15 @@ describe('GET /api/stream lifecycle', () => {
   it('sends a heartbeat comment every 15 s on the injected clock', async () => {
     vi.useFakeTimers()
     try {
-      const { get } = buildTestApp({ now: () => Date.now() })
+      let clock = 4_000_000_000_000
+      const { get } = buildTestApp({ now: () => clock })
       const res = await get(STREAM)
       const reader: ReadableStreamDefaultReader<Uint8Array> | undefined =
         res.body?.getReader()
       await reader?.read()
-      await vi.advanceTimersByTimeAsync(15_500)
+      // Only the injected clock moves 15 s; the timers move one pump tick.
+      clock += 15_000
+      await vi.advanceTimersByTimeAsync(300)
       const chunk = await reader?.read()
       expect(new TextDecoder().decode(chunk?.value)).toBe(': ping\n\n')
       await reader?.cancel()
