@@ -65,4 +65,15 @@ describe('recordMetrics', () => {
       n: 3,
     })
   })
+
+  it('compares against the last inserted sample when timestamps tie', () => {
+    const db = openHistoryDb()
+    recordMetrics(db, snap(1, startIso))
+    recordMetrics(db, snap(2, startIso))
+    recordMetrics(db, snap(2, startIso))
+    expect(db.prepare('SELECT value FROM metric_samples').all()).toEqual([
+      { value: 1 },
+      { value: 2 },
+    ])
+  })
 })

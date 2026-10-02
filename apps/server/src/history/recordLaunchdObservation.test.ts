@@ -40,4 +40,12 @@ describe('recordLaunchdObservation', () => {
     recordLaunchdObservation(db, { ...base, label: 'com.example.other', at: 2 })
     expect(times(db)).toEqual([1, 2])
   })
+
+  it('compares against the last inserted observation when timestamps tie', () => {
+    const db = openHistoryDb()
+    recordLaunchdObservation(db, { ...base, at: 1 })
+    recordLaunchdObservation(db, { ...base, runs: 4, at: 1 })
+    recordLaunchdObservation(db, { ...base, runs: 4, at: 1 })
+    expect(times(db)).toEqual([1, 1])
+  })
 })

@@ -45,7 +45,7 @@ describe('pruneHistory', () => {
     expect(db.prepare('SELECT count(*) AS n FROM runs').get()).toEqual({ n: 0 })
   })
 
-  it('shrinks to the cap, oldest metric samples first, then observations and rollups', () => {
+  it('shrinks to the cap, oldest metric samples first, then older observations and rollups, keeping each latest per label', () => {
     const db = openHistoryDb()
     const now = Date.now()
     for (let i = 0; i < 500; i += 1) {
@@ -54,6 +54,9 @@ describe('pruneHistory', () => {
     db.prepare(
       'INSERT INTO launchd_observations (label, pid, runs, last_exit, at) VALUES (?, ?, ?, ?, ?)',
     ).run('a', 1, 1, 0, now)
+    db.prepare(
+      'INSERT INTO launchd_observations (label, pid, runs, last_exit, at) VALUES (?, ?, ?, ?, ?)',
+    ).run('a', 1, 0, 0, now - 5)
     db.prepare(
       'INSERT INTO metric_rollups (component, key, hour, min, max, sum, count) VALUES (?, ?, ?, ?, ?, ?, ?)',
     ).run('worker', queued, 1, 1, 1, 1, 1)
@@ -66,8 +69,8 @@ describe('pruneHistory', () => {
       db.prepare('SELECT count(*) AS n FROM metric_samples').get(),
     ).toEqual({ n: 0 })
     expect(
-      db.prepare('SELECT count(*) AS n FROM launchd_observations').get(),
-    ).toEqual({ n: 0 })
+      db.prepare('SELECT label, at FROM launchd_observations').all(),
+    ).toEqual([{ label: 'a', at: now }])
     expect(
       db.prepare('SELECT count(*) AS n FROM metric_rollups').get(),
     ).toEqual({ n: 0 })
