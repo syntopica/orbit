@@ -10,12 +10,15 @@ export const fetchWorkerStatus = async (
   signal: AbortSignal,
 ): Promise<WorkerStatus> => {
   const token = await readWorkerToken(deps.tokenFile)
-  const response = await deps.fetch(`${deps.url}/v1/status`, {
+  const response = await deps.fetch(new URL('/v1/status', deps.url).href, {
     headers: { Authorization: `Bearer ${token}` },
     signal,
   })
-  if (response.status === 401 || response.status === 403)
-    throw new ProcessError('unauthorized')
-  if (!response.ok) throw new ProcessError('unreachable')
+  if (!response.ok) {
+    // An unread body keeps the connection busy until garbage collection.
+    await response.body?.cancel()
+    const denied = response.status === 401 || response.status === 403
+    throw new ProcessError(denied ? 'unauthorized' : 'unreachable')
+  }
   return parseWorkerStatus(await readCappedText(response))
 }
