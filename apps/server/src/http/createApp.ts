@@ -41,7 +41,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   api.use('*', requireSession(deps.authDb, deps.now))
   api.post('/logout', postLogout(auth))
   api.get('/snapshots', getSnapshots(deps.hub))
-  api.get('/stream', refuseHead(), getStream(deps.hub, deps.now))
+  api.get('/stream', refuseHead(), getStream(deps.hub, deps.authDb, deps.now))
   api.get('/launchd', getLaunchdRows(deps.catalog, pool))
   api.get(
     '/launchd/history',
