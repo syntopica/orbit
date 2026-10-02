@@ -37,7 +37,8 @@ export const redeemInvitation = (
     db.exec('COMMIT')
     return session
   } catch (error) {
-    db.exec('ROLLBACK')
+    // SQLite may already have rolled back; a second ROLLBACK would mask the error.
+    if (db.isTransaction) db.exec('ROLLBACK')
     throw error
   }
 }
