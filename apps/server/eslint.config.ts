@@ -17,6 +17,7 @@ export default [
       'src/state/ensureStateDir.ts',
       'src/state/openDatabase.ts',
       'src/**/*.test.ts',
+      'src/test/**/*.ts',
     ],
     rules: { 'security/detect-non-literal-fs-filename': 'off' },
   },

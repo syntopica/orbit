@@ -1,3 +1,7 @@
-import process from 'node:process'
+import { runCli } from './runCli'
 
-process.stdout.write('orbit\n')
+process.exitCode = await runCli(process.argv.slice(2), {
+  out: (line) => process.stdout.write(`${line}\n`),
+  err: (line) => process.stderr.write(`${line}\n`),
+  env: process.env,
+})

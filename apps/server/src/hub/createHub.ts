@@ -14,6 +14,8 @@ export const createHub = (options: {
   recentEvents: number
   firstId: number
 }): Hub => {
+  if (!Number.isInteger(options.ringSize) || options.ringSize < 1)
+    throw new Error('ringSize must be a positive integer')
   const resendMs = 30_000
   let nextId = options.firstId
   const ring = createRing(options.ringSize)

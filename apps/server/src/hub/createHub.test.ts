@@ -150,3 +150,13 @@ describe('createHub', () => {
     expect(late).toHaveLength(1)
   })
 })
+
+describe('createHub ring size', () => {
+  it('rejects a ring smaller than one message', () => {
+    for (const ringSize of [0, -1, 1.5, Number.NaN]) {
+      expect(() =>
+        createHub({ ringSize, recentEvents: 5, firstId: 1 }),
+      ).toThrow('ringSize')
+    }
+  })
+})
