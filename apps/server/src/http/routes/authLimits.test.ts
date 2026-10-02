@@ -22,7 +22,10 @@ describe('auth route input bounds', () => {
     }
   })
   it('turns non-string, oversized or extra fields into the same 401', async () => {
-    const { post } = buildTestApp()
+    const { authDb, post } = buildTestApp()
+    // Real credentials exist, so only the schema stands between input and hashing.
+    createAdminToken(authDb, 0)
+    const { id } = createInvitation(authDb, 1_790_000_000_000)
     vi.mocked(hashSecret).mockClear()
     const bodies = [
       { token: 12_345 },
@@ -40,9 +43,9 @@ describe('auth route input bounds', () => {
       expect(await res.json()).toEqual({ error: 'unauthorized' })
     }
     for (const [i, body] of [
-      { id: 'a'.repeat(11), secret: { not: 'a string' } },
+      { id, secret: { not: 'a string' } },
       { id: 'a'.repeat(33), secret: 'b'.repeat(22) },
-      { id: 'a'.repeat(11), secret: 'b'.repeat(65) },
+      { id, secret: 'b'.repeat(65) },
       'not json',
     ].entries()) {
       const raw = typeof body === 'string' ? body : JSON.stringify(body)
