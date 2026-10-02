@@ -1,0 +1,75 @@
+import { openHistoryDb } from '../test/openHistoryDb'
+import { pruneHistory } from './pruneHistory'
+
+const insertSampleSql =
+  'INSERT INTO metric_samples (component, key, value, at) VALUES (?, ?, ?, ?)'
+const queued = 'worker.queued'
+const hour = 3_600_000
+const day = 24 * hour
+
+describe('pruneHistory', () => {
+  it('rolls up complete hours idempotently and applies retention', () => {
+    const db = openHistoryDb()
+    const now = 100 * day + 30 * 60_000
+    const insert = db.prepare(insertSampleSql)
+    insert.run('worker', queued, 2, now - hour)
+    insert.run('worker', queued, 6, now - hour + 60_000)
+    insert.run('worker', queued, 9, now - 8 * day)
+    const observe = db.prepare(
+      'INSERT INTO launchd_observations (label, pid, runs, last_exit, at) VALUES (?, ?, ?, ?, ?)',
+    )
+    observe.run('a', null, 1, 0, now - 95 * day)
+    observe.run('a', null, 2, 0, now - 92 * day)
+    observe.run('b', null, 1, 0, now - 120 * day)
+    db.prepare('INSERT INTO runs (started, stopped) VALUES (?, ?)').run(
+      now - 91 * day,
+      now - 91 * day,
+    )
+    pruneHistory(db, now)
+    pruneHistory(db, now)
+    const rollup = db
+      .prepare('SELECT min, max, sum, count FROM metric_rollups')
+      .all()
+    expect(rollup).toEqual([{ min: 2, max: 6, sum: 8, count: 2 }])
+    expect(
+      db.prepare('SELECT count(*) AS n FROM metric_samples').get(),
+    ).toEqual({ n: 2 })
+    expect(
+      db
+        .prepare('SELECT label, runs FROM launchd_observations ORDER BY label')
+        .all(),
+    ).toEqual([
+      { label: 'a', runs: 2 },
+      { label: 'b', runs: 1 },
+    ])
+    expect(db.prepare('SELECT count(*) AS n FROM runs').get()).toEqual({ n: 0 })
+  })
+
+  it('shrinks to the cap, oldest metric samples first, then observations and rollups', () => {
+    const db = openHistoryDb()
+    const now = Date.now()
+    for (let i = 0; i < 500; i += 1) {
+      db.prepare(insertSampleSql).run('worker', queued, i, now - i)
+    }
+    db.prepare(
+      'INSERT INTO launchd_observations (label, pid, runs, last_exit, at) VALUES (?, ?, ?, ?, ?)',
+    ).run('a', 1, 1, 0, now)
+    db.prepare(
+      'INSERT INTO metric_rollups (component, key, hour, min, max, sum, count) VALUES (?, ?, ?, ?, ?, ?, ?)',
+    ).run('worker', queued, 1, 1, 1, 1, 1)
+    pruneHistory(db, now, 10 * 1024 * 1024)
+    expect(
+      db.prepare('SELECT count(*) AS n FROM metric_samples').get(),
+    ).toEqual({ n: 500 })
+    pruneHistory(db, now, 1)
+    expect(
+      db.prepare('SELECT count(*) AS n FROM metric_samples').get(),
+    ).toEqual({ n: 0 })
+    expect(
+      db.prepare('SELECT count(*) AS n FROM launchd_observations').get(),
+    ).toEqual({ n: 0 })
+    expect(
+      db.prepare('SELECT count(*) AS n FROM metric_rollups').get(),
+    ).toEqual({ n: 0 })
+  })
+})
