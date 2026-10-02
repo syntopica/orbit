@@ -28,7 +28,7 @@ const make = (run: Parameters<typeof createLaunchdCatalog>[0]['run']) =>
 describe('createLaunchdCatalog', () => {
   afterEach(() => vi.useRealTimers())
 
-  it('reads each schedule once and tolerates a missing plist', async () => {
+  it('caches each good schedule and tolerates a missing plist', async () => {
     let calls = 0
     const catalog = make(async (request) => {
       calls += 1
@@ -41,7 +41,7 @@ describe('createLaunchdCatalog', () => {
     const signal = new AbortController().signal
     const rows = await catalog.rows(signal)
     await catalog.rows(signal)
-    expect(calls).toBe(2)
+    expect(calls).toBe(3)
     expect(rows.map((r) => r.schedule)).toEqual([
       { intervalS: 3600, calendar: false, keepAlive: false },
       null,
@@ -114,5 +114,41 @@ describe('createLaunchdCatalog', () => {
     await expect(catalog.rows(controller.signal)).rejects.toThrow('timeout')
     await catalog.rows(new AbortController().signal).catch(() => undefined)
     expect(calls).toBe(3)
+  })
+  it('retries a failed plutil read on the next call', async () => {
+    let calls = 0
+    const catalog = make(async () => {
+      calls += 1
+      return await Promise.resolve(
+        calls <= 2
+          ? { code: 1, stdout: '' }
+          : { code: 0, stdout: '{"StartInterval":60}' },
+      )
+    })
+    const signal = new AbortController().signal
+    expect((await catalog.rows(signal)).map((r) => r.schedule)).toEqual([
+      null,
+      null,
+    ])
+    expect((await catalog.rows(signal))[0]?.schedule?.intervalS).toBe(60)
+  })
+
+  it('ignores a non-positive StartInterval and a malformed calendar', async () => {
+    const catalog = make(
+      async () =>
+        await Promise.resolve({
+          code: 0,
+          stdout: JSON.stringify({
+            StartInterval: 0,
+            StartCalendarInterval: 'x',
+          }),
+        }),
+    )
+    const rows = await catalog.rows(new AbortController().signal)
+    expect(rows[0]?.schedule).toEqual({
+      intervalS: null,
+      calendar: false,
+      keepAlive: false,
+    })
   })
 })

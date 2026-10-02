@@ -1,17 +1,26 @@
 import type { LabelReading } from '../../types/LabelReading'
 import { summarizeLaunchd } from './summarizeLaunchd'
 
-const entry = (label: string) => ({
+const entry = (label: string, role: 'scheduled' | 'keepalive') => ({
   component: 'worker' as const,
   label,
-  role: 'scheduled' as const,
+  role,
   plist: '/x',
 })
 const reading = (
   label: string,
   state: LabelReading['state'],
   loaded = true,
-): LabelReading => ({ entry: entry(label), loaded, state })
+  extra: {
+    role?: 'scheduled' | 'keepalive'
+    error?: LabelReading['error']
+  } = {},
+): LabelReading => ({
+  entry: entry(label, extra.role ?? 'scheduled'),
+  loaded,
+  state,
+  error: extra.error ?? null,
+})
 const failing = (r: LabelReading) =>
   summarizeLaunchd([r], new Date()).metrics.find(
     (m) => m.key === 'launchd.failing',
@@ -73,5 +82,33 @@ describe('summarizeLaunchd', () => {
         reading('a', { state: 'waiting', pid: null, runs: 1, lastExit: 1 }),
       ),
     ).toBe(1)
+  })
+  it('fails a keepalive job without a pid whatever its last exit', () => {
+    const idle = { state: 'waiting', pid: null, runs: 1 }
+    expect(
+      failing(
+        reading('k', { ...idle, lastExit: 0 }, true, { role: 'keepalive' }),
+      ),
+    ).toBe(1)
+    expect(
+      failing(
+        reading('k', { ...idle, lastExit: null }, true, { role: 'keepalive' }),
+      ),
+    ).toBe(1)
+  })
+  it('does not fail a keepalive job with a pid', () => {
+    expect(
+      failing(
+        reading(
+          'k',
+          { state: 'running', pid: 3, runs: 1, lastExit: 78 },
+          true,
+          { role: 'keepalive' },
+        ),
+      ),
+    ).toBe(0)
+  })
+  it('fails an unreadable label', () => {
+    expect(failing(reading('u', null, false, { error: 'timeout' }))).toBe(1)
   })
 })

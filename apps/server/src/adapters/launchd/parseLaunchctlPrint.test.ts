@@ -49,6 +49,42 @@ describe('parseLaunchctlPrint', () => {
         .state,
     ).toBe('running')
   })
+  it('fails closed on an empty state', () => {
+    expect(() => parseLaunchctlPrint('x = {\n\tstate = \n}\n')).toThrow(
+      'schema_invalid',
+    )
+  })
+  it('reads CRLF output', () => {
+    const text = 'x = {\r\n\tstate = running\r\n\tpid = 7\r\n}\r\n'
+    expect(parseLaunchctlPrint(text)).toMatchObject({
+      state: 'running',
+      pid: 7,
+    })
+  })
+  it('splits on the first separator only', () => {
+    expect(parseLaunchctlPrint('x = {\n\tstate = a = b\n}\n').state).toBe(
+      'a = b',
+    )
+  })
+  it('trims values', () => {
+    expect(parseLaunchctlPrint('x = {\n\tstate = running  \n}\n').state).toBe(
+      'running',
+    )
+  })
+  it('reads a missing last exit code as null', () => {
+    expect(
+      parseLaunchctlPrint('x = {\n\tstate = running\n}\n').lastExit,
+    ).toBeNull()
+  })
+  it('reads a malformed pid or runs as null', () => {
+    const text = 'x = {\n\tstate = running\n\tpid = abc\n\truns = 1.5\n}\n'
+    expect(parseLaunchctlPrint(text)).toMatchObject({ pid: null, runs: null })
+  })
+  it('reads an empty pid as null', () => {
+    expect(
+      parseLaunchctlPrint('x = {\n\tstate = running\n\tpid = \n}\n').pid,
+    ).toBeNull()
+  })
 })
 
 describe('parseExitCode', () => {

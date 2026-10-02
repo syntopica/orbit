@@ -1,8 +1,11 @@
 import type { Adapter } from '../../types/Adapter'
 import type { LabelReading } from '../../types/LabelReading'
 import type { LaunchdAdapterDeps } from '../../types/LaunchdAdapterDeps'
+import { assertSomeReadable } from './assertSomeReadable'
 import { diffLaunchd } from './diffLaunchd'
-import { readLabel } from './readLabel'
+import { nextBaseline } from './nextBaseline'
+import { readLabelIsolated } from './readLabelIsolated'
+import { recordReadings } from './recordReadings'
 import { summarizeLaunchd } from './summarizeLaunchd'
 
 export const createLaunchdAdapter = (deps: LaunchdAdapterDeps): Adapter => {
@@ -15,19 +18,12 @@ export const createLaunchdAdapter = (deps: LaunchdAdapterDeps): Adapter => {
     read: async (signal) => {
       const readings: LabelReading[] = []
       for (const entry of deps.labels)
-        readings.push(await readLabel(deps, entry, signal))
+        readings.push(await readLabelIsolated(deps, entry, signal))
+      assertSomeReadable(readings)
       const now = new Date()
-      for (const r of readings) {
-        deps.record({
-          label: r.entry.label,
-          pid: r.state?.pid ?? null,
-          runs: r.state?.runs ?? null,
-          lastExit: r.state?.lastExit ?? null,
-          at: now.getTime(),
-        })
-      }
+      recordReadings(readings, now.getTime(), deps.record)
       const events = diffLaunchd(previous, readings, now)
-      previous = new Map(readings.map((r) => [r.entry.label, r]))
+      previous = nextBaseline(previous, readings)
       return {
         component: 'launchd',
         ...summarizeLaunchd(readings, now),

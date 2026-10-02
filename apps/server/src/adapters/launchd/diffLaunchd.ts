@@ -10,11 +10,8 @@ export const diffLaunchd = (
 ): OrbitEvent[] => {
   const at = now.toISOString()
   return readings.flatMap((reading): OrbitEvent[] => {
-    const label = reading.entry.label
-    const before = previous.get(label)?.state ?? null
-    const after = reading.state
-    return before === null || after === null
-      ? []
-      : eventsForLabel(label, before, after, at)
+    const before = previous.get(reading.entry.label)
+    if (before === undefined || reading.error !== null) return []
+    return eventsForLabel(reading.entry.label, before.state, reading.state, at)
   })
 }

@@ -7,10 +7,7 @@ import { readSchedule } from './readSchedule'
 export const createLaunchdCatalog = (
   deps: LaunchdAdapterDeps,
 ): LaunchdCatalog => {
-  const cache = new Map<
-    string,
-    { schedule: LaunchdSchedule | null; at: number }
-  >()
+  const cache = new Map<string, { schedule: LaunchdSchedule; at: number }>()
   const scheduleOf = async (
     plist: string,
     signal: AbortSignal,
@@ -19,7 +16,7 @@ export const createLaunchdCatalog = (
     if (hit !== undefined && Date.now() - hit.at < 600_000) return hit.schedule
     const schedule = await readSchedule(deps, plist, signal).catch(() => null)
     if (signal.aborted) throw new ProcessError('timeout')
-    cache.set(plist, { schedule, at: Date.now() })
+    if (schedule !== null) cache.set(plist, { schedule, at: Date.now() })
     return schedule
   }
   return {

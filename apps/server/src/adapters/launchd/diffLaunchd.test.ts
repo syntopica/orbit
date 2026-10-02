@@ -10,6 +10,7 @@ const reading = (
 ): LabelReading => ({
   entry: { component: 'worker', label, role: 'keepalive', plist: '/x' },
   loaded,
+  error: null,
   state: loaded ? { state: 'x', pid, runs: 1, lastExit } : null,
 })
 const prev = (r: LabelReading) => new Map([[label, r]])
@@ -41,12 +42,27 @@ describe('diffLaunchd', () => {
   it('emits nothing when nothing changed', () => {
     expect(diffLaunchd(prev(reading(5, 0)), [reading(5, 0)], at)).toEqual([])
   })
-  it('emits nothing across an unloaded reading', () => {
-    expect(
-      diffLaunchd(prev(reading(5, 0)), [reading(null, null, false)], at),
-    ).toEqual([])
-    expect(
-      diffLaunchd(prev(reading(null, null, false)), [reading(5, 0)], at),
-    ).toEqual([])
+  it('emits stopped when a running label is unloaded', () => {
+    const events = diffLaunchd(
+      prev(reading(5, 0)),
+      [reading(null, null, false)],
+      at,
+    )
+    expect(events.map((e) => e.kind)).toEqual(['launchd.stopped'])
+  })
+  it('emits started when an unloaded label runs', () => {
+    const events = diffLaunchd(
+      prev(reading(null, null, false)),
+      [reading(5, 0)],
+      at,
+    )
+    expect(events.map((e) => e.kind)).toEqual(['launchd.started'])
+  })
+  it('emits nothing for an unreadable label', () => {
+    const bad: LabelReading = {
+      ...reading(null, null, false),
+      error: 'timeout',
+    }
+    expect(diffLaunchd(prev(reading(5, 0)), [bad], at)).toEqual([])
   })
 })

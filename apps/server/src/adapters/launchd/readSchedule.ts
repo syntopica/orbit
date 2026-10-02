@@ -5,6 +5,7 @@ import { ProcessError } from '../../process/ProcessError'
 import type { LaunchdAdapterDeps } from '../../types/LaunchdAdapterDeps'
 import type { LaunchdSchedule } from '../../types/LaunchdSchedule'
 import { calendarPeriodS } from './calendarPeriodS'
+import { positiveInterval } from './positiveInterval'
 
 export const readSchedule = async (
   deps: LaunchdAdapterDeps,
@@ -22,15 +23,15 @@ export const readSchedule = async (
   if (result.code !== 0) throw new ProcessError('not_found')
   const parsed = z
     .object({
-      StartInterval: z.number().int().optional(),
+      StartInterval: z.unknown().optional(),
       StartCalendarInterval: z.unknown().optional(),
       KeepAlive: z.unknown().optional(),
     })
     .parse(JSON.parse(result.stdout))
+  const period = calendarPeriodS(parsed.StartCalendarInterval)
   return {
-    intervalS:
-      parsed.StartInterval ?? calendarPeriodS(parsed.StartCalendarInterval),
-    calendar: parsed.StartCalendarInterval !== undefined,
+    intervalS: positiveInterval(parsed.StartInterval) ?? period,
+    calendar: period !== null,
     keepAlive: parsed.KeepAlive !== undefined && parsed.KeepAlive !== false,
   }
 }

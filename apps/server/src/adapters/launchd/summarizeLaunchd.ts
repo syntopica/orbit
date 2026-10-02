@@ -1,19 +1,14 @@
 import type { SnapshotCore } from '@orbit/contract'
 
 import type { LabelReading } from '../../types/LabelReading'
+import { isLabelFailing } from './isLabelFailing'
 
 export const summarizeLaunchd = (
   readings: readonly LabelReading[],
   now: Date,
 ): Pick<SnapshotCore, 'health' | 'metrics' | 'pending'> => {
   const at = now.toISOString()
-  const failing = readings.filter(
-    (r) =>
-      !r.loaded ||
-      (r.state?.pid === null &&
-        r.state.lastExit !== null &&
-        r.state.lastExit !== 0),
-  ).length
+  const failing = readings.filter(isLabelFailing).length
   const running = readings.filter(
     (r) => r.state !== null && r.state.pid !== null,
   ).length

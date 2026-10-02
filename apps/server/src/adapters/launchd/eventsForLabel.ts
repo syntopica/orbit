@@ -1,15 +1,18 @@
 import type { OrbitEvent } from '@orbit/contract'
 
 import type { LaunchctlState } from '../../types/LaunchctlState'
+import { exitEvent } from './exitEvent'
 
 export const eventsForLabel = (
   label: string,
-  before: LaunchctlState,
-  after: LaunchctlState,
+  before: LaunchctlState | null,
+  after: LaunchctlState | null,
   at: string,
 ): OrbitEvent[] => {
+  const wasRunning = before?.pid != null
+  const isRunning = after?.pid != null
   const events: OrbitEvent[] = []
-  if (before.pid === null && after.pid !== null) {
+  if (!wasRunning && isRunning) {
     events.push({
       at,
       component: 'launchd',
@@ -18,7 +21,7 @@ export const eventsForLabel = (
       refs: { label },
     })
   }
-  if (before.pid !== null && after.pid === null) {
+  if (wasRunning && !isRunning) {
     events.push({
       at,
       component: 'launchd',
@@ -27,15 +30,5 @@ export const eventsForLabel = (
       refs: { label },
     })
   }
-  if (after.lastExit !== null && after.lastExit !== before.lastExit) {
-    const severity = after.lastExit === 0 ? 'info' : 'warn'
-    events.push({
-      at,
-      component: 'launchd',
-      kind: 'launchd.exit_changed',
-      severity,
-      refs: { label, exit: after.lastExit },
-    })
-  }
-  return events
+  return [...events, ...exitEvent(label, before, after, at)]
 }
