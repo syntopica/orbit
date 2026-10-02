@@ -21,6 +21,10 @@ describe('sourceKey', () => {
     expect(await keyFor('6.6.6.6, 100.64.0.7', '127.0.0.1')).toBe('100.64.0.7')
     expect(await keyFor('100.64.0.7')).toBe('100.64.0.7')
   })
+  it('replaces an over-long forwarded hop with a fixed key', async () => {
+    expect(await keyFor('a'.repeat(65), '127.0.0.1')).toBe('source:invalid')
+    expect(await keyFor('a'.repeat(64), '127.0.0.1')).toBe('a'.repeat(64))
+  })
   it('falls back to the socket address, then unknown', async () => {
     expect(await keyFor(undefined, '127.0.0.1')).toBe('127.0.0.1')
     expect(await keyFor('', '127.0.0.1')).toBe('127.0.0.1')

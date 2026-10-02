@@ -1,8 +1,7 @@
 import type { MiddlewareHandler, Next } from 'hono'
 
-import type { GuardContext } from '../types/GuardContext'
-
 import type { GuardConfig } from '../types/GuardConfig'
+import type { GuardContext } from '../types/GuardContext'
 
 export const tailnetLogin = (config: GuardConfig): MiddlewareHandler => {
   const logins = new Set(config.allowedLogins)

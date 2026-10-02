@@ -21,6 +21,8 @@ app.get('/page', (c) => c.text('page'))
 
 type Headers = Record<string, string>
 
+const fromHere: Headers = { Origin: 'http://127.0.0.1:8790' }
+
 const call = async (
   path: string,
   init: { method?: string; headers?: Headers; dropHeaders?: string[] } = {},
@@ -120,6 +122,20 @@ describe('same-origin guard', () => {
       expect(await status('/api/x', { headers: { Origin: origin } })).toBe(403)
     }
   })
+  it('accepts the Sec-Fetch-Site fallback only for GET and HEAD', async () => {
+    const noOrigin = { 'X-Orbit': '1' }
+    expect(await status('/api/x', { method: 'POST', headers: noOrigin })).toBe(
+      403,
+    )
+    expect(await status('/api/x', { method: 'HEAD' })).toBe(200)
+  })
+  it('pins the fallback to exactly same-origin', async () => {
+    for (const site of ['same-site', 'none', '']) {
+      expect(
+        await status('/api/x', { headers: { 'Sec-Fetch-Site': site } }),
+      ).toBe(403)
+    }
+  })
   it('does not let Sec-Fetch-Site override a bad Origin', async () => {
     expect(
       await status('/api/x', {
@@ -140,17 +156,24 @@ describe('same-origin guard', () => {
 
 describe('csrf header', () => {
   it('requires X-Orbit: 1 on mutations', async () => {
-    expect(await status('/api/x', { method: 'POST' })).toBe(403)
-    expect(
-      await status('/api/x', { method: 'POST', headers: { 'X-Orbit': '0' } }),
-    ).toBe(403)
-    expect(
-      await status('/api/x', { method: 'POST', headers: { 'X-Orbit': '1' } }),
-    ).toBe(200)
+    const post = async (extra: Headers) =>
+      status('/api/x', { method: 'POST', headers: { ...fromHere, ...extra } })
+    expect(await post({})).toBe(403)
+    expect(await post({ 'X-Orbit': '0' })).toBe(403)
+    expect(await post({ 'X-Orbit': '1' })).toBe(200)
+  })
+  it('rejects OPTIONS, PUT and DELETE without X-Orbit', async () => {
+    for (const method of ['OPTIONS', 'PUT', 'DELETE']) {
+      expect(await status('/api/x', { method, headers: fromHere })).toBe(403)
+    }
   })
 })
 
 describe('tailnet login', () => {
+  it('rejects a present but empty login', async () => {
+    const empty = { 'Tailscale-User-Login': '' }
+    expect(await status('/page', { headers: empty })).toBe(403)
+  })
   it('refuses a login that is not allowed and admits an allowed one', async () => {
     const other = { 'Tailscale-User-Login': 'other@example.com' }
     const mine = { 'Tailscale-User-Login': 'me@example.com' }

@@ -1,8 +1,7 @@
 import type { MiddlewareHandler, Next } from 'hono'
 
-import type { GuardContext } from '../types/GuardContext'
-
 import type { GuardConfig } from '../types/GuardConfig'
+import type { GuardContext } from '../types/GuardContext'
 
 export const hostAllowlist = (config: GuardConfig): MiddlewareHandler => {
   const hosts = new Set([
