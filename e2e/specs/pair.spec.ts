@@ -14,4 +14,5 @@ test('pairs a device once from the printed link', async ({ page, browser }) => {
   await expect(second.getByRole('alert')).toContainText(
     'expired or already used',
   )
+  await second.close()
 })
