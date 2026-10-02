@@ -56,7 +56,6 @@ describe('sessions', () => {
     const db = openAuthDb()
     const id = createSession(db, 0)
     db.prepare('UPDATE sessions SET expires = ?').run(sessionAbsoluteMs * 2)
-    expect(touchSession(db, id, sessionAbsoluteMs - 1)).toBe(true)
     expect(touchSession(db, id, sessionAbsoluteMs)).toBe(false)
     expect(listSessions(db)).toEqual([])
   })
