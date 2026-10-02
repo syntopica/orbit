@@ -18,7 +18,7 @@ This repository is public: entries describe engine behaviour only.
       (`apps/server/src/scheduler/createAdapterLoop.ts`). Every Base adapter
       settles on abort; add a hard limit before the first adapter that may not.
 - [ ] Ticker key collides when two events share a timestamp and ref
-      (`apps/web/src/screens/home/EventTicker.tsx:20`). Give events an id in the
+      (`apps/web/src/screens/home/EventTicker.tsx:19`). Give events an id in the
       contract.
 - [ ] Home "waiting for first readings" does not use the `synced` flag
       (`apps/web/src/screens`). Show it until the first `sync`.

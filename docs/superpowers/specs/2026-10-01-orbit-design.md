@@ -1,6 +1,6 @@
 # orbit - design
 
-Status: draft, revision 5 (after adversarial review rounds 1 to 3 and the
+Status: draft, revision 6 (after adversarial review rounds 1 to 3 and the
 implementation of sub-project 0). Scope: sub-project 0 (Base) and sub-project 1
 (Memory). Later sub-projects get their own specs.
 
@@ -22,6 +22,10 @@ decided differently from revision 4, applied in place in the sections named:
   palette and home pulse implementation notes.
 - 11, 13: the Vite dev proxy rewrites `Origin`; uPlot is not used in
   sub-project 0.
+
+**Revision 6 (worker screen).** 7.3 (new): the Worker screen, its
+`GET /api/worker` detail route, the diagnosis rules, and event refs and
+folded runs in the home ticker.
 
 **Revision 4.** After adversarial review rounds 1 to 3.
 
@@ -496,6 +500,33 @@ close.
 
 **Home pulse.** The satellite pulse is a CSS keyframe animation, not a Motion
 component, to stay inside the bundle budget (section 11).
+
+### 7.3 Worker screen
+
+`GET /api/worker` is a session-guarded detail route over the worker's
+`GET /v1/status`, read with the adapter's token and 1 MiB cap under its own
+4 s abort (a two-slot pool, separate from the launchd one). It answers
+`{ now, queues, nodes, cooldowns, failures }`: times as epoch ms, durations
+as ms, allowlisted fields only. Queues sort by queued then failed, cooldowns
+by time left, failures newest first (at most 50). Queue, runner, node and
+model names, job ids and error codes are identifiers, not content: each must
+match `^[\w.:/@+-]{1,128}$`. A row whose own name or id fails is dropped; a
+secondary code that fails (an error, a block reason, a model) is blanked to
+`null`. An unconfigured or unreachable worker answers a fixed 503.
+
+The screen refetches every 15 s. Its diagnosis card asks "why is work
+waiting?" only when something is queued and nothing is leased, running or
+draining, and lists every cause found: each runner cooldown with its time
+left (against the server's `now`); per node, a report older than 5 min (the
+only cause given for that node), a person at the machine (last release
+`user_active` and under 5 min idle, the worker's default idle threshold),
+battery, memory pressure (the reported level or a pressure block reason), any
+other block reason verbatim; or that no node has reported. Worker identifiers
+are shown verbatim in monospace.
+
+The home ticker shows each event's refs after its label, and folds a
+`launchd.stopped` directly preceded by the same label's `launchd.started`
+within 5 min into one "ran" row.
 
 ### 7.1 Visual language
 
