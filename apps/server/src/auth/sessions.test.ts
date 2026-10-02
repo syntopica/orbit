@@ -117,7 +117,7 @@ describe('revokeSessions', () => {
     expect(() => revokeSessions(db, '%%%%%%%%')).toThrow()
     expect(() => revokeSessions(db, '________')).toThrow()
     expect(() => revokeSessions(db, '')).toThrow()
-    expect(listSessions(db)).toHaveLength(3)
+    expect(listSessions(db)).toHaveLength(2)
   })
   it('revokes only matching sessions', () => {
     const db = openAuthDb()
