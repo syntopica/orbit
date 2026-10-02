@@ -286,6 +286,10 @@ cadence, in memory only.
   server sends a full opening without `resync`. The client therefore applies a
   synthetic `resync` on that source's first open, which drops the state it
   holds so the fresh opening never duplicates it.
+- Stream ids start at the server's start time in milliseconds, so a restart
+  always numbers above every id issued before it.
+- Each ping re-validates the session; a revoked or expired session ends the
+  stream, and the client's probe then routes to login.
 - Snapshots and events carry no content (section 6.6).
 
 ### 5.6 orbit's own state
@@ -331,7 +335,8 @@ Files are created `0600`, the directory `0700`.
   exit; parsed with a tested parser over captured fixtures, failing closed to
   `schema_invalid` on an unrecognised format.
 - A scheduled run is "missed" only when orbit observed the whole expected
-  window and the run count did not increase; otherwise the window is unknown.
+  window and the run count did not increase; otherwise no miss is claimed and
+  the bucket is drawn `idle` (section 7.2).
   The expected window is 1.5 x the schedule period (`StartInterval`, or the
   smallest period implied by `StartCalendarInterval`: a month field 366 days, a
   day field 31 days, a weekday 7 days, an hour 1 day, a minute 1 hour). A
@@ -340,8 +345,10 @@ Files are created `0600`, the directory `0700`.
   chosen range. Observations are kept 90 days (section 5.7), so a yearly
   calendar job's window is never covered and such a job is never claimed
   missed.
-- A `keepalive` job is healthy while it has a pid; a non-zero last exit with no
-  pid is `down`. Exit codes are not consulted for keepalive jobs.
+- A `keepalive` job is healthy while it has a pid; with no pid it is failing,
+  and the launchd card turns `warn` with `check_failed`, not `down`. Exit codes
+  are not consulted for keepalive jobs. A `scheduled` job is failing when it has
+  no pid and a non-zero last exit; a label launchd does not know is failing too.
 
 ## 6. Security
 
