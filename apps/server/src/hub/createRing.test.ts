@@ -21,6 +21,9 @@ describe('createRing', () => {
     })
     expect(ring.after(0)).toBeNull()
     expect(ring.after(9)).toBeNull()
+    expect(ring.after(4)).toBeNull()
+    expect(ring.after(Number.NaN)).toBeNull()
+    expect(ring.after(2.5)).toBeNull()
     expect(createRing(2).after(1)).toBeNull()
   })
   it('keeps exactly capacity messages and accepts the id just before the oldest', () => {

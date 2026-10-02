@@ -135,4 +135,18 @@ describe('createHub', () => {
     hub.publish(snap(1, [tick]))
     expect(seen).toHaveLength(2)
   })
+  it('starts a listener added during delivery with the next message', () => {
+    const hub = newHub()
+    const late: StreamMessage[] = []
+    const off = hub.subscribe(() => {
+      off()
+      hub.subscribe((m) => {
+        late.push(m)
+      })
+    })
+    hub.publish(snap(1))
+    expect(late).toEqual([])
+    hub.publish(snap(2))
+    expect(late).toHaveLength(1)
+  })
 })

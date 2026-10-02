@@ -12,7 +12,8 @@ export const createRing = (capacity: number): Ring => {
     after: (id) => {
       const first = items[0]
       const last = items.at(-1)
-      if (first === undefined || last === undefined) return null
+      if (first === undefined || last === undefined || !Number.isInteger(id))
+        return null
       if (id < first.id - 1 || id > last.id) return null
       return items.filter((message) => message.id > id)
     },

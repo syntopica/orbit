@@ -4,7 +4,8 @@ export const deliverToListeners = (
   listeners: ReadonlySet<(message: StreamMessage) => void>,
   message: StreamMessage,
 ): void => {
-  for (const listener of listeners) {
+  // A listener added during delivery starts with the next message.
+  for (const listener of Array.from(listeners)) {
     try {
       listener(message)
     } catch {
