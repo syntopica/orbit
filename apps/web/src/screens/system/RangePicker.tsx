@@ -1,25 +1,27 @@
-import { HISTORY_RANGES } from '../../heartbeat/historyRanges'
-import { RANGE_SPECS } from '../../heartbeat/rangeSpecs'
 import { SYSTEM_LABELS } from '../../labels/systemLabels'
 import type { RangePickerProps } from '../../types/RangePickerProps'
 
-export const RangePicker = ({ range, onChange }: RangePickerProps) => (
+export const RangePicker = <T extends string>({
+  options,
+  range,
+  onChange,
+}: RangePickerProps<T>) => (
   <div
     role="group"
     aria-label={SYSTEM_LABELS.range}
     className="border-line flex gap-1 rounded-lg border p-1"
   >
-    {HISTORY_RANGES.map((option) => (
+    {options.map((option) => (
       <button
-        key={option}
+        key={option.value}
         type="button"
-        aria-pressed={option === range}
+        aria-pressed={option.value === range}
         onClick={() => {
-          onChange(option)
+          onChange(option.value)
         }}
         className="text-muted aria-pressed:bg-panel aria-pressed:text-ink rounded-md px-3 py-1 text-sm"
       >
-        {RANGE_SPECS[option].label}
+        {option.label}
       </button>
     ))}
   </div>

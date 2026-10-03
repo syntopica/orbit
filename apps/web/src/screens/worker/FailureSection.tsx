@@ -1,8 +1,9 @@
 import { formatLocalTime } from '../../formatters/formatLocalTime'
 import { WORKER_LABELS } from '../../labels/workerLabels'
 import type { FailureSectionProps } from '../../types/FailureSectionProps'
+import { FailureChart } from './FailureChart'
 
-export const FailureSection = ({ groups }: FailureSectionProps) => (
+export const FailureSection = ({ groups, activity }: FailureSectionProps) => (
   <section aria-labelledby="failures-heading" className="space-y-2">
     <h2
       id="failures-heading"
@@ -10,10 +11,20 @@ export const FailureSection = ({ groups }: FailureSectionProps) => (
     >
       {WORKER_LABELS.failures}
     </h2>
+    {activity.model !== null && activity.model.failures.keys.length > 0 && (
+      <FailureChart
+        failures={activity.model.failures}
+        bucketMs={activity.model.bucketMs}
+        stale={activity.stale}
+      />
+    )}
     {groups.length === 0 ? (
       <p className="text-muted text-sm">{WORKER_LABELS.noFailures}</p>
     ) : (
-      <ol className="divide-line border-line bg-panel divide-y rounded-xl border text-sm">
+      <ol
+        aria-label={WORKER_LABELS.failedJobs}
+        className="divide-line border-line bg-panel divide-y rounded-xl border text-sm"
+      >
         {groups.map(({ latest, count }) => (
           <li key={latest.id} className="flex flex-wrap gap-x-3 px-3 py-2">
             <span className="text-muted">

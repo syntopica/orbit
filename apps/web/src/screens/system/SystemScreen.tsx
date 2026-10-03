@@ -1,4 +1,5 @@
 import { ConnectionIndicator } from '../../components/shell/ConnectionIndicator'
+import { HISTORY_RANGE_OPTIONS } from '../../heartbeat/historyRangeOptions'
 import { useSystemModel } from '../../hooks/useSystemModel'
 import { SYSTEM_LABELS } from '../../labels/systemLabels'
 import { LaunchdRowView } from './LaunchdRowView'
@@ -13,7 +14,11 @@ export const SystemScreen = () => {
           {SYSTEM_LABELS.title}
         </h1>
         {model.isPhone ? <ConnectionIndicator /> : null}
-        <RangePicker range={model.range} onChange={model.setRange} />
+        <RangePicker
+          options={HISTORY_RANGE_OPTIONS}
+          range={model.range}
+          onChange={model.setRange}
+        />
       </header>
       {model.failed ? <p role="alert">{SYSTEM_LABELS.catalogFailed}</p> : null}
       {model.rows?.length === 0 && (

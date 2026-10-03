@@ -3,20 +3,30 @@ import { createServer } from 'node:http'
 import type { AddressInfo } from 'node:net'
 import { join } from 'node:path'
 
+import { fakeActivity } from './fakeActivity'
 import { E2E } from './paths'
 
-// A stand-in coordinator: GET /v1/status with the right bearer token only.
+// A stand-in coordinator: GET /v1/status and /v1/activity with the right
+// bearer token only.
 export const startFakeWorker = async (
   token: string,
 ): Promise<{ url: string; stop: () => Promise<void> }> => {
   const body = await readFile(join(E2E.fixtures, 'worker-status.json'))
   const server = createServer((request, response) => {
     const allowed = request.headers.authorization === `Bearer ${token}`
-    if (request.url !== '/v1/status' || !allowed) {
+    const url = new URL(request.url ?? '/', 'http://127.0.0.1')
+    const known = ['/v1/status', '/v1/activity'].includes(url.pathname)
+    if (!known || !allowed) {
       response.writeHead(allowed ? 404 : 401).end()
       return
     }
-    response.writeHead(200, { 'Content-Type': 'application/json' }).end(body)
+    response
+      .writeHead(200, { 'Content-Type': 'application/json' })
+      .end(
+        url.pathname === '/v1/status'
+          ? body
+          : fakeActivity(Number(url.searchParams.get('hours'))),
+      )
   })
   await new Promise<void>((resolve) => {
     server.listen(0, '127.0.0.1', resolve)

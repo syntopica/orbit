@@ -69,7 +69,7 @@ describe('WorkerScreen', () => {
     expect(within(nodes).getByText('offline')).toBeInTheDocument()
     expect(within(nodes).getByText('model-a:7b')).toBeInTheDocument()
     const failures = within(
-      screen.getByRole('region', { name: 'Recent failures' }),
+      screen.getByRole('list', { name: 'Failed jobs' }),
     ).getAllByRole('listitem')
     expect(failures).toHaveLength(2)
     expect(failures[0]).toHaveTextContent('runner_failed')

@@ -1,6 +1,6 @@
 # orbit - design
 
-Status: draft, revision 6 (after adversarial review rounds 1 to 3 and the
+Status: draft, revision 7 (after adversarial review rounds 1 to 3 and the
 implementation of sub-project 0). Scope: sub-project 0 (Base) and sub-project 1
 (Memory). Later sub-projects get their own specs.
 
@@ -26,6 +26,11 @@ decided differently from revision 4, applied in place in the sections named:
 **Revision 6 (worker screen).** 7.3 (new): the Worker screen, its
 `GET /api/worker` detail route, the diagnosis rules, and event refs and
 folded runs in the home ticker.
+
+**Revision 7 (worker activity charts).** 7.3: `GET /api/worker/activity`,
+the Worker screen's range control, activity, per-queue, failure and
+OpenRouter charts with progressive disclosure, and the lazy Worker route;
+7.1: chart palette and mark rules; 13: visx replaces Recharts for panels.
 
 **Revision 4.** After adversarial review rounds 1 to 3.
 
@@ -524,6 +529,48 @@ battery, memory pressure (the reported level or a pressure block reason), any
 other block reason verbatim; or that no node has reported. Worker identifiers
 are shown verbatim in monospace.
 
+**Activity charts.** `GET /api/worker/activity?range=24h|7d` is a
+session-guarded detail route over the coordinator's `GET /v1/activity` with
+`hours=24|168`, under the same two-slot pool, 4 s abort, 1 MiB cap and fixed
+503 as `/api/worker`; any other range is a 400. It answers
+`{ now, since, bucketMs, rows }`, each row
+`{ bucket, queue, provider, sampling, outcome, error, attempts, wallMs,
+tokensIn, tokensOut }` (epoch ms and ms; buckets are 1 h up to 48 h and 6 h
+beyond, epoch-aligned). A row whose queue, provider or outcome fails the
+identifier rule is dropped; an error code that fails is blanked to `null`.
+Aggregates only: no job id or content.
+
+The screen holds one range control (24 hours | 7 days) in a single row above
+the charts, kept in the URL as `?range=`, which scopes every chart below it.
+Activity refetches every 60 s; a range change keeps the previous render at
+half opacity until the new one lands. Production attempts exclude sampling
+(shadow and judge) jobs, which are only counted. The charts:
+
+1. **Activity**, under the diagnosis: stacked columns per bucket of
+   production attempts, one segment per provider and failures as their own
+   segment on top. The tooltip gives the bucket's local time range, the
+   count per segment, the top three error codes, the mean wall time and the
+   sampling attempts.
+2. **Per-queue sparkline** in every queue row (table and phone list):
+   succeeded production attempts per bucket. The queue name is a button
+   (`aria-expanded`) that opens the queue's outcome counts, provider mix,
+   mean wall time, tokens in and out, and top error codes for the range.
+3. **Failures over time** in Recent failures: production failures per bucket
+   by error code, the range's top four codes with the rest folded into
+   "other".
+4. **OpenRouter attempts today (UTC)**: a stat tile with a sparkline, all
+   OpenRouter attempts (sampling included) since 00:00 UTC on the server
+   clock. It says attempts, never requests of a limit: the provider quota is
+   not known to orbit.
+
+Detail is progressive: hover, tap or keyboard focus shows it, never a
+standing label. Each chart is one tab stop, a `slider` over its buckets whose
+value text is the bucket's numbers; arrow keys, Home and End move it, Escape
+hides the tooltip. The hit target is the whole bucket band. Every chart's
+numbers are also in a "Show table" disclosure, so a tooltip never gates a
+value. The Worker route is lazy-loaded, keeping chart code off the initial
+route.
+
 The home ticker shows each event's refs after its label, and folds a
 `launchd.stopped` directly preceded by the same label's `launchd.started`
 within 5 min into one "ran" row.
@@ -539,6 +586,16 @@ within 5 min into one "ran" row.
   tweening, pulses tied to real cadence; `prefers-reduced-motion` disables
   animation.
 - No decoration without data: every animated element encodes a measured value.
+- Charts: categorical slots in a fixed order (the dataviz reference palette,
+  slots 1-6, light and dark steps as theme tokens, validated against the
+  panel surface in both schemes; the light slots under 3:1 rely on the table
+  view). Providers map to slots by a fixed table (agy, openrouter, ollama,
+  codex, cursor, other), never by rank; failure codes take slots 1-4 by rank
+  within the range, the folded rest grey. Status colours stay reserved for
+  state and always carry a label (the `failed` segment). Columns at most
+  24 px wide with a 4 px rounded data end, square at the baseline, a 2 px
+  surface gap between segments and columns; 2 px lines; hairline solid
+  gridlines; one y axis. Text wears text tokens, never a series colour.
 
 ## 8. Error handling
 
@@ -649,9 +706,12 @@ Library choices:
 - Graph: sigma 3 with graphology (ForceAtlas2 and Louvain in a web worker,
   neighbourhood queries) through `@react-sigma/core`.
 - Flow diagram: `@xyflow/react` with custom stage nodes and animated edges.
-- Charts: Recharts for panels. Heartbeat strips in sub-project 0 are SVG
-  rectangles (section 7.2); uPlot stays the choice for dense metric charts and
-  sparklines in later sub-projects.
+- Charts: visx (`@visx/scale`, `@visx/shape`, `@visx/tooltip`,
+  `@visx/responsive`) for panels, replacing Recharts (revision 7): measured
+  at about 24 KB brotli for the subset against 94.5 KB for Recharts 3.10.1,
+  React-native, and full control over the mark specs of section 7.1.
+  Heartbeat strips in sub-project 0 are SVG rectangles (section 7.2); uPlot
+  stays the choice for dense metric charts in later sub-projects.
 - Command palette: `cmdk`.
 - Data and routing: TanStack Query and TanStack Router; Motion; Tailwind 4 from
   the template; `react-markdown` without raw HTML.

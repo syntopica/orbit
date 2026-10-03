@@ -16,6 +16,14 @@
   --color-warn: #fbbf24;
   --color-down: #f87171;
   --color-unknown: #475569;
+  /* Categorical chart slots in fixed order (dataviz palette, dark steps),
+     validated against the panel surface in both schemes. */
+  --color-series-1: #3987e5;
+  --color-series-2: #d95926;
+  --color-series-3: #199e70;
+  --color-series-4: #c98500;
+  --color-series-5: #d55181;
+  --color-series-6: #008300;
   --animate-pulse-ring: pulse-ring 1.2s ease-out forwards;
 
   @keyframes pulse-ring {
@@ -42,6 +50,12 @@
     --color-warn: #b45309;
     --color-down: #b91c1c;
     --color-unknown: #64748b;
+    --color-series-1: #2a78d6;
+    --color-series-2: #eb6834;
+    --color-series-3: #1baf7a;
+    --color-series-4: #eda100;
+    --color-series-5: #e87ba4;
+    --color-series-6: #008300;
   }
 }
 

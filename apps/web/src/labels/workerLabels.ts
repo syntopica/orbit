@@ -34,6 +34,7 @@ export const WORKER_LABELS = {
   unknown: 'unknown',
   failures: 'Recent failures',
   noFailures: 'No recent failures.',
+  failedJobs: 'Failed jobs',
   noError: 'no code',
   job: 'job',
 } as const

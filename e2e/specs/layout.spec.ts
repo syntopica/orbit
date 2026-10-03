@@ -30,6 +30,11 @@ test('a phone gets the worker queues as a list without sideways scroll', async (
     'queue.a',
   )
   await expect(page.getByRole('table')).toHaveCount(0)
+  await expect(
+    page.getByRole('slider', {
+      name: 'Production attempts per bucket by provider',
+    }),
+  ).toBeVisible()
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= window.innerWidth,

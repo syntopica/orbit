@@ -1,3 +1,8 @@
 import type { WorkerQueue } from '@orbit/contract'
 
-export type QueueListProps = { readonly rows: readonly WorkerQueue[] }
+import type { WorkerActivityState } from './WorkerActivityState'
+
+export type QueueListProps = {
+  readonly rows: readonly WorkerQueue[]
+  readonly activity: WorkerActivityState
+}

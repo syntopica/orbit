@@ -21,6 +21,11 @@ for (const colorScheme of ['dark', 'light'] as const) {
       await expect(
         page.getByRole('region', { name: 'Diagnosis' }),
       ).toBeVisible()
+      await expect(
+        page.getByRole('slider', {
+          name: 'Production attempts per bucket by provider',
+        }),
+      ).toBeVisible()
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
       await page.goto('/system')
       await expect(

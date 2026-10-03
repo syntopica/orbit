@@ -1,6 +1,7 @@
-import type { HistoryRange } from './HistoryRange'
+import type { RangeOption } from './RangeOption'
 
-export type RangePickerProps = {
-  readonly range: HistoryRange
-  readonly onChange: (range: HistoryRange) => void
+export type RangePickerProps<T extends string> = {
+  readonly options: readonly RangeOption<T>[]
+  readonly range: T
+  readonly onChange: (range: T) => void
 }

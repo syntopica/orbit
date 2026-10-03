@@ -1,10 +1,12 @@
 import { ConnectionIndicator } from '../../components/shell/ConnectionIndicator'
+import { useWorkerActivity } from '../../hooks/useWorkerActivity'
 import { useWorkerModel } from '../../hooks/useWorkerModel'
 import { WORKER_LABELS } from '../../labels/workerLabels'
 import { WorkerBody } from './WorkerBody'
 
 export const WorkerScreen = () => {
   const model = useWorkerModel()
+  const activity = useWorkerActivity()
   return (
     <main className="mx-auto max-w-5xl space-y-8">
       <header className="flex items-center justify-between">
@@ -18,7 +20,11 @@ export const WorkerScreen = () => {
         <p className="text-muted">{WORKER_LABELS.loading}</p>
       )}
       {model.body !== null && (
-        <WorkerBody body={model.body} isPhone={model.isPhone} />
+        <WorkerBody
+          body={model.body}
+          isPhone={model.isPhone}
+          activity={activity}
+        />
       )}
     </main>
   )
