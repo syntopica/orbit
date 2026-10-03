@@ -1,11 +1,13 @@
+import { FAILURE_CODE_ORDER } from './failureCodeOrder'
 import { FAILURE_KEYS } from './failureKeys'
 
+// Each code to its fixed slot; "other" and anything unlisted is neutral grey.
 export const failureKeysFor = (
   keys: readonly string[],
 ): Record<string, string> =>
   Object.fromEntries(
-    keys.map((key, i) => [
+    keys.map((key) => [
       key,
-      key === 'other' ? 'bg-unknown' : (FAILURE_KEYS[i] ?? 'bg-unknown'),
+      FAILURE_KEYS[FAILURE_CODE_ORDER.indexOf(key)] ?? 'bg-unknown',
     ]),
   )

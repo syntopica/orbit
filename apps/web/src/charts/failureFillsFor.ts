@@ -1,12 +1,13 @@
+import { FAILURE_CODE_ORDER } from './failureCodeOrder'
 import { FAILURE_FILLS } from './failureFills'
 
-// The range's codes by rank to slots 1-4; the folded rest is neutral grey.
+// Each code to its fixed slot; "other" and anything unlisted is neutral grey.
 export const failureFillsFor = (
   keys: readonly string[],
 ): Record<string, string> =>
   Object.fromEntries(
-    keys.map((key, i) => [
+    keys.map((key) => [
       key,
-      key === 'other' ? 'fill-unknown' : (FAILURE_FILLS[i] ?? 'fill-unknown'),
+      FAILURE_FILLS[FAILURE_CODE_ORDER.indexOf(key)] ?? 'fill-unknown',
     ]),
   )

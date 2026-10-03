@@ -8,7 +8,7 @@ export const OpenrouterTile = ({ today, bucketMs }: OpenrouterTileProps) => (
   <div
     role="group"
     aria-labelledby="openrouter-today"
-    className="border-line bg-panel space-y-1 rounded-xl border p-4 md:w-56"
+    className="border-line bg-panel space-y-1 self-start rounded-xl border p-4 md:w-56"
   >
     <p id="openrouter-today" className="text-muted text-xs">
       {ACTIVITY_LABELS.openrouter}

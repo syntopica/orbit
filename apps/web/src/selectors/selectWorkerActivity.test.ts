@@ -100,20 +100,21 @@ describe('selectWorkerActivity', () => {
       { key: 'no code', count: 1 },
     ])
   })
-  it('charts failures by their top four codes and folds the rest', () => {
+  it('charts failures by fixed codes in fixed order and folds the rest', () => {
+    const codes = ['c1', 'quota_wall', 'no_output', 'c2']
     const many = selectWorkerActivity(
       workerActivity(
-        ['c1', 'c2', 'c3', 'c4', 'c5', 'c6'].map((error, i) =>
+        codes.map((error, i) =>
           activityRow({ outcome: 'failed', error, attempts: 10 - i }),
         ),
       ),
     )
-    expect(many.failures.keys).toEqual(['c1', 'c2', 'c3', 'c4', 'other'])
+    expect(many.failures.keys).toEqual(['no_output', 'quota_wall', 'other'])
     expect(many.failures.columns.at(-1)?.segments.at(-1)).toEqual({
       key: 'other',
-      count: 11,
+      count: 17,
     })
-    expect(many.failures.columns.at(-1)?.total).toBe(45)
+    expect(many.failures.columns.at(-1)?.total).toBe(34)
     expect(many.failures.columns[0]?.total).toBe(0)
   })
   it('counts every OpenRouter attempt since 00:00 UTC', () => {

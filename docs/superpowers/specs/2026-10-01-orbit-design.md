@@ -556,8 +556,8 @@ half opacity until the new one lands. Production attempts exclude sampling
    (`aria-expanded`) that opens the queue's outcome counts, provider mix,
    mean wall time, tokens in and out, and top error codes for the range.
 3. **Failures over time** in Recent failures: production failures per bucket
-   by error code, the range's top four codes with the rest folded into
-   "other".
+   by error code, each listed code in its fixed slot and every other code
+   folded into "other".
 4. **OpenRouter attempts today (UTC)**: a stat tile with a sparkline, all
    OpenRouter attempts (sampling included) since 00:00 UTC on the server
    clock. It says attempts, never requests of a limit: the provider quota is
@@ -590,8 +590,9 @@ within 5 min into one "ran" row.
   slots 1-6, light and dark steps as theme tokens, validated against the
   panel surface in both schemes; the light slots under 3:1 rely on the table
   view). Providers map to slots by a fixed table (agy, openrouter, ollama,
-  codex, cursor, other), never by rank; failure codes take slots 1-4 by rank
-  within the range, the folded rest grey. Status colours stay reserved for
+  codex, cursor, other), never by rank; failure codes map by a fixed table
+  (no_output, schema_violation, quota_wall, lease_lost, timeout,
+  executor_error), never by rank, the folded rest grey. Status colours stay reserved for
   state and always carry a label (the `failed` segment). Columns at most
   24 px wide with a 4 px rounded data end, square at the baseline, a 2 px
   surface gap between segments and columns; 2 px lines; hairline solid
