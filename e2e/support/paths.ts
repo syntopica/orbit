@@ -1,7 +1,8 @@
 import { join } from 'node:path'
 
 const root = join(import.meta.dirname, '..', '.tmp')
-const port = 38_790
+// ORBIT_E2E_PORT lets two checkouts run their e2e suites at the same time.
+const port = Number(process.env['ORBIT_E2E_PORT'] ?? 38_790)
 
 export const E2E = {
   root,
