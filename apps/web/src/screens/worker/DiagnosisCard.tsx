@@ -21,6 +21,11 @@ export const DiagnosisCard = ({ diagnosis }: DiagnosisCardProps) => (
         {WORKER_LABELS.waiting}
       </p>
     )}
+    {diagnosis.state !== 'idle' && (
+      <p className="text-muted text-sm">
+        {diagnosis.done1h} {WORKER_LABELS.doneLastHour}
+      </p>
+    )}
     {diagnosis.state === 'working' && diagnosis.blockers.length > 0 && (
       <BlockerList blockers={diagnosis.blockers} />
     )}

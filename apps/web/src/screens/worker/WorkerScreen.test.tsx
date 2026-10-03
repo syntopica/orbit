@@ -48,7 +48,10 @@ describe('WorkerScreen', () => {
     serve(view)
     const { container } = await renderAt('/worker')
     const diagnosis = await screen.findByRole('region', { name: 'Diagnosis' })
-    expect(diagnosis).toHaveTextContent('3 waiting and nothing running. Why:')
+    expect(diagnosis).toHaveTextContent(
+      '3 waiting and nothing running right now. Why:',
+    )
+    expect(diagnosis).toHaveTextContent('0 done in the last hour.')
     expect(diagnosis).toHaveTextContent('runner-a available in 4d 10h')
     expect(diagnosis).toHaveTextContent('node-a is in use, works when idle')
     expect(diagnosis).toHaveTextContent('node-b last reported 10h ago')

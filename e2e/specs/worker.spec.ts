@@ -9,7 +9,9 @@ test('explains why worker jobs wait and lists one failure row', async ({
   await page.getByRole('link', { name: 'Worker' }).first().click()
   await expect(page).toHaveURL(/\/worker$/)
   const diagnosis = page.getByRole('region', { name: 'Diagnosis' })
-  await expect(diagnosis).toContainText('32 waiting and nothing running.')
+  await expect(diagnosis).toContainText(
+    '32 waiting and nothing running right now.',
+  )
   await expect(diagnosis).toContainText('runner-a available in 4d 10h')
   await expect(diagnosis).toContainText('node-a is in use, works when idle')
   await expect(diagnosis).toContainText('node-b last reported 10h ago')

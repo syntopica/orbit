@@ -22,6 +22,7 @@ describe('diagnoseWorker', () => {
       state: 'idle',
       queued: 0,
       live: 1,
+      done1h: 0,
       blockers: [],
     })
   })
@@ -35,10 +36,21 @@ describe('diagnoseWorker', () => {
       state: 'working',
       queued: 5,
       live: 1,
+      done1h: 0,
       blockers: [
         { kind: 'cooldown', subject: 'runner-a', ms: 60_000, code: null },
       ],
     })
+  })
+  it('sums the work done in the last hour, so a gap between jobs is not a stall', () => {
+    const view = workerView({
+      queues: [
+        workerQueue({ queued: 3, done1h: 13 }),
+        workerQueue({ name: 'queue.b', done1h: 3 }),
+      ],
+      nodes: [workerNode()],
+    })
+    expect(diagnoseWorker(view)).toMatchObject({ state: 'blocked', done1h: 16 })
   })
   it('lists cooldowns against the server clock, never negative', () => {
     const view = workerView({

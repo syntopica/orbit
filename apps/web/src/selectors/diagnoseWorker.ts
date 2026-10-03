@@ -9,7 +9,8 @@ import { nodeBlockers } from './nodeBlockers'
 export const diagnoseWorker = (view: WorkerView): WorkerDiagnosis => {
   const queued = view.queues.reduce((sum, q) => sum + q.queued, 0)
   const live = view.queues.reduce((sum, q) => sum + q.live, 0)
-  if (queued === 0) return { state: 'idle', queued, live, blockers: [] }
+  const done1h = view.queues.reduce((sum, q) => sum + q.done1h, 0)
+  if (queued === 0) return { state: 'idle', queued, live, done1h, blockers: [] }
   const cooldowns = view.cooldowns.map((c): WorkerBlocker => ({
     kind: 'cooldown',
     subject: c.runner,
@@ -21,5 +22,11 @@ export const diagnoseWorker = (view: WorkerView): WorkerDiagnosis => {
       ? [{ kind: 'no_nodes', subject: null, ms: null, code: null }]
       : view.nodes.flatMap(nodeBlockers)
   const blockers = [...cooldowns, ...nodes]
-  return { state: live > 0 ? 'working' : 'blocked', queued, live, blockers }
+  return {
+    state: live > 0 ? 'working' : 'blocked',
+    queued,
+    live,
+    done1h,
+    blockers,
+  }
 }
