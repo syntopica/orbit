@@ -52,6 +52,7 @@ const setup = () => {
     hub,
     catalog: null,
     worker: null,
+    workerActivity: null,
     guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
     webRoot: '/nonexistent',
     now: () => Date.now(),

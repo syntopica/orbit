@@ -5,6 +5,7 @@ import { runProcess } from '../process/runProcess'
 import type { Hub } from '../types/Hub'
 import type { OrbitState } from '../types/OrbitState'
 import type { RequestHandler } from '../types/RequestHandler'
+import { buildWorkerActivityReader } from './buildWorkerActivityReader'
 import { buildWorkerReader } from './buildWorkerReader'
 
 // The HTTP application over the state, for the port the server really got.
@@ -35,6 +36,7 @@ export const buildHandler = (
     hub,
     catalog,
     worker: buildWorkerReader(config.worker, fetch),
+    workerActivity: buildWorkerActivityReader(config.worker, fetch),
     guard: {
       port,
       allowedHosts: config.allowedHosts,

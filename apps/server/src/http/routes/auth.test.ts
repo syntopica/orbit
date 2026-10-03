@@ -17,6 +17,7 @@ const setup = () => {
     hub: createHub({ ringSize: 10, recentEvents: 5, firstId: 1 }),
     catalog: null,
     worker: null,
+    workerActivity: null,
     guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
     webRoot: '/nonexistent',
     now: () => at,

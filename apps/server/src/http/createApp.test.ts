@@ -31,6 +31,7 @@ describe('createApp static files', () => {
       hub: createHub({ ringSize: 2, recentEvents: 2, firstId: 1 }),
       catalog: null,
       worker: null,
+      workerActivity: null,
       guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
       webRoot,
       now: () => Date.now(),

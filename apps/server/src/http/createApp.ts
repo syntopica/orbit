@@ -14,6 +14,7 @@ import { getLaunchdRows } from './routes/getLaunchdRows'
 import { getSnapshots } from './routes/getSnapshots'
 import { getStream } from './routes/getStream'
 import { getWorker } from './routes/getWorker'
+import { getWorkerActivity } from './routes/getWorkerActivity'
 import { postLogout } from './routes/postLogout'
 import { postPair } from './routes/postPair'
 import { postSession } from './routes/postSession'
@@ -50,6 +51,10 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
     getLaunchdHistory(deps.historyDb, deps.catalog, pool, deps.now),
   )
   api.get('/worker', getWorker(deps.worker, workerPool, deps.now))
+  api.get(
+    '/worker/activity',
+    getWorkerActivity(deps.workerActivity, workerPool, deps.now),
+  )
   api.all('*', (c) => c.json({ error: 'not_found' }, 404))
   app.route('/api', api)
   serveWeb(app, deps.webRoot)
