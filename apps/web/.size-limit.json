@@ -8,5 +8,10 @@
     "name": "3D orbit chunk (brotli)",
     "path": "../server/dist/public/assets/OrbitScene-*.js",
     "limit": "250 KB"
+  },
+  {
+    "name": "flow route (brotli)",
+    "path": "../server/dist/public/assets/MemoryFlowScreen-*.js",
+    "limit": "250 KB"
   }
 ]

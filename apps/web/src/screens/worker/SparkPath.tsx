@@ -10,14 +10,15 @@ export const SparkPath = ({ points, active, stroke, dot }: SparkPathProps) => {
       <LinePath
         data={[...points]}
         x={(p) => p.x}
-        y={(p) => p.y}
+        y={(p) => p.y ?? 0}
+        defined={(p) => p.y !== null}
         className={stroke}
         fill="none"
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-      {point === undefined ? null : (
+      {point === undefined || point.y === null ? null : (
         <circle
           cx={point.x}
           cy={point.y}

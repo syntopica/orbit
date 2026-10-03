@@ -1,3 +1,5 @@
+import '../zodConfig'
+
 import type { z } from 'zod'
 
 import { ApiError } from './ApiError'

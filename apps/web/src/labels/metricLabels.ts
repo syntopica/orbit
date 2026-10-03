@@ -13,6 +13,7 @@ export const METRIC_LABELS: Record<Metric['key'], string> = {
   'worker.nodes': 'nodes',
   'atrium.records': 'records',
   'atrium.not_indexed': 'not indexed',
+  'atrium.synth_synthesized': 'synthesized in the last pass',
   'atrium.synth_deferred': 'deferred by synthesis',
   'atrium.synth_failed': 'failed in synthesis',
   'brain.pages': 'pages',

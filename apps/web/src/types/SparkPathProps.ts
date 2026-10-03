@@ -1,7 +1,7 @@
-import type { SparkPoint } from './SparkPoint'
+import type { TrendPoint } from './TrendPoint'
 
 export type SparkPathProps = {
-  readonly points: readonly SparkPoint[]
+  readonly points: readonly TrendPoint[]
   readonly active: number | null
   readonly stroke: string
   readonly dot: string

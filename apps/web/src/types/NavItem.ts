@@ -1,4 +1,4 @@
 export type NavItem = {
-  readonly to: '/' | '/worker' | '/system'
+  readonly to: '/' | '/memory' | '/atrium' | '/clips' | '/worker' | '/system'
   readonly label: string
 }
