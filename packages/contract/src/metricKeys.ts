@@ -11,6 +11,7 @@ export const METRIC_KEYS = [
   'worker.nodes',
   'atrium.records',
   'atrium.not_indexed',
+  'atrium.synth_synthesized',
   'atrium.synth_deferred',
   'atrium.synth_failed',
   'brain.pages',
