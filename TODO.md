@@ -11,10 +11,6 @@ This repository is public: entries describe engine behaviour only.
 - [ ] Plan and build 1c: Brain screen (WebGL graph, page view, lint/doctor).
       Re-measure `brain graph --json --no-html` p95 on a quiet machine first; it
       was at the 2 s budget under load.
-- [!] Brain health reads `warn check_failed` while `brain doctor --json` checks
-  `CAPTURE_TOKEN` from the environment, which orbit's allowlist strips by
-  design. Blocked on the brain engine (filed in its TODO); credentials never go
-  into `orbit.json` `env`.
 
 ## Web
 

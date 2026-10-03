@@ -7,6 +7,13 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-03 [x] Brain and clips health no longer read `check_failed` for a
+  credentials check orbit cannot satisfy: the engines accept
+  `doctor --json --skip NAME`, the table lists that form, and a request naming
+  an entry by its leading arguments runs the whole entry
+  (`resolveListedArgs.ts`, af65ec6). Evidence: `resolveListedArgs.test.ts`,
+  `createEngineRunner.test.ts`; a live reading of brain doctor failing checks
+  went from 1 to 0 after deploy.
 - 2026-10-03 [x] Worker health degrades: `warn lagging` once the oldest queued
   job has waited over 24 h (`workerHealth.ts`, spec 3.2); zero nodes or queued
   work alone stay `ok` because nodes run only while idle. Evidence:
