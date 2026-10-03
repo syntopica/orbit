@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test'
 
-import { signIn } from '../support/signIn'
+import { signInWithForm } from '../support/signInWithForm'
 
 test('signs in and shows live satellites', async ({ page }) => {
-  await signIn(page)
+  await signInWithForm(page)
   await expect(
     page.getByRole('status', { name: 'Connection' }).first(),
   ).toHaveText('Live')

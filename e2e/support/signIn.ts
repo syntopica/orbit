@@ -1,17 +1,17 @@
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
+import type { Cookie, Page } from '@playwright/test'
 
-import type { Page } from '@playwright/test'
+import { signInWithForm } from './signInWithForm'
 
-import { E2E } from './paths'
-import { useOwnSource } from './useOwnSource'
+// The server also caps sign-ins across all sources (30 a minute), which the
+// suite outgrew; the form runs once and later pages reuse its session cookie.
+let session: readonly Cookie[] | null = null
 
 export const signIn = async (page: Page): Promise<void> => {
-  await useOwnSource(page)
-  await page.goto('/login')
-  await page
-    .getByLabel('Admin token')
-    .fill(readFileSync(join(E2E.root, 'token'), 'utf8').trim())
-  await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.waitForURL('/')
+  if (session === null) {
+    await signInWithForm(page)
+    session = await page.context().cookies()
+    return
+  }
+  await page.context().addCookies([...session])
+  await page.goto('/')
 }
