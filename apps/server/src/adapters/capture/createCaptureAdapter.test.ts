@@ -52,7 +52,7 @@ describe('createCaptureAdapter', () => {
       adapter.read(new AbortController().signal),
     ).rejects.toMatchObject({ reason: 'unauthorized' })
   })
-  it('rejects an offset oldestAt as schema_invalid', async () => {
+  it('emits an offset oldestAt as the equivalent UTC instant', async () => {
     const adapter = await adapterWith(
       reply({
         data: {
@@ -62,16 +62,16 @@ describe('createCaptureAdapter', () => {
         },
       }),
     )
-    await expect(
-      adapter.read(new AbortController().signal),
-    ).rejects.toMatchObject({ reason: 'schema_invalid' })
+    const core = await adapter.read(new AbortController().signal)
+    expect(core.pending[0]?.oldestAt).toBe('2026-10-01T00:00:00.000Z')
   })
-  it('rejects a non-ISO oldestAt as schema_invalid', async () => {
+  it('emits an unparseable oldestAt as null and keeps the count', async () => {
     const adapter = await adapterWith(
-      reply({ data: { schemaVersion: 1, count: 1, oldestAt: 'yesterday' } }),
+      reply({ data: { schemaVersion: 1, count: 3, oldestAt: 'yesterday' } }),
     )
-    await expect(
-      adapter.read(new AbortController().signal),
-    ).rejects.toMatchObject({ reason: 'schema_invalid' })
+    const core = await adapter.read(new AbortController().signal)
+    expect(core.pending).toEqual([
+      { key: 'capture.undrained', count: 3, oldestAt: null },
+    ])
   })
 })

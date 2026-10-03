@@ -3,6 +3,7 @@ import type { Adapter } from '../../types/Adapter'
 import type { WorkerAdapterDeps } from '../../types/WorkerAdapterDeps'
 import { fetchWorkerText } from '../worker/fetchWorkerText'
 import { captureCountSchema } from './captureCountSchema'
+import { normalizeOldestAt } from './normalizeOldestAt'
 
 // The capture service wraps answers in { data }; its schemaVersion is checked
 // by the schema literal, so a new major reads as schema_invalid.
@@ -28,7 +29,7 @@ export const createCaptureAdapter = (deps: WorkerAdapterDeps): Adapter => ({
               {
                 key: 'capture.undrained',
                 count: data.count,
-                oldestAt: data.oldestAt,
+                oldestAt: normalizeOldestAt(data.oldestAt),
               },
             ]
           : [],
