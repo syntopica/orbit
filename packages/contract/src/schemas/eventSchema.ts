@@ -10,6 +10,8 @@ export const eventSchema = z
     component: z.enum(COMPONENT_IDS),
     kind: z.enum(EVENT_KINDS),
     severity: z.enum(['info', 'warn', 'error']),
-    refs: z.record(z.string().regex(/^[a-z][a-zA-Z]{0,31}$/), refValueSchema),
+    refs: z
+      .record(z.string().regex(/^[a-z][a-zA-Z]{0,31}$/), refValueSchema)
+      .refine((refs) => Object.keys(refs).length <= 8, 'at most 8 refs'),
   })
   .strict()

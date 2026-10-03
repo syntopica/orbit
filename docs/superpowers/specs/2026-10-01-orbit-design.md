@@ -219,7 +219,7 @@ Labels, units, explanations and "where to resolve" hints are UI strings keyed
 by those enums, not data from engines. Event `refs` hold opaque ids (job ids, attempt
 ids, launchd labels from the registry), counts and closed codes only,
 validated by a per-kind schema with string values capped at 64 characters and
-matching `^[A-Za-z0-9_.:-]+$`. Path-derived identifiers such as brain page ids
+matching `^[A-Za-z0-9_.:-]+$`, at most eight refs per event. Path-derived identifiers such as brain page ids
 are content: they are never streamed, and are resolved only through
 authenticated detail endpoints.
 
