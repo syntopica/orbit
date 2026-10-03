@@ -55,6 +55,17 @@ describe('toWorkerView', () => {
     ])
     expect(view.now).toBe(NOW)
   })
+  it('leaves failed sampling jobs out of the failed count', () => {
+    const view = toWorkerView(
+      status({
+        queues: {
+          'queue.a': { ...queue({ failed: 69 }), sampling_failed: 59 },
+        },
+      }),
+      NOW,
+    )
+    expect(view.queues[0]?.failed).toBe(10)
+  })
   it('sorts queues by queued, then failed, then name, and drops unsafe names', () => {
     const view = toWorkerView(
       status({

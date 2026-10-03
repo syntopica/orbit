@@ -12,7 +12,8 @@ export const toQueueRow = (
     name,
     queued: count('queued'),
     live: count('leased') + count('running') + count('draining'),
-    failed: count('failed'),
+    // Shadow copies and their judges are sampling, not lost work.
+    failed: Math.max(0, count('failed') - (queue.sampling_failed ?? 0)),
     succeeded: count('succeeded'),
     oldestQueuedMs:
       queue.oldest_queued_s === null

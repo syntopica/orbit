@@ -10,6 +10,7 @@ export const workerStatusSchema = z.object({
       oldest_queued_s: z.number().nullable(),
       done_1h: z.number(),
       wasted_1h_s: z.number(),
+      sampling_failed: z.number().int().nonnegative().optional(),
     }),
   ),
   nodes: z.record(z.string(), workerNodeReportSchema),
