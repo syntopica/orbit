@@ -19,6 +19,12 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.syntopica.orbit.plis
 The plist sets `Umask` 63 (octal 077): launchd opens `orbit.log` before orbit
 runs, so the plist, not orbit's own `umask`, is what makes the log `0600`.
 
+The plist also carries a `PATH`: the directory of the node that printed it, then
+the installing shell's `PATH` entries. launchd's default `PATH` finds neither
+`node` nor the brain toolchain, so without it `brain` and `clips` read `down`.
+Print the plist from a shell where those tools resolve, and re-print it after
+upgrading node. `orbit doctor` fails when the installed plist has no `PATH`.
+
 Remote access goes through Tailscale Serve only; orbit itself never leaves
 loopback:
 
@@ -76,6 +82,9 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
   }
 }
 ```
+
+`worker.url` and `capture.url` are origins: a path prefix is ignored, because
+requests are built as `/api/...` against the origin.
 
 ## Update
 

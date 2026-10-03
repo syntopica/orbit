@@ -122,6 +122,9 @@ healthy. Data older than its target turns the card `warn` (`stale`).
   UI.
 - **Configured but unavailable**: configured, yet its CLI, file or API cannot
   be read. The component is shown `down` with a reason code.
+- A `brain` or `clips` entry in `orbit.json` whose instance configuration has
+  no checkout path, or whose command does not resolve, reads `down not_found`:
+  configured in `orbit.json` means configured, not absent.
 
 ### 3.3 End-to-end memory flow (what "Memory flow" draws)
 
@@ -168,7 +171,7 @@ a file at the end of work it already does, and orbit reads the file.
 | brain | `brain page --json --id <id>` | one page's frontmatter, body and links; `id` validated against the configured page roots, no path traversal, body capped at 1 MB | on-demand detail call |
 | clips | `clips status --json` | counts per state; intake per day | benchmarked |
 | clips | `clips doctor --json` | checks `name`, `ok`, `code` | benchmarked |
-| capture | `GET /api/captures/count?drained=false` (bearer) | `{ "count": n, "oldestAt": t }` | one indexed query on the service |
+| capture | `GET /api/captures/count` (bearer) | `{ "data": { "schemaVersion": 1, "count": n, "oldestAt": t } }` (`oldestAt` may carry any offset; orbit normalises it to UTC, or null when unparseable) | one indexed query on the service |
 
 Each status file has exactly one writer and is published atomically: written
 to a temporary file in the same directory, `fsync`ed, then renamed over the
