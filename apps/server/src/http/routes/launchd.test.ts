@@ -23,7 +23,10 @@ describe('launchd routes', () => {
       historyDb,
       hub: createHub({ ringSize: 2, recentEvents: 2, firstId: 1 }),
       worker: null,
+      atrium: null,
+      clips: null,
       workerActivity: null,
+      stageLabels: new Map(),
       catalog: {
         rows: vi.fn<LaunchdCatalog['rows']>().mockResolvedValue([
           {

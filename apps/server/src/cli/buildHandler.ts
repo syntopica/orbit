@@ -2,18 +2,17 @@ import { createLaunchdCatalog } from '../adapters/launchd/createLaunchdCatalog'
 import { recordLaunchdObservation } from '../history/recordLaunchdObservation'
 import { createApp } from '../http/createApp'
 import { runProcess } from '../process/runProcess'
-import type { Hub } from '../types/Hub'
-import type { OrbitState } from '../types/OrbitState'
+import type { BuildHandlerArgs } from '../types/BuildHandlerArgs'
 import type { RequestHandler } from '../types/RequestHandler'
+import { buildAtriumReader } from './buildAtriumReader'
+import { buildClipsReader } from './buildClipsReader'
+import { buildStageLabels } from './buildStageLabels'
 import { buildWorkerActivityReader } from './buildWorkerActivityReader'
 import { buildWorkerReader } from './buildWorkerReader'
 
 // The HTTP application over the state, for the port the server really got.
 export const buildHandler = (
-  state: OrbitState,
-  hub: Hub,
-  webRoot: string,
-  port: number,
+  ...[state, hub, webRoot, port, engines]: BuildHandlerArgs
 ): RequestHandler => {
   const { config, historyDb } = state
   const uid = process.getuid?.() ?? 0
@@ -35,6 +34,13 @@ export const buildHandler = (
     historyDb,
     hub,
     catalog,
+    stageLabels: buildStageLabels(config.launchd?.labels ?? []),
+    clips: buildClipsReader(
+      engines['clips'],
+      config.engines.clips !== undefined,
+      config.cadenceMs.clips ?? 60_000,
+    ),
+    atrium: buildAtriumReader(config.atrium, config.cadenceMs.atrium ?? 60_000),
     worker: buildWorkerReader(config.worker, fetch),
     workerActivity: buildWorkerActivityReader(config.worker, fetch),
     guard: {

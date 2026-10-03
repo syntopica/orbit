@@ -3,6 +3,8 @@ import type { DatabaseSync } from 'node:sqlite'
 import type { LaunchdHistory } from '../types/LaunchdHistory'
 import type { LaunchdObservation } from '../types/LaunchdObservation'
 
+import { readRunIntervals } from './readRunIntervals'
+
 export const readLaunchdHistory = (
   db: DatabaseSync,
   label: string,
@@ -19,10 +21,6 @@ export const readLaunchdHistory = (
       `SELECT ${columns} FROM launchd_observations WHERE label = ? AND at >= ? ORDER BY at`,
     )
     .all(label, from) as LaunchdObservation[]
-  const runs = db
-    .prepare(
-      'SELECT started, stopped FROM runs WHERE stopped >= ? ORDER BY started',
-    )
-    .all(from) as LaunchdHistory['runs']
+  const runs = readRunIntervals(db, from)
   return { observations: [...before, ...within], runs }
 }

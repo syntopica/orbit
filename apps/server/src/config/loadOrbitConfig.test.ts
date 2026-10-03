@@ -65,4 +65,26 @@ describe('loadOrbitConfig', () => {
     )
     expect(config.worker?.url).toBe('https://worker.example')
   })
+  it('accepts a flow stage on a launchd label and refuses an unknown one', async () => {
+    const withStage = (stage: string) => ({
+      launchd: {
+        labels: [
+          {
+            component: 'atrium',
+            label: 'com.example.refresh',
+            role: 'scheduled',
+            plist: '/x.plist',
+            stage,
+          },
+        ],
+      },
+    })
+    const config = await loadOrbitConfig(
+      await withOrbitJson(withStage('index')),
+    )
+    expect(config.launchd?.labels[0]?.stage).toBe('index')
+    await expect(
+      loadOrbitConfig(await withOrbitJson(withStage('nowhere'))),
+    ).rejects.toThrow()
+  })
 })

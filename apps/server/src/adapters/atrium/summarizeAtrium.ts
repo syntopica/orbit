@@ -22,6 +22,11 @@ export const summarizeAtrium = (
   ]
   if (synthesis !== null)
     metrics.push(
+      {
+        key: 'atrium.synth_synthesized',
+        value: synthesis.lastPass.synthesized,
+        at,
+      },
       { key: 'atrium.synth_deferred', value: synthesis.lastPass.deferred, at },
       { key: 'atrium.synth_failed', value: synthesis.lastPass.failed, at },
     )

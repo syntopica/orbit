@@ -2,6 +2,8 @@ import { mkdtemp, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { atriumRefreshDocument } from '../../test/atriumRefreshDocument'
+
 import { createAtriumAdapter } from './createAtriumAdapter'
 
 const signal = () => new AbortController().signal
@@ -28,12 +30,13 @@ describe('createAtriumAdapter', () => {
     const writtenAt = new Date().toISOString()
     await writeFile(
       join(dir, 'refresh.json'),
-      JSON.stringify({
-        schemaVersion: 1,
-        writtenAt,
-        records: { total: 2 },
-        populations: [],
-      }),
+      JSON.stringify(
+        atriumRefreshDocument({
+          writtenAt,
+          records: { total: 2, bySource: { 'source-a': 2 } },
+          populations: [],
+        }),
+      ),
     )
     const core = await adapterIn(dir).read(signal())
     expect(core.component).toBe('atrium')

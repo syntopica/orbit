@@ -21,7 +21,7 @@ export const startServer = async (
   await assertWebRoot(options.webRoot)
   const hub = createServerHub()
   const { server, port } = await listenLoopback(state.config.port, (actual) =>
-    buildHandler(state, hub, options.webRoot, actual),
+    buildHandler(state, hub, options.webRoot, actual, options.engines),
   )
   let stopScheduler = (): void => undefined
   let stopHistory = (): void => undefined

@@ -9,8 +9,12 @@ import { requireCsrfHeader } from './requireCsrfHeader'
 import { requireSameOrigin } from './requireSameOrigin'
 import { requireSession } from './requireSession'
 import { authBodyLimit } from './routes/authBodyLimit'
+import { getAtrium } from './routes/getAtrium'
+import { getClips } from './routes/getClips'
 import { getLaunchdHistory } from './routes/getLaunchdHistory'
 import { getLaunchdRows } from './routes/getLaunchdRows'
+import { getMemoryFlow } from './routes/getMemoryFlow'
+import { getMetricHistory } from './routes/getMetricHistory'
 import { getSnapshots } from './routes/getSnapshots'
 import { getStream } from './routes/getStream'
 import { getWorker } from './routes/getWorker'
@@ -26,6 +30,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   const auth = { db: deps.authDb, now: deps.now }
   const pool = createDetailPool(2)
   const workerPool = createDetailPool(2)
+  const memoryPool = createDetailPool(2)
   const app = new Hono<OrbitEnv>()
   // Fixed JSON only: the error itself is never logged or returned (spec 8).
   app.onError((_error, c) => c.json({ error: 'internal' }, 500))
@@ -50,6 +55,10 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
     '/launchd/history',
     getLaunchdHistory(deps.historyDb, deps.catalog, pool, deps.now),
   )
+  api.get('/history/metrics', getMetricHistory(deps.historyDb, deps.now))
+  api.get('/clips', getClips(deps.clips, deps.hub, memoryPool, deps.now))
+  api.get('/memory/flow', getMemoryFlow(deps, memoryPool))
+  api.get('/atrium', getAtrium(deps.atrium, memoryPool, deps.now))
   api.get('/worker', getWorker(deps.worker, workerPool, deps.now))
   api.get(
     '/worker/activity',

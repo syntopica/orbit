@@ -1,10 +1,5 @@
-import { join } from 'node:path'
-
-import { ProcessError } from '../../process/ProcessError'
 import type { Adapter } from '../../types/Adapter'
-import { atriumRefreshSchema } from './atriumRefreshSchema'
-import { atriumSynthesisSchema } from './atriumSynthesisSchema'
-import { readStatusFile } from './readStatusFile'
+import { readAtriumDocuments } from './readAtriumDocuments'
 import { summarizeAtrium } from './summarizeAtrium'
 
 // Reads the documents atrium's jobs publish; never runs atrium itself.
@@ -18,16 +13,8 @@ export const createAtriumAdapter = (deps: {
   timeoutMs: 5000,
   freshnessMs: deps.cadenceMs * 2,
   read: async (signal) => {
-    const file = (name: string) => join(deps.statusDir, name)
-    const refresh = await readStatusFile(
-      file('refresh.json'),
-      atriumRefreshSchema,
-      signal,
-    )
-    if (refresh === null) throw new ProcessError('not_found')
-    const synthesis = await readStatusFile(
-      file('synthesis.json'),
-      atriumSynthesisSchema,
+    const { refresh, synthesis } = await readAtriumDocuments(
+      deps.statusDir,
       signal,
     )
     const now = new Date()

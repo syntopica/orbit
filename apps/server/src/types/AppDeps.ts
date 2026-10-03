@@ -1,5 +1,9 @@
+import type { FlowStageId } from '@orbit/contract'
+
 import type { DatabaseSync } from 'node:sqlite'
 
+import type { AtriumDeps } from './AtriumDeps'
+import type { ClipsReader } from './ClipsReader'
 import type { GuardConfig } from './GuardConfig'
 import type { Hub } from './Hub'
 import type { LaunchdCatalog } from './LaunchdCatalog'
@@ -10,6 +14,9 @@ export type AppDeps = {
   readonly authDb: DatabaseSync
   readonly historyDb: DatabaseSync
   readonly hub: Hub
+  readonly stageLabels: ReadonlyMap<FlowStageId, string>
+  readonly clips: ClipsReader | null
+  readonly atrium: AtriumDeps | null
   readonly catalog: LaunchdCatalog | null
   readonly worker: WorkerReader | null
   readonly workerActivity: WorkerActivityReader | null
