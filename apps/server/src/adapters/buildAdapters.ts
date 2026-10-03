@@ -2,6 +2,7 @@ import { join } from 'node:path'
 
 import type { Adapter } from '../types/Adapter'
 import type { AdapterContext } from '../types/AdapterContext'
+import { buildMemoryAdapters } from './buildMemoryAdapters'
 import { createLaunchdAdapter } from './launchd/createLaunchdAdapter'
 import { createSyntheticAdapter } from './synthetic/createSyntheticAdapter'
 import { createWorkerAdapter } from './worker/createWorkerAdapter'
@@ -32,6 +33,7 @@ export const buildAdapters = (context: AdapterContext): Adapter[] => {
       }),
     )
   }
+  adapters.push(...buildMemoryAdapters(context))
   if (config.synthetic)
     adapters.push(
       createSyntheticAdapter(

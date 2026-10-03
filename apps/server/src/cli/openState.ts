@@ -15,7 +15,7 @@ export const openState = async (
   // Before any database opens, so the -wal and -shm side files are 0600 too.
   process.umask(0o077)
   const dataDir = resolveDataDir(env)
-  await loadInstanceConfig(dataDir)
+  const instance = await loadInstanceConfig(dataDir)
   const stateDir = await ensureStateDir(dataDir)
   const config = await loadOrbitConfig(dataDir)
   const authDb = openDatabase(join(stateDir, 'auth.sqlite3'), AUTH_SCHEMA_SQL)
@@ -27,6 +27,7 @@ export const openState = async (
     dataDir,
     stateDir,
     config,
+    instance,
     env,
     authDb,
     historyDb,

@@ -43,6 +43,27 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
     "url": "http://127.0.0.1:8765",
     "tokenFile": "/path/to/instance/worker/state/tokens/admin.token"
   },
+  "atrium": { "statusDir": "/path/to/instance/atrium/status" },
+  "capture": {
+    "url": "https://capture.example",
+    "tokenFile": "/path/to/instance/capture.token"
+  },
+  "engines": {
+    "brain": {
+      "command": "bin/brain",
+      "subcommands": [
+        ["lint", "--json"],
+        ["doctor", "--json"]
+      ]
+    },
+    "clips": {
+      "command": "bin/clips",
+      "subcommands": [
+        ["status", "--json"],
+        ["doctor", "--json"]
+      ]
+    }
+  },
   "launchd": {
     "labels": [
       {

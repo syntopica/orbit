@@ -2,11 +2,16 @@ import { buildAdapters } from '../adapters/buildAdapters'
 import { recordLaunchdObservation } from '../history/recordLaunchdObservation'
 import { runProcess } from '../process/runProcess'
 import { createScheduler } from '../scheduler/createScheduler'
+import type { EngineRunner } from '../types/EngineRunner'
 import type { Hub } from '../types/Hub'
 import type { LoopHandle } from '../types/LoopHandle'
 import type { OrbitState } from '../types/OrbitState'
 
-export const buildScheduler = (state: OrbitState, hub: Hub): LoopHandle =>
+export const buildScheduler = (
+  state: OrbitState,
+  hub: Hub,
+  engines: Readonly<Record<string, EngineRunner>>,
+): LoopHandle =>
   createScheduler(
     buildAdapters({
       config: state.config,
@@ -17,6 +22,7 @@ export const buildScheduler = (state: OrbitState, hub: Hub): LoopHandle =>
       },
       run: runProcess,
       fetch,
+      engines,
     }),
     hub,
   )

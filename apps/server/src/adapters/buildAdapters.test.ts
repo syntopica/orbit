@@ -8,6 +8,7 @@ const context = (raw: unknown) => ({
   record: () => undefined,
   run: async () => await Promise.resolve({ code: 0, stdout: '' }),
   fetch,
+  engines: {},
 })
 
 const worker = { url: 'http://127.0.0.1:8765', tokenFile: '/t' }
@@ -71,5 +72,38 @@ describe('buildAdapters', () => {
     expect([s?.cadenceMs, s?.timeoutMs, s?.freshnessMs]).toEqual([
       2000, 4000, 10_000,
     ])
+  })
+  it('builds the memory adapters that are configured', () => {
+    const runner = async () => await Promise.resolve({ code: 0, stdout: '' })
+    const built = buildAdapters({
+      ...context({
+        atrium: { statusDir: '/data/atrium/status' },
+        capture: { url: 'https://capture.example', tokenFile: '/t' },
+        engines: {
+          brain: { command: 'bin/brain', subcommands: [['lint', '--json']] },
+          clips: { command: 'bin/clips', subcommands: [['status', '--json']] },
+        },
+      }),
+      engines: { brain: runner, clips: runner },
+    })
+    expect(built.map((a) => [a.id, a.cadenceMs])).toEqual([
+      ['atrium', 60_000],
+      ['brain', 60_000],
+      ['clips', 60_000],
+      ['capture', 120_000],
+    ])
+  })
+  it('keeps an engine whose command did not resolve, failing not_found', async () => {
+    const [brain] = buildAdapters({
+      ...context({
+        engines: {
+          brain: { command: 'bin/brain', subcommands: [['lint', '--json']] },
+        },
+      }),
+      engines: {},
+    })
+    await expect(
+      brain?.read(new AbortController().signal),
+    ).rejects.toMatchObject({ reason: 'not_found' })
   })
 })

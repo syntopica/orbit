@@ -36,6 +36,20 @@ export const orbitConfigSchema = z
       })
       .strict()
       .optional(),
+    atrium: z
+      .object({
+        statusDir: z.string().refine(isAbsolute),
+        refreshIntervalMs: z.number().int().min(60_000).default(3_600_000),
+      })
+      .strict()
+      .optional(),
+    capture: z
+      .object({
+        url: z.url({ protocol: /^https?$/ }),
+        tokenFile: z.string().min(1),
+      })
+      .strict()
+      .optional(),
     engines: engineTableSchema.default({}),
     cadenceMs: z
       .partialRecord(z.enum(COMPONENT_IDS), z.number().int().min(1000))

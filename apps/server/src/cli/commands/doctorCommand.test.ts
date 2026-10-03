@@ -13,7 +13,7 @@ describe('doctorCommand', () => {
     expect(out.some((l) => l.startsWith('ok') && l.includes('instance'))).toBe(
       true,
     )
-    expect(out).toHaveLength(9)
+    expect(out).toHaveLength(10)
   })
 
   it('passes once a token exists, and never prints it', async () => {

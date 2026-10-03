@@ -1,5 +1,6 @@
 import type { DoctorCheck } from '../../types/DoctorCheck'
 import { checkAdminToken } from './checkAdminToken'
+import { checkEngines } from './checkEngines'
 import { checkInstance } from './checkInstance'
 import { checkLaunchdLabels } from './checkLaunchdLabels'
 import { checkLaunchdLoaded } from './checkLaunchdLoaded'
@@ -19,4 +20,5 @@ export const DOCTOR_CHECKS: readonly DoctorCheck[] = [
   checkTailscaleServe,
   checkOrbitPlist,
   checkWorkerToken,
+  checkEngines,
 ]

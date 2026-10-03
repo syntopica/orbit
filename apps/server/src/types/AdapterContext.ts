@@ -1,3 +1,4 @@
+import type { EngineRunner } from './EngineRunner'
 import type { LaunchdObservation } from './LaunchdObservation'
 import type { OrbitConfig } from './OrbitConfig'
 import type { RunRequest } from './RunRequest'
@@ -10,4 +11,5 @@ export type AdapterContext = {
   readonly record: (observation: LaunchdObservation) => void
   readonly run: (request: RunRequest) => Promise<RunResult>
   readonly fetch: typeof fetch
+  readonly engines: Readonly<Record<string, EngineRunner>>
 }
