@@ -25,6 +25,7 @@ describe('launchd routes', () => {
       worker: null,
       atrium: null,
       clips: null,
+      brain: null,
       workerActivity: null,
       stageLabels: new Map(),
       catalog: {

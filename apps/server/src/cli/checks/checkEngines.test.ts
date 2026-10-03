@@ -61,4 +61,30 @@ describe('checkEngines', () => {
     })
     state.close()
   })
+  it('skips entries that hold a placeholder', async () => {
+    const bin = await writeFakeBin('tool', `echo '{"schemaVersion":1}'`)
+    const state = await openTestState({
+      engines: {
+        brain: {
+          command: 'tool',
+          subcommands: [
+            ['lint', '--json'],
+            ['page', '--json', '--id', '{pageId}'],
+          ],
+        },
+      },
+    })
+    const ready = {
+      ...state,
+      instance: {
+        ...state.instance,
+        engines: { brain: { path: dirname(bin) } },
+      },
+    }
+    expect(await checkEngines(ready)).toMatchObject({
+      level: 'ok',
+      detail: '1 engine commands ran',
+    })
+    state.close()
+  })
 })

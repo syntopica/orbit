@@ -6,19 +6,19 @@ import type { RunRequest } from '../types/RunRequest'
 import type { RunResult } from '../types/RunResult'
 import { resolveListedArgs } from './resolveListedArgs'
 
-// Only the argument lists the table names ever run; anything else is refused.
-// A request may name an entry by its leading arguments (resolveListedArgs).
+// Only argument lists the table names ever run (spec 5.3); a placeholder is
+// filled only with a valid page id, and a leading request runs its entry whole.
 export const createEngineRunner =
   (
     engine: ResolvedEngine,
     run: (request: RunRequest) => Promise<RunResult>,
   ): EngineRunner =>
-  async (args, signal) => {
-    const listed = resolveListedArgs(engine.subcommands, args)
-    if (listed === null) throw new ProcessError('check_failed')
+  async (requested, signal) => {
+    const args = resolveListedArgs(engine.subcommands, requested)
+    if (args === null) throw new ProcessError('check_failed')
     return await run({
       file: engine.file,
-      args: [...listed],
+      args,
       env: buildChildEnv(process.env, engine.env),
       timeoutMs: 10_000,
       maxBytes: 8 * 1024 * 1024,

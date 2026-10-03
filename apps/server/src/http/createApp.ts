@@ -22,6 +22,7 @@ import { getWorkerActivity } from './routes/getWorkerActivity'
 import { postLogout } from './routes/postLogout'
 import { postPair } from './routes/postPair'
 import { postSession } from './routes/postSession'
+import { registerBrainRoutes } from './routes/registerBrainRoutes'
 import { securityHeaders } from './securityHeaders'
 import { serveWeb } from './serveWeb'
 import { tailnetLogin } from './tailnetLogin'
@@ -64,6 +65,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
     '/worker/activity',
     getWorkerActivity(deps.workerActivity, workerPool, deps.now),
   )
+  registerBrainRoutes(api, deps.brain, memoryPool, deps.now)
   api.all('*', (c) => c.json({ error: 'not_found' }, 404))
   app.route('/api', api)
   serveWeb(app, deps.webRoot)

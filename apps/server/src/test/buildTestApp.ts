@@ -19,6 +19,7 @@ export const buildTestApp = (overrides: Partial<AppDeps> = {}) => {
     stageLabels: new Map(),
     atrium: null,
     clips: null,
+    brain: null,
     worker: null,
     workerActivity: null,
     guard: { port: 8790, allowedHosts: [], allowedLogins: [] },

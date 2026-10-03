@@ -43,4 +43,30 @@ describe('createEngineRunner', () => {
       run(['index'], new AbortController().signal),
     ).rejects.toMatchObject({ reason: 'check_failed' })
   })
+  it('refuses a placeholder value outside the page id pattern', async () => {
+    const run = createEngineRunner(
+      { ...engine, subcommands: [['page', '--json', '--id', '{pageId}']] },
+      () => {
+        throw new Error('must not run')
+      },
+    )
+    await expect(
+      run(['page', '--json', '--id', '../x'], new AbortController().signal),
+    ).rejects.toMatchObject({ reason: 'check_failed' })
+  })
+  it('passes the validated page id to the process', async () => {
+    const seen: RunRequest[] = []
+    const run = createEngineRunner(
+      { ...engine, subcommands: [['page', '--json', '--id', '{pageId}']] },
+      async (request) => {
+        seen.push(request)
+        return await Promise.resolve({ code: 0, stdout: '{}' })
+      },
+    )
+    await run(
+      ['page', '--json', '--id', 'notes/a'],
+      new AbortController().signal,
+    )
+    expect(seen[0]?.args).toEqual(['page', '--json', '--id', 'notes/a'])
+  })
 })

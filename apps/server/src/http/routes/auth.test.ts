@@ -20,6 +20,7 @@ const setup = () => {
     worker: null,
     atrium: null,
     clips: null,
+    brain: null,
     workerActivity: null,
     guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
     webRoot: '/nonexistent',

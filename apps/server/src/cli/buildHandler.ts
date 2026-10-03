@@ -5,6 +5,7 @@ import { runProcess } from '../process/runProcess'
 import type { BuildHandlerArgs } from '../types/BuildHandlerArgs'
 import type { RequestHandler } from '../types/RequestHandler'
 import { buildAtriumReader } from './buildAtriumReader'
+import { buildBrainReaders } from './buildBrainReaders'
 import { buildClipsReader } from './buildClipsReader'
 import { buildStageLabels } from './buildStageLabels'
 import { buildWorkerActivityReader } from './buildWorkerActivityReader'
@@ -39,6 +40,11 @@ export const buildHandler = (
       engines['clips'],
       config.engines.clips !== undefined,
       config.cadenceMs.clips ?? 60_000,
+    ),
+    brain: buildBrainReaders(
+      engines['brain'],
+      config.engines.brain !== undefined,
+      config.cadenceMs.brain ?? 60_000,
     ),
     atrium: buildAtriumReader(config.atrium, config.cadenceMs.atrium ?? 60_000),
     worker: buildWorkerReader(config.worker, fetch),
