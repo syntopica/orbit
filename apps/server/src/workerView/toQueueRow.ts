@@ -1,5 +1,6 @@
 import type { WorkerQueue } from '@orbit/contract'
 
+import { productionCount } from '../adapters/worker/productionCount'
 import type { WorkerStatus } from '../types/WorkerStatus'
 import { secondsToMs } from './secondsToMs'
 
@@ -7,13 +8,12 @@ export const toQueueRow = (
   name: string,
   queue: WorkerStatus['queues'][string],
 ): WorkerQueue => {
-  const count = (state: string): number => queue.states[state] ?? 0
+  const count = (state: string): number => productionCount(queue, state)
   return {
     name,
     queued: count('queued'),
     live: count('leased') + count('running') + count('draining'),
-    // Shadow copies and their judges are sampling, not lost work.
-    failed: Math.max(0, count('failed') - (queue.sampling_failed ?? 0)),
+    failed: count('failed'),
     succeeded: count('succeeded'),
     oldestQueuedMs:
       queue.oldest_queued_s === null

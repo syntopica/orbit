@@ -142,6 +142,10 @@ healthy. Data older than its target turns the card `warn` (`stale`).
   oldest queued job has waited more than 24 h. Nodes run only while their
   machine is idle and queues may wait for a quiet window, so zero nodes or a
   queued job alone is normal; nothing picking work up for a day is not.
+  Queued and failed counts and the queue age are production work only: the
+  worker reports shadow copies and judges as `sampling_queued` and
+  `sampling_failed`, and a shadow pinned to a resting executor may wait for
+  days without anything being wrong.
 
 ### 3.3 End-to-end memory flow (what "Memory flow" draws)
 
