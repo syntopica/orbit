@@ -49,7 +49,7 @@ describe('Shell', () => {
         snapshot: snapshotOf('worker', 'down'),
       })
     })
-    const toasts = await screen.findAllByRole('alert')
+    const toasts = await screen.findAllByTestId('toast')
     expect(toasts.map((t) => t.textContent)).toEqual([
       expect.stringContaining('Worker is down'),
     ])

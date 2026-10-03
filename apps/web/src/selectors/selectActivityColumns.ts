@@ -14,8 +14,8 @@ export const selectActivityColumns = (
   starts: readonly number[],
 ): ActivityColumn[] => {
   const acc: ActivityAccumulator[] = starts.map(() => ({
-    segments: new Map(),
-    errors: new Map(),
+    segments: new Map<string, number>(),
+    errors: new Map<string, number>(),
     wallMs: 0,
     attempts: 0,
     sampling: 0,

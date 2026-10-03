@@ -55,9 +55,9 @@ Each task below lists its exact files.
 
 **Files:**
 - Create: `package.json`, `pnpm-workspace.yaml`, `lefthook.yml`, `commitlint.config.mjs`, `prettier.config.mjs`, `.prettierignore`, `.editorconfig`, `.gitignore`, `.npmrc`, `renovate.json`, `.github/workflows/ci.yml`
-- Create: `packages/contract/` from `~/p/codeality/templates/ts-package` (all config files; `src/index.ts`, `src/index.test.ts` replaced below)
-- Create: `apps/server/` from `~/p/codeality/templates/ts-package` (same)
-- Create: `apps/web/` from `~/p/codeality/templates/vite-react-app` (all config files and `src/`)
+- Create: `packages/contract/` from `<codeality checkout>/templates/ts-package` (all config files; `src/index.ts`, `src/index.test.ts` replaced below)
+- Create: `apps/server/` from `<codeality checkout>/templates/ts-package` (same)
+- Create: `apps/web/` from `<codeality checkout>/templates/vite-react-app` (all config files and `src/`)
 - Modify: each package's `vitest.config.ts` (thresholds 90), each `package.json` (name, deps, `gate:pkg`)
 
 **Interfaces:**
@@ -68,14 +68,14 @@ Each task below lists its exact files.
 ```bash
 cd ~/p/orbit
 mkdir -p packages apps
-rsync -a --exclude node_modules --exclude dist --exclude coverage --exclude .turbo --exclude '*.tsbuildinfo' --exclude .lighthouseci --exclude .env ~/p/codeality/templates/ts-package/ packages/contract/
-rsync -a --exclude node_modules --exclude dist --exclude coverage --exclude .turbo --exclude '*.tsbuildinfo' --exclude .lighthouseci --exclude .env ~/p/codeality/templates/ts-package/ apps/server/
-rsync -a --exclude node_modules --exclude dist --exclude coverage --exclude .turbo --exclude '*.tsbuildinfo' --exclude .lighthouseci --exclude .env ~/p/codeality/templates/vite-react-app/ apps/web/
+rsync -a --exclude node_modules --exclude dist --exclude coverage --exclude .turbo --exclude '*.tsbuildinfo' --exclude .lighthouseci --exclude .env <codeality checkout>/templates/ts-package/ packages/contract/
+rsync -a --exclude node_modules --exclude dist --exclude coverage --exclude .turbo --exclude '*.tsbuildinfo' --exclude .lighthouseci --exclude .env <codeality checkout>/templates/ts-package/ apps/server/
+rsync -a --exclude node_modules --exclude dist --exclude coverage --exclude .turbo --exclude '*.tsbuildinfo' --exclude .lighthouseci --exclude .env <codeality checkout>/templates/vite-react-app/ apps/web/
 # Repository-level files move to the root; packages keep only package-level config.
 for p in packages/contract apps/server apps/web; do
   rm -rf "$p/.github" "$p/lefthook.yml" "$p/commitlint.config.mjs" "$p/renovate.json" "$p/.editorconfig" "$p/.npmrc"
 done
-cp ~/p/codeality/templates/ts-package/{lefthook.yml,commitlint.config.mjs,renovate.json,.editorconfig,.npmrc,prettier.config.mjs,.prettierignore} .
+cp <codeality checkout>/templates/ts-package/{lefthook.yml,commitlint.config.mjs,renovate.json,.editorconfig,.npmrc,prettier.config.mjs,.prettierignore} .
 rm -f apps/web/src/lib/add.ts apps/web/src/lib/add.test.ts
 ```
 

@@ -5,11 +5,16 @@ import { REASON_LABELS } from '../../labels/reasonLabels'
 export const Toasts = () => {
   const { toasts, dismiss } = useDownToasts()
   return (
-    <div className="fixed right-4 bottom-20 z-50 flex w-80 flex-col gap-2 md:bottom-4">
+    <div
+      role="status"
+      aria-live="polite"
+      aria-label="Notifications"
+      className="fixed right-4 bottom-20 z-50 flex w-80 flex-col gap-2 md:bottom-4"
+    >
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          role="alert"
+          data-testid="toast"
           className="border-down/40 bg-panel flex items-start justify-between gap-3 rounded-xl border p-3 text-sm"
         >
           <span>

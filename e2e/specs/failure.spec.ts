@@ -20,7 +20,9 @@ test('one failing component goes down alone and recovers', async ({ page }) => {
     page.getByRole('img', { name: /^Synthetic probe: Down/ }),
   ).toBeVisible({ timeout: 10_000 })
   await expect(
-    page.getByRole('alert').filter({ hasText: 'Synthetic probe is down' }),
+    page
+      .getByRole('status', { name: 'Notifications' })
+      .filter({ hasText: 'Synthetic probe is down' }),
   ).toBeVisible()
   await expect(
     page.getByRole('img', { name: /^Scheduled jobs: Down/ }),

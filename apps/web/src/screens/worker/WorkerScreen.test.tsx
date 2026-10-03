@@ -60,7 +60,7 @@ describe('WorkerScreen', () => {
       within(queues).getByRole('rowheader', { name: 'queue.a' }),
     ).toBeInTheDocument()
     expect(within(queues).getByText('2h')).toBeInTheDocument()
-    expect(within(queues).getByText('1 idle queues')).toBeInTheDocument()
+    expect(within(queues).getByText('1 idle queue')).toBeInTheDocument()
     expect(
       screen.getByRole('region', { name: 'Runners cooling down' }),
     ).toHaveTextContent('available in 4d 10h')

@@ -26,8 +26,10 @@ loopback:
 tailscale serve --bg --https=443 http://127.0.0.1:8790
 ```
 
-Add the machine's tailnet name to `allowedHosts` and your tailnet login to
-`allowedLogins` in `$SYNTOPICA_DATA/orbit/orbit.json`, then pair a phone with
+Serve forwards the client's `Host` header unchanged (measured in
+`docs/measurements/2026-10-03-tailscale-serve.md`), so add the machine's tailnet
+name to `allowedHosts` and your tailnet login to `allowedLogins` in
+`$SYNTOPICA_DATA/orbit/orbit.json`, then pair a phone with
 `node apps/server/dist/orbit.mjs pair` and scan the QR code.
 
 `orbit.json` example (placeholders):
@@ -53,6 +55,28 @@ Add the machine's tailnet name to `allowedHosts` and your tailnet login to
   }
 }
 ```
+
+## Update
+
+```bash
+git pull && pnpm install && pnpm build
+launchctl kickstart -k gui/$(id -u)/com.syntopica.orbit
+```
+
+Re-run `serve --print-plist` and replace the installed plist only when the
+template under `launchd/` changed; then `launchctl bootout` and `bootstrap` it
+again as below.
+
+## Uninstall
+
+```bash
+launchctl bootout gui/$(id -u)/com.syntopica.orbit
+rm ~/Library/LaunchAgents/com.syntopica.orbit.plist
+tailscale serve --https=443 off   # only if this route serves nothing else
+```
+
+orbit's own state (sessions, history, log) lives in `$SYNTOPICA_DATA/orbit/`;
+remove it only when the instance no longer needs it.
 
 ## Develop
 

@@ -16,6 +16,7 @@ export const WORKER_LABELS = {
   failed: 'Failed',
   succeeded: 'Succeeded',
   done1h: 'Done 1h',
+  idleQueue: 'idle queue',
   idleQueues: 'idle queues',
   cooldowns: 'Runners cooling down',
   noCooldowns: 'No runner is cooling down.',

@@ -34,17 +34,24 @@ describe('Toasts', () => {
       ['worker', 'brain', 'clips', 'capture', 'atrium'] as const
     ).entries())
       down(id, 3 + index)
-    const texts = screen.getAllByRole('alert').map((t) => t.textContent)
+    const texts = screen.getAllByTestId('toast').map((t) => t.textContent)
     expect(texts).toHaveLength(4)
     expect(texts[0]).toContain('Brain')
     expect(texts[3]).toContain('Atrium')
   })
+  it('announces toasts through a polite live region', async () => {
+    await synced()
+    down('worker', 3)
+    const region = screen.getByRole('status', { name: 'Notifications' })
+    expect(region).toHaveAttribute('aria-live', 'polite')
+    expect(region).toContainElement(screen.getByTestId('toast'))
+  })
   it('shows the reason and dismisses on request', async () => {
     await synced()
     down('worker', 3)
-    expect(screen.getByRole('alert')).toHaveTextContent('Unreachable')
+    expect(screen.getByTestId('toast')).toHaveTextContent('Unreachable')
     fireEvent.click(screen.getByRole('button', { name: 'Dismiss' }))
-    expect(screen.queryByRole('alert')).toBeNull()
+    expect(screen.queryByTestId('toast')).toBeNull()
   })
   it('expires a toast after 8 seconds, not before', async () => {
     await synced()
@@ -52,11 +59,11 @@ describe('Toasts', () => {
     act(() => {
       vi.advanceTimersByTime(7_999)
     })
-    expect(screen.getAllByRole('alert')).toHaveLength(1)
+    expect(screen.getAllByTestId('toast')).toHaveLength(1)
     act(() => {
       vi.advanceTimersByTime(1)
     })
-    expect(screen.queryByRole('alert')).toBeNull()
+    expect(screen.queryByTestId('toast')).toBeNull()
   })
   it('expires each toast 8 seconds after its own arrival', async () => {
     await synced()
@@ -68,13 +75,13 @@ describe('Toasts', () => {
     act(() => {
       vi.advanceTimersByTime(3_000)
     })
-    const left = screen.getAllByRole('alert')
+    const left = screen.getAllByTestId('toast')
     expect(left).toHaveLength(1)
     expect(left[0]).toHaveTextContent('Brain')
     act(() => {
       vi.advanceTimersByTime(5_000)
     })
-    expect(screen.queryByRole('alert')).toBeNull()
+    expect(screen.queryByTestId('toast')).toBeNull()
   })
   it('arms one timer per toast and none after unmount', async () => {
     const view = await renderShell()
@@ -114,8 +121,8 @@ describe('Toasts', () => {
     })
     down('worker', 10)
     emit({ type: 'sync', id: 11 })
-    expect(screen.queryByRole('alert')).toBeNull()
+    expect(screen.queryByTestId('toast')).toBeNull()
     down('brain', 12)
-    expect(screen.getAllByRole('alert')).toHaveLength(1)
+    expect(screen.getAllByTestId('toast')).toHaveLength(1)
   })
 })

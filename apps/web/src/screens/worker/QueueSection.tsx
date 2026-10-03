@@ -21,7 +21,10 @@ export const QueueSection = ({
     {idle.length > 0 && (
       <details className="border-line bg-panel rounded-xl border">
         <summary className="text-muted cursor-pointer px-3 py-2 text-sm">
-          {idle.length} {WORKER_LABELS.idleQueues}
+          {idle.length}{' '}
+          {idle.length === 1
+            ? WORKER_LABELS.idleQueue
+            : WORKER_LABELS.idleQueues}
         </summary>
         <QueueTable rows={idle} isPhone={isPhone} activity={activity} />
       </details>
