@@ -1,5 +1,5 @@
 import { spawn } from 'node:child_process'
-import { chmod, mkdir, rm, writeFile } from 'node:fs/promises'
+import { chmod, copyFile, mkdir, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { assertPortFree } from './support/assertPortFree'
@@ -25,9 +25,33 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
   await mkdir(E2E.stateDir, { recursive: true, mode: 0o700 })
   const launchctl = join(E2E.fixtures, 'bin', 'launchctl.mjs')
   await chmod(launchctl, 0o755)
+  const engineRoot = (name: string): string => join(E2E.root, 'engines', name)
+  for (const name of ['brain', 'clips']) {
+    await mkdir(join(engineRoot(name), 'bin'), { recursive: true })
+    const target = join(engineRoot(name), 'bin', name)
+    await copyFile(join(E2E.fixtures, 'bin', `${name}.mjs`), target)
+    await chmod(target, 0o755)
+  }
   await writeFile(
     join(E2E.data, 'syntopica.config.json'),
-    JSON.stringify({ schemaVersion: 1 }),
+    JSON.stringify({
+      schemaVersion: 1,
+      engines: {
+        brain: { path: engineRoot('brain') },
+        clips: { path: engineRoot('clips') },
+      },
+    }),
+  )
+  const atriumStatusDir = join(E2E.root, 'atrium-status')
+  await mkdir(atriumStatusDir, { recursive: true })
+  await writeFile(
+    join(atriumStatusDir, 'refresh.json'),
+    JSON.stringify({
+      schemaVersion: 1,
+      writtenAt: new Date().toISOString(),
+      records: { total: 40 },
+      populations: [{ intended: 5, indexed: 3 }],
+    }),
   )
   const workerToken = 'e2e-worker-token'
   const workerTokenFile = join(E2E.root, 'worker.token')
@@ -43,6 +67,23 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       allowedHosts: ['orbit.example.ts.net'],
       allowedLogins: ['owner@example.com'],
       worker: { url: worker.url, tokenFile: workerTokenFile },
+      atrium: { statusDir: atriumStatusDir },
+      engines: {
+        brain: {
+          command: 'bin/brain',
+          subcommands: [
+            ['lint', '--json'],
+            ['doctor', '--json'],
+          ],
+        },
+        clips: {
+          command: 'bin/clips',
+          subcommands: [
+            ['status', '--json'],
+            ['doctor', '--json'],
+          ],
+        },
+      },
       launchd: {
         launchctl,
         labels: [

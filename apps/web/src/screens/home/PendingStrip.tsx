@@ -13,7 +13,7 @@ export const PendingStrip = ({ rows, now }: PendingStripProps) => (
     {rows.length === 0 ? (
       <p className="text-muted text-sm">Nothing pending.</p>
     ) : (
-      <ul className="flex gap-2 overflow-x-auto pb-2">
+      <ul className="flex flex-wrap gap-2">
         {rows.map((row) => (
           <li
             key={`${row.component}:${row.key}`}
