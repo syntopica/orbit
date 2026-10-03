@@ -20,7 +20,7 @@
     "deps:graph": "depcruise src",
     "type-coverage": "baseline-type-coverage",
     "secrets:check": "gitleaks detect --no-banner --redact",
-    "audit:check": "baseline-audit --level moderate",
+    "audit:check": "baseline-audit --level moderate --file ../../.baseline-advisories.json",
     "check:quality": "pnpm deps:graph && pnpm type-coverage",
     "check:security": "pnpm secrets:check && pnpm audit:check",
     "lint:fast": "oxlint --deny-warnings .",

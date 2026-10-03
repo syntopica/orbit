@@ -1,0 +1,6 @@
+{
+  "GHSA-vfj7-8cjw-p6xm": {
+    "reason": "braces via micromatch in dev-only lint and type-coverage tooling, fed our own glob patterns; no patched release exists yet",
+    "expires": "2026-11-03"
+  }
+}
