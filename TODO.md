@@ -6,8 +6,16 @@ This repository is public: entries describe engine behaviour only.
 
 ## Memory (sub-project 1)
 
-- [ ] Plan and build 1b: Memory flow, Atrium and Clips screens (spec section 2,
-      sub-project 1). 1a (engine table and the four adapters) is done.
+- [ ] Atrium doctor panel (spec 7.4): needs atrium to publish its doctor result
+      to a status file at the end of work it already does;
+      `atrium doctor --json` measured 114-188 s and 620-690 MB, over the spec 4
+      budget.
+- [ ] Atrium context inspector (spec 7 item 4, 7.4): needs `schemaVersion` on
+      `atrium context --json`, a benchmark against the budget, and an engine
+      table form for one bounded free argument (spec 5.3, 500 characters).
+- [ ] Memory flow diagram: two long edges cross (curation to brain upkeep and
+      session-stop hook to index); lay the stages out so no edge crosses
+      another.
 - [ ] Plan and build 1c: Brain screen (WebGL graph, page view, lint/doctor).
       Re-measure `brain graph --json --no-html` p95 on a quiet machine first; it
       was at the 2 s budget under load.

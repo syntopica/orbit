@@ -33,5 +33,23 @@ for (const colorScheme of ['dark', 'light'] as const) {
       ).toBeVisible()
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
     })
+    test('memory flow, atrium and clips have no axe violations', async ({
+      page,
+    }) => {
+      await signIn(page)
+      await page.goto('/memory')
+      await expect(
+        page.getByRole('group', { name: 'Memory flow diagram' }),
+      ).toBeVisible()
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
+      await page.goto('/atrium')
+      await expect(
+        page.getByRole('region', { name: 'Freshness' }),
+      ).toBeVisible()
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
+      await page.goto('/clips')
+      await expect(page.getByRole('region', { name: 'Funnel' })).toBeVisible()
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
+    })
   })
 }

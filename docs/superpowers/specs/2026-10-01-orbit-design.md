@@ -1,6 +1,6 @@
 # orbit - design
 
-Status: draft, revision 7 (after adversarial review rounds 1 to 3 and the
+Status: draft, revision 8 (after adversarial review rounds 1 to 3 and the
 implementation of sub-project 0). Scope: sub-project 0 (Base) and sub-project 1
 (Memory). Later sub-projects get their own specs.
 
@@ -31,6 +31,13 @@ folded runs in the home ticker.
 the Worker screen's range control, activity, per-queue, failure and
 OpenRouter charts with progressive disclosure, and the lazy Worker route;
 7.1: chart palette and mark rules; 13: visx replaces Recharts for panels.
+
+**Revision 8 (memory screens).** 7.4 (new): the detail routes
+`GET /api/history/metrics`, `GET /api/atrium`, `GET /api/clips` and
+`GET /api/memory/flow`; flow stages and edges as data with freshness sources;
+`stage` on launchd registry entries; throughput from orbit's metric history;
+the Atrium doctor panel and context inspector deferred until atrium publishes
+a doctor status file and a versioned, benchmarked context contract.
 
 **Revision 4.** After adversarial review rounds 1 to 3.
 
@@ -166,8 +173,8 @@ a file at the end of work it already does, and orbit reads the file.
 | --- | --- | --- | --- |
 | atrium | `atrium/status/refresh.json`, written only by the refresh job at its end | records per source; archive, refresh and content ages; per-population registry/intended/indexed; `writtenAt` | written by a job that already runs; orbit reads a file |
 | atrium | `atrium/status/synthesis.json`, written only by the synthesis job at its end | last pass: synthesized, deferred, started, finished; `writtenAt` | same |
-| atrium | `atrium doctor --json` | checks `name`, `ok`, `code` | benchmarked; on-demand only if over budget |
-| atrium | `atrium context --json` | existing contract | on-demand detail call only |
+| atrium | doctor result status file, written at the end of work atrium already does | checks `name`, `ok`, `code`; `schemaVersion` | deferred until atrium publishes the status file; orbit reads a file |
+| atrium | `atrium context --json` | versioned contract with `schemaVersion` | deferred until benchmarked against the budget and the versioned contract is published |
 | brain | `brain lint --json` | issues `page`, `code`; `indexStale` | benchmarked |
 | brain | `brain doctor --json` | checks `name`, `ok`, `code` | benchmarked |
 | brain | `brain graph --json --no-html` | read-only: nodes (`id`, `type`, `degree`), edges, orphans, dangling; never writes `graph.html` | benchmarked; related-unlinked pairs excluded |
@@ -593,6 +600,59 @@ route.
 The home ticker shows each event's refs after its label, and folds a
 `launchd.stopped` directly preceded by the same label's `launchd.started`
 within 5 min into one "ran" row.
+
+### 7.4 Memory screens
+
+**History.** `GET /api/history/metrics?component=<id>&range=24h|7d|30d` is a
+session-guarded route over orbit's own history; any other component or range
+is a 400. It answers `{ now, from, runs, series }`, each series
+`{ key, points: [{ at, value }] }` in epoch ms. Samples are stored on change,
+so each key's newest sample before `from` is returned as the value in force.
+Where raw samples are past their 7-day retention, each hour's rollup maximum
+stands in, stamped at the hour's start. Screens bucket a series as the System
+screen buckets a strip (48 x 30 min, 84 x 2 h, 90 x 8 h) and take the value in
+force at each bucket's end; a bucket not covered by an orbit run interval is a
+gap.
+
+**Atrium.** `GET /api/atrium` reads the two status files under the detail
+pool (4 s, cached for the atrium cadence) and answers records per source,
+the archive, refresh and newest-content instants, the configured refresh
+interval, every population's intended and indexed counts, and the last
+synthesis pass. Sources, models and the producer are identifiers. The screen
+shows records per source, a freshness card (archive and refresh against 2 x
+the refresh interval, newest content against 3 days), the last pass with a
+synthesized and deferred trend from history, and the populations with records
+not in the index. The doctor panel waits for atrium to publish its doctor
+result to a status file (its command exceeds the budget), and the context
+inspector waits for a versioned, benchmarked `atrium context --json`.
+
+**Clips.** `GET /api/clips` runs `clips status --json` and
+`clips doctor --json` through the engine table under the detail pool (10 s,
+cached for the clips cadence) and adds the capture lane from capture's
+snapshot. It answers per-state counts with the oldest instant, intake per day,
+undated count, doctor checks (`name`, `ok`, `code`) and the capture lane. The
+screen draws the funnel pending, needs review, in reconciliation
+(`synthesized`, `locally-stale`, `reconciliation-pending`), reconciled, with
+`inconsistent` and `unreadable` apart as broken; the capture lane when
+configured, the clipper and newsletter lanes named as not measured; intake per
+day; the oldest waiting age per state; a pending and needs-review trend; and
+failing doctor checks.
+
+**Memory flow.** `GET /api/memory/flow` answers
+`{ now, stages, edges }`. Stages and edges are data in orbit. Each stage
+names its component, backlog metric, the metrics and pending keys its panel
+lists, a freshness source (an atrium instant, the oldest waiting item of its
+backlog, or the last run of its launchd label) and a policy. A launchd
+registry entry may carry `"stage": "<id>"`; the stage's last run is the newest
+observation whose run count rose. A stage is `down` while its component reads
+`down`, `unknown` when its component is not configured or no instant is
+measured, and otherwise `ok`, `warn` or `down` against its policy. An edge may
+name a counter metric; its rate is the counter's 24 h increase (or sum, for a
+per-pass count) divided by 24, and it flows while the rate is positive and its
+upstream stage is neither `warn` nor `down`. One particle crosses an edge
+every `60 / perHour` s, clamped to 1.5-12 s, and none move under reduced
+motion. Under 768 px the flow is an ordered list of stage cards. The selected
+stage is kept in the URL as `?stage=`.
 
 ### 7.1 Visual language
 

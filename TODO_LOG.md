@@ -7,6 +7,14 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-03 [x] Memory screens (sub-project 1b): history metrics route, atrium
+  and clips detail routes, memory flow route, shared trend chart, Atrium, Clips
+  and Memory flow screens with a React Flow canvas and a phone stage list. React
+  Flow nodes need `pointer-events-auto` when neither selectable nor draggable,
+  and zod's `jitless` config must load before any chunk that builds schemas, or
+  its `new Function` probe trips the CSP. Evidence: plan
+  `docs/superpowers/plans/2026-10-03-orbit-memory-screens.md`, `pnpm gate` green
+  with e2e 27/27, screenshots at 375 and 1280 px in both schemes.
 - 2026-10-03 [x] Brain and clips health no longer read `check_failed` for a
   credentials check orbit cannot satisfy: the engines accept
   `doctor --json --skip NAME`, the table lists that form, and a request naming

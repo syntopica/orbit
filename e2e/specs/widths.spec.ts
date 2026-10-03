@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test'
 
 import { signIn } from '../support/signIn'
+import { waitForScreenReady } from '../support/waitForScreenReady'
 
-// Spec 9: every screen at phone and tablet widths, both themes, without
+// Spec 9: every screen at phone, tablet and desktop widths, both themes, without
 // sideways scroll. Screenshots land in test-results/ for the visual review.
-for (const width of [375, 768]) {
+for (const width of [375, 768, 1280]) {
   for (const colorScheme of ['dark', 'light'] as const) {
     test(`every screen fits ${String(width)} px in ${colorScheme}`, async ({
       page,
@@ -12,9 +13,16 @@ for (const width of [375, 768]) {
       await page.setViewportSize({ width, height: 900 })
       await page.emulateMedia({ colorScheme })
       await signIn(page)
-      for (const path of ['/', '/worker', '/system']) {
+      for (const path of [
+        '/',
+        '/memory',
+        '/atrium',
+        '/clips',
+        '/worker',
+        '/system',
+      ]) {
         await page.goto(path)
-        await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+        await waitForScreenReady(page, path, width)
         await page.screenshot({
           path: `test-results/screens/${String(width)}-${colorScheme}${path === '/' ? '/home' : path}.png`,
           fullPage: true,

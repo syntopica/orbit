@@ -44,13 +44,43 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
   )
   const atriumStatusDir = join(E2E.root, 'atrium-status')
   await mkdir(atriumStatusDir, { recursive: true })
+  const ago = (ms: number): string => new Date(Date.now() - ms).toISOString()
   await writeFile(
     join(atriumStatusDir, 'refresh.json'),
     JSON.stringify({
       schemaVersion: 1,
-      writtenAt: new Date().toISOString(),
-      records: { total: 40 },
-      populations: [{ intended: 5, indexed: 3 }],
+      writtenAt: ago(0),
+      records: { total: 40, bySource: { 'source-a': 30, 'source-b': 10 } },
+      archive: { at: ago(600_000), ageSeconds: 600, exists: true, bytes: 1 },
+      refresh: { at: ago(300_000), ageSeconds: 300 },
+      content: { at: ago(3_600_000), ageSeconds: 3600 },
+      populations: [
+        {
+          model: 'model-a',
+          listed: true,
+          records: 5,
+          episodes: 5,
+          intended: 5,
+          indexed: 3,
+        },
+      ],
+    }),
+  )
+  await writeFile(
+    join(atriumStatusDir, 'synthesis.json'),
+    JSON.stringify({
+      schemaVersion: 1,
+      writtenAt: ago(900_000),
+      lastPass: {
+        producer: 'task',
+        startedAt: ago(1_200_000),
+        finishedAt: ago(900_000),
+        conversations: 4,
+        synthesized: 3,
+        skipped: 0,
+        failed: 0,
+        deferred: 1,
+      },
     }),
   )
   const workerToken = 'e2e-worker-token'
@@ -96,6 +126,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
           {
             component: 'launchd',
             label: 'com.example.nightly',
+            stage: 'curation',
             role: 'scheduled',
             plist: plist('com.example.nightly'),
           },
