@@ -59,6 +59,75 @@
   }
 }
 
+.orbit-stage {
+  position: relative;
+  margin-inline: auto;
+  border: 1px solid var(--color-line);
+  border-radius: 20px;
+  background: radial-gradient(
+    ellipse at 50% 48%,
+    color-mix(in srgb, var(--color-accent) 8%, var(--color-panel)),
+    var(--color-panel) 62%
+  );
+  width: 100%;
+  height: clamp(460px, 55vw, 600px);
+  overflow: hidden;
+}
+
+.orbit-label {
+  display: grid;
+  position: absolute;
+  gap: 2px;
+  visibility: hidden;
+  z-index: 1;
+  box-shadow: 0 5px 18px #0002;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 18%, transparent);
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--color-panel) 92%, transparent);
+  padding: 7px 9px;
+  width: 142px;
+  color: var(--color-ink);
+  text-decoration: none;
+}
+
+.orbit-label:hover,
+.orbit-label:focus-visible {
+  box-shadow: 0 0 20px color-mix(in srgb, var(--color-accent) 20%, transparent);
+  border-color: var(--color-accent);
+  background: var(--color-panel);
+}
+
+.orbit-label-name {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.orbit-label-pulse {
+  flex: none;
+  animation: pulse-ring 1.2s ease-out forwards;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 14%, transparent);
+  border-radius: 50%;
+  background: var(--color-accent);
+  width: 5px;
+  height: 5px;
+}
+
+.orbit-label-metric,
+.orbit-label-age {
+  color: var(--color-muted);
+  font-size: 11px;
+  line-height: 1.2;
+  font-family: var(--font-mono);
+}
+
+.orbit-label[data-greyed='true'] {
+  opacity: 0.7;
+}
+
 html,
 body {
   background: var(--color-space);

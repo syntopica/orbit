@@ -3,5 +3,10 @@
     "name": "initial route (brotli)",
     "path": "../server/dist/public/assets/index-*.js",
     "limit": "150 KB"
+  },
+  {
+    "name": "3D orbit chunk (brotli)",
+    "path": "../server/dist/public/assets/OrbitScene-*.js",
+    "limit": "250 KB"
   }
 ]

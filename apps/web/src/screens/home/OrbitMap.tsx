@@ -1,5 +1,8 @@
+import { Link } from '@tanstack/react-router'
+
 import { orbitPosition } from '../../geometry/orbitPosition'
 import type { OrbitMapProps } from '../../types/OrbitMapProps'
+import { orbitDestination } from './orbitDestination'
 import { Satellite } from './Satellite'
 
 export const OrbitMap = ({ cards, animate, now }: OrbitMapProps) => (
@@ -31,13 +34,18 @@ export const OrbitMap = ({ cards, animate, now }: OrbitMapProps) => (
       orbit
     </text>
     {cards.map((card, index) => (
-      <Satellite
+      <Link
         key={card.component}
-        card={card}
-        at={orbitPosition(index, cards.length, 220)}
-        animate={animate}
-        now={now}
-      />
+        to={orbitDestination(card.component)}
+        className="cursor-pointer hover:brightness-125"
+      >
+        <Satellite
+          card={card}
+          at={orbitPosition(index, cards.length, 220)}
+          animate={animate}
+          now={now}
+        />
+      </Link>
     ))}
   </svg>
 )

@@ -30,6 +30,45 @@ export default [
       'code-policy/atomic-file': 'off',
     },
   },
+  // React Three Fiber JSX attributes belong to Three objects, not DOM nodes.
+  {
+    files: [
+      'src/screens/home/OrbitCanvas.tsx',
+      'src/screens/home/OrbitCore.tsx',
+      'src/screens/home/OrbitTrack.tsx',
+      'src/screens/home/OrbitSatellite3d.tsx',
+      'src/screens/home/OrbitDust.tsx',
+      'src/screens/home/OrbitGlow.tsx',
+      'src/screens/home/OrbitTrail.tsx',
+      'src/screens/home/OrbitPulseRing.tsx',
+    ],
+    rules: {
+      'react/no-unknown-property': [
+        'error',
+        {
+          ignore: [
+            'args',
+            'rotation',
+            'intensity',
+            'distance',
+            'emissive',
+            'emissiveIntensity',
+            'roughness',
+            'transparent',
+            'depthWrite',
+            'map',
+            'blending',
+            'attach',
+            'sizeAttenuation',
+            'side',
+            'uniforms',
+            'vertexShader',
+            'fragmentShader',
+          ],
+        },
+      ],
+    },
+  },
   // Declaration files require `interface` for module augmentation (Vite env,
   // vitest matchers) and mirror upstream `any` generics — language constraints.
   {

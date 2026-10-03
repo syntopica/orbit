@@ -453,9 +453,14 @@ indicator (live, stale, offline), and a toast when a component turns `down`.
 
 1. **Orbit (home).** Components as satellites around a core, each with a
    health ring, one headline metric and a pulse whose rate follows its update
-   cadence. Below: a pending strip (one chip per non-zero `Pending`, oldest
-   first) and a live event ticker. Under 768 px the orbit becomes a list of
-   cards.
+   cadence. On desktop, a lazily loaded three.js scene via
+   `@react-three/fiber` shows a breathing core, tilted orbital tracks, drifting
+   dust, fading satellite trails and state-coloured pulse waves. Projected HTML
+   labels sit radially outside the satellites and resolve collisions. The 2D SVG orbit is
+   the fallback while the chunk loads, when WebGL is unavailable, and when the
+   user requests reduced motion. Below: a pending strip (one chip per non-zero
+   `Pending`, oldest first) and a live event ticker. Under 768 px the orbit
+   becomes a list of cards.
 2. **System.** One row per registered launchd label: component, role,
    schedule, pid, and a heartbeat strip of observations coloured by exit code,
    unknown periods grey, over 24 h / 7 d / 30 d (section 7.2).
@@ -671,7 +676,9 @@ within 5 min into one "ran" row.
   `127.0.0.1:8790` and rewrites `Origin` to the server's own origin, because
   the server accepts only its own origins (section 6.5).
 - Bundle budget (size-limit, brotli): initial route at most 150 KB; the graph
-  route chunk and the flow route chunk at most 250 KB each, loaded lazily.
+  route chunk, flow route chunk and lazily loaded desktop 3D orbit chunk at
+  most 250 KB each. The 3D orbit uses three.js through `@react-three/fiber`;
+  the SVG orbit remains available without loading the 3D chunk.
   The first plan task measures a prototype with sigma, graphology, React Flow
   and Recharts against these numbers and records the result before screens
   are built.
