@@ -2,6 +2,7 @@ import type { SnapshotCore } from '@orbit/contract'
 
 import type { WorkerStatus } from '../../types/WorkerStatus'
 import { sumQueueState } from './sumQueueState'
+import { workerHealth } from './workerHealth'
 import { workerPending } from './workerPending'
 
 export const summarizeWorker = (
@@ -18,7 +19,7 @@ export const summarizeWorker = (
   const failed = state('failed')
   const oldestAt = new Date(now.getTime() - oldest * 1000).toISOString()
   return {
-    health: { state: 'ok', reason: null },
+    health: workerHealth(oldest),
     metrics: [
       { key: 'worker.queued', value: queued, at },
       {

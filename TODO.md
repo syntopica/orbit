@@ -4,12 +4,6 @@ Active engine backlog. States: `[ ]` pending, `[~]` partial, `[!]` blocked,
 `[x]` verified complete, `[-]` obsolete. Closed items move to `TODO_LOG.md`.
 This repository is public: entries describe engine behaviour only.
 
-## Config and adapters
-
-- [!] Worker health stays `ok` unless the read itself fails
-  (`summarizeWorker.ts`). Blocked on an owner decision: should stale or failing
-  queues, all runners in cooldown, or zero nodes degrade it?
-
 ## Memory (sub-project 1)
 
 - [ ] Plan and build 1b: Memory flow, Atrium and Clips screens (spec section 2,

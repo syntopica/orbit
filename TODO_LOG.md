@@ -7,6 +7,10 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-03 [x] Worker health degrades: `warn lagging` once the oldest queued
+  job has waited over 24 h (`workerHealth.ts`, spec 3.2); zero nodes or queued
+  work alone stay `ok` because nodes run only while idle. Evidence:
+  `workerHealth.test.ts`.
 - 2026-10-03 [x] Memory adapters (sub-project 1a): engine command table with a
   listed-only runner, engine documents judged by stdout whatever the exit code,
   adapters for brain, clips, atrium (published status files) and capture

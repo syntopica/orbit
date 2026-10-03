@@ -125,6 +125,10 @@ healthy. Data older than its target turns the card `warn` (`stale`).
 - A `brain` or `clips` entry in `orbit.json` whose instance configuration has
   no checkout path, or whose command does not resolve, reads `down not_found`:
   configured in `orbit.json` means configured, not absent.
+- Worker health is `ok` while its status reads, and `warn lagging` once its
+  oldest queued job has waited more than 24 h. Nodes run only while their
+  machine is idle and queues may wait for a quiet window, so zero nodes or a
+  queued job alone is normal; nothing picking work up for a day is not.
 
 ### 3.3 End-to-end memory flow (what "Memory flow" draws)
 
