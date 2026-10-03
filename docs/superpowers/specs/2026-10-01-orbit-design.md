@@ -262,8 +262,11 @@ An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, 
 - `engines.<name>.path` in the instance config is the engine's checkout
   directory, not an executable. orbit's engine table in `orbit.json` names,
   per engine, the command (a path relative to that checkout, or an absolute
-  path) and the subcommands orbit may run; anything else is refused. The
-  command is resolved once at start to an absolute path; a missing or
+  path) and the subcommands orbit may run; anything else is refused. A caller
+  may name a listed entry by its leading arguments (an exact entry wins, and
+  zero or several candidates are refused); the runner then runs the table's
+  whole entry, so the appended tail, such as `--skip credentials`, comes from
+  `orbit.json` and never from the caller. The command is resolved once at start to an absolute path; a missing or
   non-executable file is `not_found`.
 - `spawn` with `shell: false`, a fixed argument list, `detached: true` so the
   child leads its own process group; on timeout or abort the whole group gets
