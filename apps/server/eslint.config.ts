@@ -14,6 +14,7 @@ export default [
       'src/fs/readJsonFile.ts',
       'src/launchd/readPlistTemplate.ts',
       'src/adapters/worker/readWorkerToken.ts',
+      'src/adapters/atrium/readStatusFile.ts',
       'src/adapters/synthetic/createSyntheticAdapter.ts',
       'src/state/ensureStateDir.ts',
       'src/state/openDatabase.ts',
