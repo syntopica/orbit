@@ -68,7 +68,7 @@ describe('pruneHistory boundaries', () => {
     ])
   })
 
-  it('rolls up only the two last complete hours', () => {
+  it('rolls up every complete hour on the first run', () => {
     const db = openHistoryDb()
     const current = Math.floor(now / hour)
     const insert = db.prepare(insertSampleSql)
@@ -79,7 +79,21 @@ describe('pruneHistory boundaries', () => {
     pruneHistory(db, now)
     expect(
       column(db, 'SELECT hour AS v FROM metric_rollups ORDER BY hour'),
-    ).toEqual([current - 2, current - 1])
+    ).toEqual([current - 3, current - 2, current - 1])
+  })
+
+  it('fills the hours since the newest rollup after a long gap', () => {
+    const db = openHistoryDb()
+    const current = Math.floor(now / hour)
+    const insert = db.prepare(insertSampleSql)
+    insert.run('w', 'k', 1, (current - 10) * hour)
+    pruneHistory(db, (current - 9) * hour)
+    insert.run('w', 'k', 1, (current - 9) * hour + 1)
+    insert.run('w', 'k', 1, (current - 6) * hour)
+    pruneHistory(db, now)
+    expect(
+      column(db, 'SELECT hour AS v FROM metric_rollups ORDER BY hour'),
+    ).toEqual([current - 10, current - 9, current - 6])
   })
 
   it('refreshes a rollup when its samples change between runs', () => {

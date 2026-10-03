@@ -16,15 +16,19 @@ export const shrinkToCap = (db: DatabaseSync, capBytes: number): void => {
     },
     { table: 'metric_rollups', column: 'hour', candidates: '1 = 1' },
   ]
+  // Deleting frees pages that the measure already excludes, so the file is
+  // vacuumed once at the end rather than after every round.
+  let deletedAny = false
   for (let round = 0; round < 1_000; round += 1) {
-    if (measureDbBytes(db) <= capBytes) return
+    if (measureDbBytes(db) <= capBytes) break
     const deleted = order.some((target) => deleteOldestFraction(db, target))
-    if (!deleted) return
-    try {
-      db.exec('VACUUM')
-    } catch {
-      // Another connection holds the file; stop and let the next prune retry.
-      return
-    }
+    if (!deleted) break
+    deletedAny = true
+  }
+  if (!deletedAny) return
+  try {
+    db.exec('VACUUM')
+  } catch {
+    // Another connection holds the file; the next prune vacuums again.
   }
 }

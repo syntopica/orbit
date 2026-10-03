@@ -1,5 +1,7 @@
 import type { DatabaseSync } from 'node:sqlite'
 
+import { pruneAudit } from './pruneAudit'
+
 export const recordAudit = (
   db: DatabaseSync,
   action: 'session.create' | 'session.pair' | 'session.logout',
@@ -11,4 +13,5 @@ export const recordAudit = (
     action,
     outcome,
   )
+  pruneAudit(db, now)
 }

@@ -46,7 +46,23 @@ describe('shrinkToCap', () => {
     expect(() => {
       shrinkToCap(failing, 1)
     }).not.toThrow()
-    expect(count(db, 'metric_samples')).toBe(449)
+    expect(count(db, 'metric_samples')).toBe(0)
+  })
+
+  it('vacuums once after deleting down to the cap', () => {
+    const db = openHistoryDb()
+    const insert = db.prepare(
+      'INSERT INTO metric_samples (component, key, value, at) VALUES (?, ?, ?, ?)',
+    )
+    for (let i = 0; i < 500; i += 1) insert.run('w', 'k', i, i)
+    const vacuums: string[] = []
+    shrinkToCap(
+      interceptExec(db, (sql) => {
+        if (sql === 'VACUUM') vacuums.push(sql)
+      }),
+      1,
+    )
+    expect(vacuums).toEqual(['VACUUM'])
   })
 
   it('stops without vacuuming when only baselines are left', () => {
