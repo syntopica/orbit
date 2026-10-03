@@ -18,6 +18,7 @@ export const readStatusFile = async <T>(
     text = await readFile(path, { encoding: 'utf8', signal })
   } catch (error) {
     if (isNotFound(error)) return null
+    if (signal.aborted) throw error
     throw new ProcessError('check_failed')
   }
   if (text.length > 1_048_576) throw new ProcessError('output_too_large')

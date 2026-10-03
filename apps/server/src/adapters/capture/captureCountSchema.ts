@@ -6,6 +6,6 @@ export const captureCountSchema = z.object({
   data: z.object({
     schemaVersion: z.literal(1),
     count: nonNegativeCount,
-    oldestAt: z.iso.datetime({ offset: true }).nullable(),
+    oldestAt: z.iso.datetime().nullable(),
   }),
 })

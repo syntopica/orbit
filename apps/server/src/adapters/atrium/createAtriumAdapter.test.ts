@@ -39,4 +39,13 @@ describe('createAtriumAdapter', () => {
     expect(core.component).toBe('atrium')
     expect(core.metrics[0]).toMatchObject({ key: 'atrium.records', value: 2 })
   })
+  it('rethrows the abort instead of mapping it to check_failed', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'orbit-atrium-'))
+    await writeFile(join(dir, 'refresh.json'), '{}')
+    const controller = new AbortController()
+    controller.abort()
+    await expect(adapterIn(dir).read(controller.signal)).rejects.toMatchObject({
+      name: 'AbortError',
+    })
+  })
 })
