@@ -15,7 +15,7 @@ export const startServer = async (
   options: {
     webRoot: string
     signal: AbortSignal
-    engines?: Readonly<Record<string, EngineRunner>>
+    engines: Readonly<Record<string, EngineRunner>>
   },
 ): Promise<{ port: number }> => {
   await assertWebRoot(options.webRoot)
@@ -33,7 +33,7 @@ export const startServer = async (
     state.close()
   }
   try {
-    const scheduler = buildScheduler(state, hub, options.engines ?? {})
+    const scheduler = buildScheduler(state, hub, options.engines)
     stopScheduler = () => {
       scheduler.stop()
     }

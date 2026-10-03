@@ -48,11 +48,16 @@ describe('checkEngines', () => {
     })
     state.close()
   })
-  it('fails naming the engine and the reason', async () => {
-    const state = await withTool('exit 3')
+  it('accepts a valid document whatever the exit code', async () => {
+    const state = await withTool(`echo '{"schemaVersion":1}'; exit 2`)
+    expect((await checkEngines(state)).level).toBe('ok')
+    state.close()
+  })
+  it('fails on unparseable output with a non-zero exit', async () => {
+    const state = await withTool('echo nope; exit 64')
     expect(await checkEngines(state)).toMatchObject({
       level: 'fail',
-      detail: 'brain check_failed',
+      detail: 'brain exit_nonzero',
     })
     state.close()
   })

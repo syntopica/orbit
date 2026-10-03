@@ -25,7 +25,8 @@ export const resolveEngines = async (
       Object.assign(runners, {
         [name]: createEngineRunner({ file, subcommands, env }, run),
       })
-    } catch {
+    } catch (error) {
+      if (!(error instanceof ProcessError)) throw error
       failed.push(name)
     }
   }

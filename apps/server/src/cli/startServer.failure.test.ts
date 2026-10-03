@@ -32,6 +32,7 @@ describe('startServer failure after listening', () => {
       startServer(bound, {
         webRoot: await webRootWithIndex(),
         signal: new AbortController().signal,
+        engines: {},
       }),
     ).rejects.toThrow('history failed')
     expect(vi.mocked(listenLoopback)).toHaveBeenCalledOnce()

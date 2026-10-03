@@ -63,7 +63,7 @@ describe('startServer', () => {
     const webRoot = await webRootWithIndex()
     await startServer(
       { ...state, config: { ...state.config, port: 0 } },
-      { webRoot, signal: controller.signal },
+      { webRoot, signal: controller.signal, engines: {} },
     )
     expect(state.authDb.isOpen).toBe(false)
   })
@@ -91,7 +91,7 @@ describe('startServer', () => {
     await expect(
       startServer(
         { ...state, config: { ...state.config, port } },
-        { webRoot, signal: controller.signal },
+        { webRoot, signal: controller.signal, engines: {} },
       ),
     ).rejects.toThrow('orbit could not listen on the configured port')
     taken.close()
@@ -103,11 +103,11 @@ describe('startServer', () => {
     const signal = new AbortController().signal
     const bound = { ...state, config: { ...state.config, port: 0 } }
     await expect(
-      startServer(bound, { webRoot: '/nonexistent/web', signal }),
+      startServer(bound, { webRoot: '/nonexistent/web', signal, engines: {} }),
     ).rejects.toThrow('web root is missing or has no index.html')
     const empty = await mkdtemp(join(tmpdir(), 'orbit-empty-'))
     await expect(
-      startServer(bound, { webRoot: empty, signal }),
+      startServer(bound, { webRoot: empty, signal, engines: {} }),
     ).rejects.toThrow('web root is missing or has no index.html')
     state.close()
   })

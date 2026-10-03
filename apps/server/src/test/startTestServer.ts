@@ -11,6 +11,7 @@ export const startTestServer = async (orbit: Record<string, unknown> = {}) => {
   const { port } = await startServer(bound, {
     webRoot: await webRootWithIndex(),
     signal: controller.signal,
+    engines: {},
   })
   return { state: bound, controller, port }
 }
