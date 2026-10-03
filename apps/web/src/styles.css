@@ -148,3 +148,8 @@ body {
     transition: none !important;
   }
 }
+
+/* Let the graph panel supply sigma's canvas background. */
+div.react-sigma {
+  --sigma-background-color: transparent;
+}

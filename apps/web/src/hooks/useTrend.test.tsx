@@ -65,4 +65,55 @@ describe('useTrend', () => {
     unmount()
     client.clear()
   })
+  it.each([undefined, true, false])(
+    'uses the polling policy %s',
+    async (poll) => {
+      const client = new QueryClient({
+        defaultOptions: { queries: { retry: false } },
+      })
+      vi.useFakeTimers()
+      const request = vi.fn(
+        async () => await Promise.resolve(Response.json(history(DAY, 4))),
+      )
+      vi.stubGlobal('fetch', request)
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <QueryClientProvider client={client}>{children}</QueryClientProvider>
+      )
+      const component = poll === false ? 'brain' : 'clips'
+      const { result, unmount } = renderHook(
+        () =>
+          useTrend(
+            component,
+            '24h',
+            SPECS,
+            poll === undefined
+              ? undefined
+              : { poll, gcTime: poll ? undefined : 0 },
+          ),
+        { wrapper },
+      )
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1)
+      })
+      expect(result.current.model).not.toBeNull()
+      try {
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(120_000)
+        })
+        expect(request).toHaveBeenCalledTimes(poll === false ? 1 : 3)
+        unmount()
+        await act(async () => {
+          await vi.advanceTimersByTimeAsync(1)
+        })
+        expect(
+          client.getQueryData(['metric-history', component, '24h']) ===
+            undefined,
+        ).toBe(poll === false)
+      } finally {
+        unmount()
+        client.clear()
+        vi.useRealTimers()
+      }
+    },
+  )
 })

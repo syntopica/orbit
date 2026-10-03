@@ -11,7 +11,7 @@ export const TabBar = () => (
       <Link
         key={item.to}
         to={item.to}
-        className="text-muted flex-1 py-3 text-center text-sm"
+        className="text-muted min-w-0 flex-1 cursor-pointer truncate px-1 py-3 text-center text-xs"
         activeProps={{ className: 'text-ink', 'aria-current': 'page' }}
         activeOptions={{ exact: true }}
       >

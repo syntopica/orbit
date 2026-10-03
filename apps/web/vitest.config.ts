@@ -21,6 +21,7 @@ export default defineConfig({
         'src/**/*.{test,spec}.{ts,tsx}',
         'src/test/**',
         'src/main.tsx',
+        'src/layout/layoutWorker.ts',
         'src/vite-env.d.ts',
         // WebGL scene behavior is covered by the desktop browser spec.
         'src/geometry/createOrbitGlowTexture.ts',

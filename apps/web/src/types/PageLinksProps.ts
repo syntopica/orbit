@@ -1,0 +1,8 @@
+import type { BrainPage } from '@orbit/contract'
+
+import type { BrainSearch } from './BrainSearch'
+
+export type PageLinksProps = {
+  readonly page: BrainPage
+  readonly search: BrainSearch
+}

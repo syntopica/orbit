@@ -12,6 +12,7 @@ export default defineConfig({
     // The CSP has no data: in font-src, so no asset may be inlined.
     assetsInlineLimit: 0,
   },
+  worker: { format: 'es' },
   server: {
     proxy: {
       '/api': {

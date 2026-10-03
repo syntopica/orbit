@@ -2,9 +2,10 @@ import { Command } from 'cmdk'
 
 import type { PaletteListProps } from '../../types/PaletteListProps'
 import { NAV_ITEMS } from './navItems'
+import { PalettePages } from './PalettePages'
 
 export const PaletteList = ({ palette }: PaletteListProps) => (
-  <Command.List>
+  <Command.List className="max-h-[calc(100dvh-11rem)] overflow-y-auto">
     <Command.Empty className="text-muted px-3 py-2 text-sm">
       Nothing matches
     </Command.Empty>
@@ -21,6 +22,7 @@ export const PaletteList = ({ palette }: PaletteListProps) => (
         </Command.Item>
       ))}
     </Command.Group>
+    <PalettePages palette={palette} />
     <Command.Group heading="Session">
       <Command.Item
         onSelect={palette.signOut}

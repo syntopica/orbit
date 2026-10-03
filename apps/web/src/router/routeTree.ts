@@ -1,4 +1,5 @@
 import { atriumRoute } from './atriumRoute'
+import { brainRoute } from './brainRoute'
 import { clipsRoute } from './clipsRoute'
 import { homeRoute } from './homeRoute'
 import { loginRoute } from './loginRoute'
@@ -14,6 +15,7 @@ export const routeTree = rootRoute.addChildren([
     homeRoute,
     memoryRoute,
     atriumRoute,
+    brainRoute,
     clipsRoute,
     workerRoute,
     systemRoute,

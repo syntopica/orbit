@@ -3,6 +3,7 @@ import { useCallback, useState } from 'react'
 
 import { apiFetch } from '../api/apiFetch'
 import type { CommandPaletteModel } from '../types/CommandPaletteModel'
+import { validateBrainSearch } from '../validators/validateBrainSearch'
 import { useHotkey } from './useHotkey'
 
 export const useCommandPalette = (): CommandPaletteModel => {
@@ -28,6 +29,10 @@ export const useCommandPalette = (): CommandPaletteModel => {
     go: (to) => {
       setOpen(false)
       void navigate({ to })
+    },
+    openPage: (id) => {
+      setOpen(false)
+      void navigate({ to: '/brain', search: validateBrainSearch({ page: id }) })
     },
     signOut: () => {
       setOpen(false)
