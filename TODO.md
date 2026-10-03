@@ -10,6 +10,18 @@ This repository is public: entries describe engine behaviour only.
   (`summarizeWorker.ts`). Blocked on an owner decision: should stale or failing
   queues, all runners in cooldown, or zero nodes degrade it?
 
+## Memory (sub-project 1)
+
+- [ ] Plan and build 1b: Memory flow, Atrium and Clips screens (spec section 2,
+      sub-project 1). 1a (engine table and the four adapters) is done.
+- [ ] Plan and build 1c: Brain screen (WebGL graph, page view, lint/doctor).
+      Re-measure `brain graph --json --no-html` p95 on a quiet machine first; it
+      was at the 2 s budget under load.
+- [!] Brain health reads `warn check_failed` while `brain doctor --json` checks
+  `CAPTURE_TOKEN` from the environment, which orbit's allowlist strips by
+  design. Blocked on the brain engine (filed in its TODO); credentials never go
+  into `orbit.json` `env`.
+
 ## Web
 
 - [!] Web type coverage is 99.89 % (7772/7780, strict, tests excluded); spec 11

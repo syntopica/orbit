@@ -7,6 +7,14 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-03 [x] Memory adapters (sub-project 1a): engine command table with a
+  listed-only runner, engine documents judged by stdout whatever the exit code,
+  adapters for brain, clips, atrium (published status files) and capture
+  (undrained count, offsets normalised to UTC), `orbit doctor` engines and plist
+  PATH checks, e2e satellites. Evidence: plan
+  `docs/superpowers/plans/2026-10-03-orbit-memory-adapters.md`, commits
+  2ddccf7..e75164a, `pnpm gate` green with e2e 20/20, final review Ready after
+  one fix wave.
 - 2026-10-03 [x] Audit table bounded: every `recordAudit` prunes rows older than
   90 days and keeps the newest 10,000 (`auth/pruneAudit.ts`). Evidence:
   `pruneAudit.test.ts`.
