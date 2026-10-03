@@ -9,5 +9,5 @@ export const getSnapshots =
     c.json({
       lastId: hub.lastId(),
       snapshots: hub.snapshots(),
-      events: hub.recentEvents(),
+      events: hub.recentEvents().map((message) => message.event),
     })

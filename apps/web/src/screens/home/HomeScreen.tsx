@@ -13,7 +13,7 @@ export const HomeScreen = () => {
         <h1 className="text-2xl font-semibold tracking-tight">Orbit</h1>
         {model.isPhone ? <ConnectionIndicator /> : null}
       </header>
-      {model.cards.length === 0 && (
+      {!model.synced && (
         <p className="text-muted">Waiting for the first readings…</p>
       )}
       {model.isPhone ? (

@@ -1,6 +1,7 @@
 import type { OrbitEvent } from '@orbit/contract'
 import { describe, expect, it } from 'vitest'
 
+import { eventMessages } from '../test/eventMessages'
 import { collapseTicker } from './collapseTicker'
 
 const STOPPED = 'launchd.stopped'
@@ -21,7 +22,10 @@ const ev = (
   refs: { label },
 })
 const shape = (events: OrbitEvent[]) =>
-  collapseTicker(events).map((row) => [row.event.kind, row.ranMs])
+  collapseTicker(eventMessages(events)).map((row) => [
+    row.event.kind,
+    row.ranMs,
+  ])
 
 describe('collapseTicker', () => {
   it('folds a stop and the start just before it into one ran row', () => {

@@ -22,7 +22,7 @@ export const applyStreamMessage = (
       return {
         ...state,
         lastId: message.id,
-        events: [message.event, ...state.events].slice(0, 50),
+        events: [message, ...state.events].slice(0, 50),
       }
     case 'sync':
       return { ...state, lastId: message.id, synced: true }

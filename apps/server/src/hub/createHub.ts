@@ -1,6 +1,6 @@
 import type {
   ComponentId,
-  OrbitEvent,
+  EventMessage,
   Snapshot,
   StreamMessage,
 } from '@orbit/contract'
@@ -8,6 +8,8 @@ import type {
 import type { Hub } from '../types/Hub'
 import { createRing } from './createRing'
 import { deliverToListeners } from './deliverToListeners'
+import { snapshotHash } from './snapshotHash'
+import { withoutEvents } from './withoutEvents'
 
 export const createHub = (options: {
   ringSize: number
@@ -21,16 +23,16 @@ export const createHub = (options: {
   const ring = createRing(options.ringSize)
   const current = new Map<ComponentId, Snapshot>()
   const sent = new Map<ComponentId, { hash: string; at: number }>()
-  const events: OrbitEvent[] = []
+  const events: EventMessage[] = []
   const listeners = new Set<(message: StreamMessage) => void>()
   const send = (message: StreamMessage): void => {
     ring.push(message)
     deliverToListeners(listeners, message)
   }
   const publishSnapshot = (snapshot: Snapshot): void => {
-    const stored = { ...snapshot, events: [] }
+    const stored = withoutEvents(snapshot)
     current.set(snapshot.component, stored)
-    const hash = JSON.stringify({ ...stored, observedAt: '' })
+    const hash = snapshotHash(stored)
     const prior = sent.get(snapshot.component)
     if (prior?.hash === hash && Date.now() - prior.at < resendMs) return
     sent.set(snapshot.component, { hash, at: Date.now() })
@@ -41,9 +43,10 @@ export const createHub = (options: {
     publish: (snapshot) => {
       publishSnapshot(snapshot)
       for (const event of snapshot.events) {
-        events.push(event)
+        const message: EventMessage = { type: 'event', id: nextId++, event }
+        events.push(message)
         events.splice(0, Math.max(0, events.length - options.recentEvents))
-        send({ type: 'event', id: nextId++, event })
+        send(message)
       }
     },
     snapshots: () => [...current.values()],

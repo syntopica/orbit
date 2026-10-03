@@ -64,6 +64,34 @@ describe('createHub', () => {
     expect(hub.snapshots()[0]?.observedAt).toBe('b')
     expect(hub.lastId()).toBe(100)
   })
+  it('ignores read timestamps when deciding a snapshot changed', () => {
+    const hub = newHub()
+    const seen: StreamMessage[] = []
+    hub.subscribe((m) => {
+      seen.push(m)
+    })
+    const at = (stamp: string): Snapshot => {
+      const { lastGood: _, ...core } = snap(1)
+      return {
+        ...core,
+        metrics: [{ key: 'synthetic.value', value: 1, at: stamp }],
+        pending: [{ key: 'synthetic.items', count: 2, oldestAt: stamp }],
+        observedAt: stamp,
+        lastGood: { ...core, observedAt: stamp },
+      }
+    }
+    hub.publish(at('2026-10-02T10:00:00.000Z'))
+    hub.publish(at('2026-10-02T10:00:05.000Z'))
+    expect(seen).toHaveLength(1)
+    hub.publish({ ...at('2026-10-02T10:00:10.000Z'), metrics: [] })
+    expect(seen).toHaveLength(2)
+  })
+  it('stores lastGood without its events', () => {
+    const hub = newHub()
+    const { lastGood: _, ...core } = snap(1, [tick])
+    hub.publish({ ...snap(1), lastGood: core })
+    expect(hub.snapshots()[0]?.lastGood?.events).toEqual([])
+  })
   it('resends an unchanged snapshot only after 30 seconds', () => {
     vi.useFakeTimers()
     const hub = newHub()

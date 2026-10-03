@@ -15,10 +15,7 @@ export const EventTicker = ({ events }: EventTickerProps) => (
     ) : (
       <ol className="divide-line border-line bg-panel divide-y rounded-xl border">
         {collapseTicker(events).map((row) => (
-          <TickerRowView
-            key={`${row.event.at}:${row.event.component}:${row.event.kind}:${JSON.stringify(row.event.refs)}`}
-            row={row}
-          />
+          <TickerRowView key={row.id} row={row} />
         ))}
       </ol>
     )}

@@ -25,8 +25,8 @@ export const writeOpening = async (
   for (const snapshot of hub.snapshots()) {
     await writeMessage(stream, { type: 'snapshot', id, snapshot }, false)
   }
-  for (const event of hub.recentEvents()) {
-    await writeMessage(stream, { type: 'event', id, event }, false)
+  for (const message of hub.recentEvents()) {
+    await writeMessage(stream, message, false)
   }
   await writeMessage(stream, { type: 'sync', id }, true)
   return id

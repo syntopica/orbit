@@ -1,8 +1,8 @@
 import type { Snapshot, SnapshotCore } from '@orbit/contract'
 
+import { syntheticAdapter } from '../test/syntheticAdapter'
+import { syntheticCore } from '../test/syntheticCore'
 import { createAdapterLoop } from './createAdapterLoop'
-import { syntheticAdapter } from './syntheticAdapter'
-import { syntheticCore } from './syntheticCore'
 
 describe('createAdapterLoop', () => {
   beforeEach(() => vi.useFakeTimers())
@@ -82,6 +82,21 @@ describe('createAdapterLoop', () => {
     expect(published.some((s) => s.health.reason === 'timeout')).toBe(true)
     expect(maxActive).toBe(1)
     expect(calls).toBeGreaterThan(1)
+  })
+
+  it('resumes after a read that never settles, ten timeouts later', async () => {
+    let calls = 0
+    const hung = syntheticAdapter(async () => {
+      calls += 1
+      return new Promise<SnapshotCore>(() => undefined)
+    })
+    const loop = createAdapterLoop(hung, { publish: () => undefined })
+    loop.start()
+    await vi.advanceTimersByTimeAsync(32_000)
+    expect(calls).toBe(1)
+    await vi.advanceTimersByTimeAsync(4000)
+    loop.stop()
+    expect(calls).toBe(2)
   })
 
   it('marks data stale when nothing new arrives within freshnessMs', async () => {

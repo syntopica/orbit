@@ -1,9 +1,9 @@
 import type { Snapshot } from '@orbit/contract'
 
+import { syntheticAdapter } from '../test/syntheticAdapter'
+import { syntheticCore } from '../test/syntheticCore'
 import type { Adapter } from '../types/Adapter'
 import { createAdapterLoop } from './createAdapterLoop'
-import { syntheticAdapter } from './syntheticAdapter'
-import { syntheticCore } from './syntheticCore'
 
 describe('createAdapterLoop restart', () => {
   beforeEach(() => vi.useFakeTimers())

@@ -24,6 +24,7 @@ export const useHomeModel = (): HomeModel => {
     cards,
     pending,
     events: synced ? events.slice(0, 20) : [],
+    synced,
     isPhone,
     animate: !reduced,
     now,

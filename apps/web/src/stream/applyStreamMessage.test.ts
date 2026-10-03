@@ -40,7 +40,7 @@ describe('applyStreamMessage', () => {
     let state = INITIAL_STREAM_STATE
     for (let n = 1; n <= 60; n += 1) state = applyStreamMessage(state, event(n))
     expect(state.events).toHaveLength(50)
-    expect(state.events[0]?.refs).toEqual({ n: 60 })
+    expect(state.events[0]?.event.refs).toEqual({ n: 60 })
   })
   it('forgets everything on resync', () => {
     let state = applyStreamMessage(INITIAL_STREAM_STATE, {

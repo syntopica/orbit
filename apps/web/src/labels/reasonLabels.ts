@@ -12,4 +12,5 @@ export const REASON_LABELS: Record<ReasonCode, string> = {
   unreachable: 'Unreachable',
   lagging: 'Reads are slow',
   check_failed: 'Health check failed',
+  permission_denied: 'Permission denied',
 }

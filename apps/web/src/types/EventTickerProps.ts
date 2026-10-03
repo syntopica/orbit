@@ -1,3 +1,3 @@
-import type { OrbitEvent } from '@orbit/contract'
+import type { EventMessage } from '@orbit/contract'
 
-export type EventTickerProps = { readonly events: readonly OrbitEvent[] }
+export type EventTickerProps = { readonly events: readonly EventMessage[] }

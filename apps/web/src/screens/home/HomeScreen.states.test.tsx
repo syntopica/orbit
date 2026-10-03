@@ -37,6 +37,14 @@ describe('HomeScreen states', () => {
     expect(screen.getByText('Nothing pending.')).toBeInTheDocument()
     expect(screen.getByText('No events yet.')).toBeInTheDocument()
   })
+  it('stops waiting at sync even with no components', async () => {
+    await renderAt('/')
+    const source = openStream()
+    act(() => {
+      source.emit({ type: 'sync', id: 1 })
+    })
+    expect(screen.queryByText(/Waiting for the first readings/)).toBeNull()
+  })
   it('caps the ticker at twenty events', async () => {
     await renderAt('/')
     const source = openStream()
