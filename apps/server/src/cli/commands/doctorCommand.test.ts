@@ -17,7 +17,11 @@ describe('doctorCommand', () => {
   })
 
   it('passes once a token exists, and never prints it', async () => {
-    const env = { SYNTOPICA_DATA: await tempInstance() }
+    // HOME is isolated so the developer's installed LaunchAgent is not read.
+    const env = {
+      SYNTOPICA_DATA: await tempInstance(),
+      HOME: await tempInstance(),
+    }
     const created = collectIo(env)
     await tokenCommand(['create'], created.io)
     const { io, out } = collectIo(env)

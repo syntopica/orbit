@@ -12,6 +12,8 @@
   </array>
   <key>EnvironmentVariables</key>
   <dict>
+    <key>PATH</key>
+    <string>__PATH__</string>
     <key>SYNTOPICA_DATA</key>
     <string>__DATA__</string>
   </dict>

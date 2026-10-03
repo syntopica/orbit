@@ -17,6 +17,7 @@ const safe = {
   node: '/usr/local/bin/node',
   orbit: '/opt/orbit/orbit.mjs',
   data: '/srv/instance',
+  path: '/opt/n/bin:/usr/bin',
 }
 
 const lint = async (rendered: string): Promise<number> => {
@@ -44,6 +45,9 @@ describe('renderPlistTemplate', () => {
     )
     expect(rendered).toContain('<key>Umask</key>\n  <integer>63</integer>')
     expect(rendered).toContain('<string>/srv/instance/orbit/orbit.log</string>')
+    expect(rendered).toContain(
+      '<key>PATH</key>\n    <string>/opt/n/bin:/usr/bin</string>',
+    )
     expect(await lint(rendered)).toBe(0)
   })
 
@@ -72,7 +76,7 @@ describe('renderPlistTemplate', () => {
   it.each(['\0', '\n', '\r'])(
     'refuses a value containing %j with a fixed error',
     (bad) => {
-      for (const key of ['node', 'orbit', 'data'] as const) {
+      for (const key of ['node', 'orbit', 'data', 'path'] as const) {
         expect(() =>
           renderPlistTemplate(template, { ...safe, [key]: `/x${bad}y` }),
         ).toThrow(new Error('plist value is not allowed'))

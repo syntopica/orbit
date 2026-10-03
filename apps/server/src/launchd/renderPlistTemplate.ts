@@ -12,9 +12,10 @@ export const renderPlistTemplate = (
     __NODE__: formatXmlText(validatePlistValue(values.node)),
     __ORBIT__: formatXmlText(validatePlistValue(values.orbit)),
     __DATA__: formatXmlText(validatePlistValue(values.data)),
+    __PATH__: formatXmlText(validatePlistValue(values.path)),
   }
   return template.replaceAll(
-    /__(?:NODE|ORBIT|DATA)__/gu,
+    /__(?:NODE|ORBIT|DATA|PATH)__/gu,
     (token) => replacements[token] ?? token,
   )
 }

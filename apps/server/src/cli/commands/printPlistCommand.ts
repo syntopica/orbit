@@ -1,6 +1,7 @@
 import { dirname, isAbsolute } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { buildLaunchdPath } from '../../launchd/buildLaunchdPath'
 import { readPlistTemplate } from '../../launchd/readPlistTemplate'
 import { renderPlistTemplate } from '../../launchd/renderPlistTemplate'
 import type { CliIo } from '../../types/CliIo'
@@ -19,6 +20,7 @@ export const printPlistCommand = (io: CliIo): number => {
       node: process.execPath,
       orbit: bundle,
       data,
+      path: buildLaunchdPath(process.execPath, io.env['PATH']),
     }).trimEnd(),
   )
   return 0

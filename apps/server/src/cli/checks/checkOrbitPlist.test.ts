@@ -23,9 +23,11 @@ const printing = (json: string) => async (home: string) =>
 echo '${json}'`,
   )
 
+const withPath = '{"Umask":63,"EnvironmentVariables":{"PATH":"/a:/b"}}'
+
 describe('checkOrbitPlist', () => {
   it('passes when the plist carries Umask 63', async () => {
-    expect(await levelFor(printing('{"Umask":63}'))).toMatchObject({
+    expect(await levelFor(printing(withPath))).toMatchObject({
       level: 'ok',
     })
   })
@@ -35,6 +37,21 @@ describe('checkOrbitPlist', () => {
     expect((await levelFor(printing('{}'))).level).toBe('fail')
     expect((await levelFor(printing('[]'))).level).toBe('fail')
     expect((await levelFor(printing('nope'))).level).toBe('fail')
+  })
+
+  it('fails when the plist carries no PATH, so engines would not resolve', async () => {
+    const missing = await levelFor(printing('{"Umask":63}'))
+    expect(missing.level).toBe('fail')
+    expect(missing.detail).toContain('PATH')
+    expect(
+      (
+        await levelFor(
+          printing(
+            '{"Umask":63,"EnvironmentVariables":{"SYNTOPICA_DATA":"/d"}}',
+          ),
+        )
+      ).level,
+    ).toBe('fail')
   })
 
   it('warns when the plist is not installed or plutil is missing', async () => {

@@ -4,6 +4,7 @@ import { join } from 'node:path'
 import { buildChildEnv } from '../../process/buildChildEnv'
 import { runProcess } from '../../process/runProcess'
 import type { DoctorCheck } from '../../types/DoctorCheck'
+import { readPlistPath } from './readPlistPath'
 import { readPlistUmask } from './readPlistUmask'
 
 // The installed LaunchAgent must carry Umask 63 (octal 077): launchd opens the
@@ -29,11 +30,18 @@ export const checkOrbitPlist: DoctorCheck = async (state) => {
   if (result.code !== 0) {
     return { name, level: 'warn', detail: 'LaunchAgent not installed' }
   }
-  return readPlistUmask(result.stdout) === 63
-    ? { name, level: 'ok', detail: 'Umask 63' }
-    : {
+  if (readPlistUmask(result.stdout) !== 63) {
+    return {
+      name,
+      level: 'fail',
+      detail: 'Umask is not 63: orbit.log would not be 0600',
+    }
+  }
+  return readPlistPath(result.stdout) === null
+    ? {
         name,
         level: 'fail',
-        detail: 'Umask is not 63: orbit.log would not be 0600',
+        detail: 'no PATH in EnvironmentVariables: engines would not resolve',
       }
+    : { name, level: 'ok', detail: 'Umask 63, PATH set' }
 }
