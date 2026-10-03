@@ -7,6 +7,13 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-03 [x] Brain screen (sub-project 1c): engine table `{pageId}`
+  placeholder, brain graph, related, page and checks routes, sigma graph with
+  ForceAtlas2 and Louvain in a Vite module worker, filters, local view, page
+  view without raw HTML, lint and doctor panels, palette pages. Evidence: plan
+  `docs/superpowers/plans/2026-10-03-orbit-brain-screen.md`, measurements
+  `docs/measurements/2026-10-03-brain-detail-commands.md`, `pnpm gate` green
+  with e2e 34/34; Brain route plus worker 97.08 kB brotli of 250.
 - 2026-10-03 [x] Memory screens (sub-project 1b): history metrics route, atrium
   and clips detail routes, memory flow route, shared trend chart, Atrium, Clips
   and Memory flow screens with a React Flow canvas and a phone stage list. React

@@ -7,7 +7,7 @@ for (const colorScheme of ['dark', 'light'] as const) {
   test.describe(`${colorScheme} scheme`, () => {
     test.use({ colorScheme })
 
-    test('login, orbit, worker and system have no axe violations', async ({
+    test('login, orbit, worker, system and brain have no axe violations', async ({
       page,
     }) => {
       await page.goto('/login')
@@ -30,6 +30,11 @@ for (const colorScheme of ['dark', 'light'] as const) {
       await page.goto('/system')
       await expect(
         page.getByRole('heading', { name: 'com.example.nightly' }),
+      ).toBeVisible()
+      expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
+      await page.goto('/brain?page=notes%2Fa')
+      await expect(
+        page.getByRole('heading', { name: 'Fixture page A' }),
       ).toBeVisible()
       expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([])
     })

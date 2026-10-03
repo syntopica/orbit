@@ -103,7 +103,10 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
           command: 'bin/brain',
           subcommands: [
             ['lint', '--json'],
-            ['doctor', '--json'],
+            ['doctor', '--json', '--skip', 'credentials'],
+            ['graph', '--json', '--no-html'],
+            ['graph', '--json', '--related', '--limit', '50'],
+            ['page', '--json', '--id', '{pageId}'],
           ],
         },
         clips: {

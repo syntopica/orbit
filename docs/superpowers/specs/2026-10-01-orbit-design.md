@@ -1,6 +1,6 @@
 # orbit - design
 
-Status: draft, revision 8 (after adversarial review rounds 1 to 3 and the
+Status: draft, revision 9 (after adversarial review rounds 1 to 3 and the
 implementation of sub-project 0). Scope: sub-project 0 (Base) and sub-project 1
 (Memory). Later sub-projects get their own specs.
 
@@ -31,6 +31,12 @@ folded runs in the home ticker.
 the Worker screen's range control, activity, per-queue, failure and
 OpenRouter charts with progressive disclosure, and the lazy Worker route;
 7.1: chart palette and mark rules; 13: visx replaces Recharts for panels.
+
+**Revision 9 (brain screen).** 5.3: one validated argument placeholder
+(`{pageId}`) and leading-argument lookup in the engine table. 7.5 (new): the
+routes `GET /api/brain/graph|related|page|checks`, the page id pattern, the
+graph's colour, size, layout and local view, the page view's content, and the
+fetch policy (open, cache, never poll).
 
 **Revision 8 (memory screens).** 7.4 (new): the detail routes
 `GET /api/history/metrics`, `GET /api/atrium`, `GET /api/clips` and
@@ -275,6 +281,10 @@ An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, 
   whole entry, so the appended tail, such as `--skip credentials`, comes from
   `orbit.json` and never from the caller. The command is resolved once at start to an absolute path; a missing or
   non-executable file is `not_found`.
+- An argument in the table may be exactly `{pageId}`, the only placeholder.
+  The runner accepts a requested argument in that position only when it
+  matches the page id pattern (section 7.5); any other `{...}` argument is a
+  configuration error. `orbit doctor` skips entries that hold a placeholder.
 - `spawn` with `shell: false`, a fixed argument list, `detached: true` so the
   child leads its own process group; on timeout or abort the whole group gets
   `SIGTERM`, then `SIGKILL` after 5 s.
@@ -653,6 +663,55 @@ upstream stage is neither `warn` nor `down`. One particle crosses an edge
 every `60 / perHour` s, clamped to 1.5-12 s, and none move under reduced
 motion. Under 768 px the flow is an ordered list of stage cards. The selected
 stage is kept in the URL as `?stage=`.
+
+### 7.5 Brain screen
+
+**Routes.** Four session-guarded detail routes run brain commands through the
+engine table under the detail pool, each cached in memory for the brain
+cadence (60 s): `GET /api/brain/graph` (`graph --json --no-html`, 10 s),
+`GET /api/brain/related` (`graph --json --related`, the table fixing
+`--limit 50`, 10 s), `GET /api/brain/page?id=<id>` (`page --json --id <id>`,
+10 s, cached per id for at most 16 ids) and `GET /api/brain/checks` (`lint
+--json` then `doctor --json`, 15 s). A page id is at most 256 ASCII
+characters, `<dir>[/<dir>...]/<stem>` of letters, digits, `_` and `-` (dots
+also inside the stem), no segment starting with `.` or `-`; an id outside it
+is a 400 and never reaches the engine. The engine's `page_not_found` is a 404
+and `invalid_page_id` a 400; anything else that fails is a fixed 503.
+
+The graph answers `{ now, nodes: [{ id, type, degree, orphan }], edges:
+[[source, target]], dangling, skipped }` with edges as node indices; a node
+whose id fails the pattern is left out with its edges and counted in
+`skipped`; a type that is not an identifier is `null`. Related answers
+`{ now, total, pairs: [{ left, right, score }] }`. A page answers its id,
+`title`, `type`, `updated`, `summary`, `sources`, `body`, `truncated`, outbound
+links (`target`, `exists`) and inbound links; no other frontmatter key is
+forwarded. Checks answer `{ now, pageCount, indexStale, issues: [{ page, code
+}], doctor: { ok, checks } }`, issues capped at 500.
+
+**Fetching.** The graph and checks load when the screen opens and are never
+polled; related pairs load when asked; a page loads when selected. Every brain
+query is dropped when its screen unmounts (section 6.6).
+
+**Graph.** sigma draws the pages; ForceAtlas2 (300 iterations) and Louvain
+run in orbit's own module worker, started from a circle in index order with a
+seeded generator, so a graph always lays out the same way. Size is
+`min(16, 2 + 1.5 * sqrt(degree))`. Colour is by type (types ranked by page
+count take series slots 1-5, the rest share slot 6) or by community (ranked by
+size the same way); orphans wear the warn colour labelled "Orphan" while
+highlighted, and the selected page the accent colour. Type filters hide
+pages; the local view shows 1-3 steps around the selected page over links in
+either direction and reuses the global positions. The canvas is an image with
+a summary name; "Find a page" and a "Show pages" table reach every page
+without a pointer, and both still work without WebGL.
+
+**Page view.** The selected page's rendered body (Markdown without raw HTML,
+images as their alt text, external links in a new tab with
+`rel="noopener noreferrer"`, `[[dir/page]]` links selecting that page), the
+fixed frontmatter fields above, and its outbound and inbound links. Related
+pairs list the selected page's pairs first. Side panels: lint issues grouped
+by code with each page selectable, failing doctor checks, and a lint trend
+from orbit's history. The selection, view depth, colour mode, orphan
+highlight, hidden types and trend range are kept in the URL.
 
 ### 7.1 Visual language
 

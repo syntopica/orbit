@@ -20,9 +20,13 @@ for (const width of [375, 768, 1280]) {
         '/clips',
         '/worker',
         '/system',
+        '/brain',
       ]) {
         await page.goto(path)
         await waitForScreenReady(page, path, width)
+        if (path === '/brain') {
+          await expect(page.getByText('Show pages')).toBeVisible()
+        }
         await page.screenshot({
           path: `test-results/screens/${String(width)}-${colorScheme}${path === '/' ? '/home' : path}.png`,
           fullPage: true,
