@@ -64,4 +64,12 @@ describe('buildAdapters', () => {
     )
     expect(l?.cadenceMs).toBe(3000)
   })
+  it('honours a synthetic cadence', () => {
+    const [s] = buildAdapters(
+      context({ synthetic: true, cadenceMs: { synthetic: 2000 } }),
+    )
+    expect([s?.cadenceMs, s?.timeoutMs, s?.freshnessMs]).toEqual([
+      2000, 4000, 10_000,
+    ])
+  })
 })

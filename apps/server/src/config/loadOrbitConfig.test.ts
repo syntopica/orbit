@@ -49,4 +49,20 @@ describe('loadOrbitConfig', () => {
     }
     await expect(loadOrbitConfig(await withOrbitJson(bad))).rejects.toThrow()
   })
+  it('rejects relative tool paths', async () => {
+    const relative = { launchd: { launchctl: 'launchctl', labels: [] } }
+    await expect(
+      loadOrbitConfig(await withOrbitJson(relative)),
+    ).rejects.toThrow()
+  })
+  it('accepts only http and https worker urls', async () => {
+    const worker = (url: string) => ({ worker: { url, tokenFile: '/t' } })
+    await expect(
+      loadOrbitConfig(await withOrbitJson(worker('file:///etc/passwd'))),
+    ).rejects.toThrow()
+    const config = await loadOrbitConfig(
+      await withOrbitJson(worker('https://worker.example')),
+    )
+    expect(config.worker?.url).toBe('https://worker.example')
+  })
 })

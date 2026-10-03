@@ -10,4 +10,5 @@ export const REASON_CODES = [
   'unreachable',
   'lagging',
   'check_failed',
+  'permission_denied',
 ] as const

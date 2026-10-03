@@ -1,4 +1,5 @@
 import { COMPONENT_IDS } from '@orbit/contract'
+import { isAbsolute } from 'node:path'
 import { z } from 'zod'
 
 export const orbitConfigSchema = z
@@ -9,8 +10,8 @@ export const orbitConfigSchema = z
     synthetic: z.boolean().default(false),
     launchd: z
       .object({
-        launchctl: z.string().default('/bin/launchctl'),
-        plutil: z.string().default('/usr/bin/plutil'),
+        launchctl: z.string().refine(isAbsolute).default('/bin/launchctl'),
+        plutil: z.string().refine(isAbsolute).default('/usr/bin/plutil'),
         labels: z
           .array(
             z
@@ -27,7 +28,10 @@ export const orbitConfigSchema = z
       .strict()
       .optional(),
     worker: z
-      .object({ url: z.url(), tokenFile: z.string().min(1) })
+      .object({
+        url: z.url({ protocol: /^https?$/ }),
+        tokenFile: z.string().min(1),
+      })
       .strict()
       .optional(),
     cadenceMs: z

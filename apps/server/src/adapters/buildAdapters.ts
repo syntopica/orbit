@@ -34,7 +34,10 @@ export const buildAdapters = (context: AdapterContext): Adapter[] => {
   }
   if (config.synthetic)
     adapters.push(
-      createSyntheticAdapter(join(context.stateDir, 'synthetic-fail')),
+      createSyntheticAdapter(
+        join(context.stateDir, 'synthetic-fail'),
+        config.cadenceMs.synthetic ?? 1000,
+      ),
     )
   return adapters
 }

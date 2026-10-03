@@ -3,13 +3,16 @@ import { access } from 'node:fs/promises'
 import { ProcessError } from '../../process/ProcessError'
 import type { Adapter } from '../../types/Adapter'
 
-export const createSyntheticAdapter = (failFlagPath: string): Adapter => {
+export const createSyntheticAdapter = (
+  failFlagPath: string,
+  cadenceMs: number,
+): Adapter => {
   let tick = 0
   return {
     id: 'synthetic',
-    cadenceMs: 1000,
-    timeoutMs: 2000,
-    freshnessMs: 5000,
+    cadenceMs,
+    timeoutMs: cadenceMs * 2,
+    freshnessMs: cadenceMs * 5,
     read: async () => {
       const failing = await access(failFlagPath).then(
         () => true,

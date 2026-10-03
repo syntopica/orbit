@@ -203,6 +203,7 @@ type HealthState = 'ok' | 'warn' | 'down'
 type ReasonCode = 'stale' | 'timeout' | 'exit_nonzero' | 'output_too_large'
   | 'schema_invalid' | 'engine_schema_unsupported' | 'not_found'
   | 'unauthorized' | 'unreachable' | 'lagging' | 'check_failed'
+  | 'permission_denied'
 type Health = { state: HealthState; reason: ReasonCode | null }
 type Metric = { key: MetricKey; value: number; at: string }
 type Pending = { key: PendingKey; count: number; oldestAt: string | null }
@@ -228,6 +229,9 @@ An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, 
 
 - **Single flight per adapter.** A tick that finds the previous read still
   running is skipped, never queued, and the snapshot is marked `lagging`.
+  After a timeout the loop waits for the aborted read to settle for at most
+  ten times the adapter's timeout; a read that ignores its abort longer than
+  that is abandoned so the adapter keeps polling.
 - **Backoff.** After a failed read the next attempt waits cadence x 2^n,
   capped at 10 x cadence; a success resets it.
 - **Bounded subprocesses, no shared polling slot.** Polling is already capped

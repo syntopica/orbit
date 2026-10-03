@@ -4,45 +4,11 @@ Active engine backlog. States: `[ ]` pending, `[~]` partial, `[!]` blocked,
 `[x]` verified complete, `[-]` obsolete. Closed items move to `TODO_LOG.md`.
 This repository is public: entries describe engine behaviour only.
 
-## Live stream and hub
-
-- [ ] Hub dedupe never fires for real adapters:
-      `apps/server/src/hub/createHub.ts:33` blanks only the top-level
-      `observedAt`, while `metrics[].at`, `pending.oldestAt` and
-      `lastGood.observedAt` change on every read, so a snapshot is sent every
-      tick (spec 5.5). Hash with those fields stripped.
-- [ ] `lastGood.events` is not cleared when a snapshot is stored
-      (`createHub.ts`, `createRecorder.ts:14`). Clear it together with the
-      dedupe fix.
-- [ ] A read that never settles halts its adapter loop
-      (`apps/server/src/scheduler/createAdapterLoop.ts`). Every Base adapter
-      settles on abort; add a hard limit before the first adapter that may not.
-- [ ] Ticker key collides when two events share a timestamp and ref
-      (`apps/web/src/screens/home/EventTicker.tsx:19`). Give events an id in the
-      contract.
-- [ ] Home "waiting for first readings" does not use the `synced` flag
-      (`apps/web/src/screens`). Show it until the first `sync`.
-
 ## Config and adapters
 
-- [ ] `launchd.launchctl` and `launchd.plutil` need not be absolute paths
-      (`apps/server/src/config/orbitConfigSchema.ts:12-13`, spec 5.3). Add
-      `.refine(isAbsolute)`.
-- [ ] `worker.url` uses `z.url()`, which accepts non-http schemes
-      (`orbitConfigSchema.ts:30`). Restrict it to http and https.
-- [ ] `cadenceMs.synthetic` is accepted but ignored (`orbitConfigSchema.ts:33`).
-      Honour it or reject it.
-- [ ] `syntheticAdapter` and `syntheticCore` are test helpers living in
-      `apps/server/src/scheduler/`. Move them under `apps/server/src/test/`.
-- [ ] A token-file EACCES maps to `not_found`
-      (`apps/server/src/adapters/worker/readWorkerToken.ts:11`). Map permission
-      errors to a distinct reason.
-- [ ] Worker health stays `ok` unless the read itself fails
-      (`summarizeWorker.ts`). Decide whether stale or failing queues should
-      degrade it.
-- [ ] `readPlistTemplate` walks up to the filesystem root
-      (`apps/server/src/launchd/readPlistTemplate.ts`). Stop at the first
-      directory holding a `package.json`.
+- [!] Worker health stays `ok` unless the read itself fails
+  (`summarizeWorker.ts`). Blocked on an owner decision: should stale or failing
+  queues, all runners in cooldown, or zero nodes degrade it?
 
 ## State and history
 

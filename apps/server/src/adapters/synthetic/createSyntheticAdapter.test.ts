@@ -10,7 +10,7 @@ const flagPath = async () =>
 describe('createSyntheticAdapter', () => {
   it('fails while the flag file exists', async () => {
     const flag = await flagPath()
-    const adapter = createSyntheticAdapter(flag)
+    const adapter = createSyntheticAdapter(flag, 1000)
     const signal = new AbortController().signal
     const core = await adapter.read(signal)
     expect(core.events.map((e) => e.kind)).toEqual(['synthetic.tick'])
@@ -24,7 +24,7 @@ describe('createSyntheticAdapter', () => {
     })
   })
   it('declares its timings and counts ticks', async () => {
-    const adapter = createSyntheticAdapter(await flagPath())
+    const adapter = createSyntheticAdapter(await flagPath(), 1000)
     expect([
       adapter.id,
       adapter.cadenceMs,
