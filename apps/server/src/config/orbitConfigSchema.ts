@@ -2,6 +2,8 @@ import { COMPONENT_IDS } from '@orbit/contract'
 import { isAbsolute } from 'node:path'
 import { z } from 'zod'
 
+import { engineTableSchema } from '../engines/engineTableSchema'
+
 export const orbitConfigSchema = z
   .object({
     port: z.number().int().min(1024).max(65_535).default(8790),
@@ -34,6 +36,7 @@ export const orbitConfigSchema = z
       })
       .strict()
       .optional(),
+    engines: engineTableSchema.default({}),
     cadenceMs: z
       .partialRecord(z.enum(COMPONENT_IDS), z.number().int().min(1000))
       .default({}),
