@@ -19,3 +19,11 @@ This repository is public: entries describe engine behaviour only.
   `brain lint` p90 3.1 s, p99 10 s. Per-engine `timeoutMs` added (clips and
   brain set to 20 s in the instance), adapter budget 45 s for two reads. Next:
   confirm the timeouts stop in the next day of lines.
+
+## Test reliability
+
+- [ ] `worker-costs.spec.ts` light 1280px failed once in the full gate
+      (2026-10-04, host load ~50) on axe `color-contrast` for `text-muted` stat
+      labels (#828997 on #fcfcfe, 3.43); it passed 12 of 12 alone. Likely axe
+      sampling mid theme transition. Next: wait for the computed colour to
+      settle (or disable transitions) before axe in that spec.
