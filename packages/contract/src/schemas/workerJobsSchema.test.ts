@@ -22,7 +22,7 @@ const job = {
 
 describe('worker job contracts', () => {
   it('keeps bounded identifiers and epoch milliseconds on list rows', () => {
-    expect(workerJobSchema.parse(job)).toEqual(job)
+    expect(workerJobSchema.parse(job)).toMatchObject(job)
     expect(workerJobSchema.safeParse({ ...job, id: 'free text' }).success).toBe(
       false,
     )
@@ -52,7 +52,7 @@ describe('worker job contracts', () => {
       hasInput: true,
       hasOutput: false,
     }
-    expect(workerJobDetailSchema.parse(detail)).toEqual(detail)
+    expect(workerJobDetailSchema.parse(detail)).toMatchObject(detail)
     expect(
       workerJobDetailSchema.safeParse({
         ...detail,

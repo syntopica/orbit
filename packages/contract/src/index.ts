@@ -64,6 +64,7 @@ export type { WorkerQuality } from './types/WorkerQuality'
 export type { WorkerQualityAttempt } from './types/WorkerQualityAttempt'
 export type { WorkerQualityJudged } from './types/WorkerQualityJudged'
 export type { WorkerQueue } from './types/WorkerQueue'
+export type { WorkerResult } from './types/WorkerResult'
 export type { WorkerView } from './types/WorkerView'
 
 export { clipsViewSchema } from './schemas/clipsViewSchema'

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { amountOrNullSchema } from './amountOrNullSchema'
 import { identifierSchema } from './identifierSchema'
 
 export const workerAttemptSchema = z.object({
@@ -12,4 +13,6 @@ export const workerAttemptSchema = z.object({
   endedAt: z.number().nullable(),
   tokensIn: z.number().int().nonnegative().nullable(),
   tokensOut: z.number().int().nonnegative().nullable(),
+  wallMs: amountOrNullSchema,
+  costUsd: amountOrNullSchema,
 })
