@@ -21,7 +21,10 @@ This repository is public: entries describe engine behaviour only.
   orbit's queue; by hand `clips status` takes 0.6 s at load 15-23. Load alone
   does not explain it: at load 102.8 the same commands took 0.5-1.1 s, while
   every 8-10 s run so far fell inside a local gate run (build and git I/O on the
-  same disk). Next: a few days of lines, then either a lighter status read in
-  the engine or a measured per-engine budget.
+  same disk). 668 lines by 2026-10-04 18:56: all 25 timeouts fell at load 20-125
+  (median load of successful runs 12); `clips status` p50 1.1 s, p90 8.7 s;
+  `brain lint` p90 3.1 s, p99 10 s. Per-engine `timeoutMs` added (clips and
+  brain set to 20 s in the instance), adapter budget 45 s for two reads. Next:
+  confirm the timeouts stop in the next day of lines.
 - [ ] 5. Per-item clips waiting in Pending, with a content-safe item list from
       the clips engine.

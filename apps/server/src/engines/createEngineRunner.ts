@@ -13,7 +13,7 @@ export const createEngineRunner =
     engine: ResolvedEngine,
     run: (request: RunRequest) => Promise<RunResult>,
   ): EngineRunner =>
-  async (requested, signal, timeoutMs = 10_000) => {
+  async (requested, signal, timeoutMs = engine.timeoutMs ?? 10_000) => {
     const args = resolveListedArgs(engine.subcommands, requested)
     if (args === null) throw new ProcessError('check_failed')
     return await run({

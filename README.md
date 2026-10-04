@@ -111,6 +111,10 @@ requests are built as `/api/...` against the origin. `pending.todoFiles` is
 optional. Each entry has an identifier name and an absolute path; when absent,
 the Pending board has no TODO sources.
 
+`engines.<name>.timeoutMs` (default 10000, at most 60000) is the time each read
+of that engine gets before it is killed; a busy machine pushes `clips status`
+and `brain lint` past 10 s, so give those engines 20000.
+
 `launchd.labels[].actions` allows `run` for scheduled jobs and `restart` for
 keepalive services. Omit it to offer no action. `engines.<name>.actions` maps a
 fixed action identifier to its argument list, button label and optional

@@ -26,6 +26,19 @@ describe('createEngineRunner', () => {
     })
     expect(seen[0]?.env['EXTRA']).toBe('1')
   })
+  it("uses the engine's own read budget unless the caller sets one", async () => {
+    const seen: RunRequest[] = []
+    const run = createEngineRunner(
+      { ...engine, timeoutMs: 20_000 },
+      async (request) => {
+        seen.push(request)
+        return await Promise.resolve({ code: 0, stdout: '{}' })
+      },
+    )
+    await run(['lint', '--json'], new AbortController().signal)
+    await run(['lint', '--json'], new AbortController().signal, 5000)
+    expect(seen.map((request) => request.timeoutMs)).toEqual([20_000, 5000])
+  })
   it('runs the full listed entry for a leading request', async () => {
     const seen: RunRequest[] = []
     const run = createEngineRunner(engine, async (request) => {

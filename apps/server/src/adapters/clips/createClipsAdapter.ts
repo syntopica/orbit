@@ -12,7 +12,9 @@ export const createClipsAdapter = (deps: {
 }): Adapter => ({
   id: 'clips',
   cadenceMs: deps.cadenceMs,
-  timeoutMs: 25_000,
+  // Two sequential engine reads, each up to its engine's `timeoutMs` (20 s at
+  // most in practice), inside the 60 s cadence.
+  timeoutMs: 45_000,
   freshnessMs: deps.cadenceMs * 2,
   read: async (signal) => {
     const { status, doctor } = await readClipsDocuments(deps.run, signal)

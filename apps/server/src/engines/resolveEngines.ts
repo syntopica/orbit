@@ -21,7 +21,7 @@ export const resolveEngines = async (
     try {
       if (checkout === undefined) throw new ProcessError('not_found')
       const file = await resolveEngineCommand(checkout, spec.command)
-      const { subcommands, env, actions } = spec
+      const { subcommands, env, actions, timeoutMs } = spec
       Object.assign(runners, {
         [name]: createEngineRunner(
           {
@@ -31,6 +31,7 @@ export const resolveEngines = async (
               ...Object.values(actions).map((action) => action.args),
             ],
             env,
+            timeoutMs,
           },
           run,
         ),
