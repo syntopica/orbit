@@ -13,7 +13,7 @@ export const PendingSearchInput = ({
       onChange={(event) => {
         model.select('q', event.target.value)
       }}
-      className="border-line bg-panel w-full rounded-lg border px-3 py-2"
+      className="border-line bg-panel w-full rounded-lg border px-3 py-2 text-base md:text-sm"
     />
   </label>
 )

@@ -1,18 +1,12 @@
 import type { usePendingBoard } from '../../hooks/usePendingBoard'
+import { PENDING_STATES } from '../../labels/pendingStates'
 
 export const PendingStateFilters = ({
   model,
 }: {
   model: ReturnType<typeof usePendingBoard>
 }) => {
-  const states = [
-    'blocked',
-    'partial',
-    'open',
-    'issue',
-    'failed',
-    'waiting',
-  ] as const
+  const states = PENDING_STATES
   return (
     <div className="flex flex-wrap gap-2">
       {states.map((state) => (

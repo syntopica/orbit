@@ -1,4 +1,5 @@
 import type { usePendingBoard } from '../../hooks/usePendingBoard'
+import { PendingGroupToggle } from './PendingGroupToggle'
 import { PendingSourceIssues } from './PendingSourceIssues'
 import { PendingSourceSection } from './PendingSourceSection'
 
@@ -10,16 +11,22 @@ export const PendingSources = ({
   const data = model.query.data
   if (data === undefined) return null
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       <PendingSourceIssues sources={data.sources} />
       {model.items.length === 0 ? (
         <p className="text-muted">No matching items.</p>
-      ) : null}
+      ) : (
+        <PendingGroupToggle model={model} />
+      )}
       {data.sources.map((source) => (
         <PendingSourceSection
           key={source.id}
           source={source}
           items={model.items.filter((item) => item.source === source.id)}
+          open={model.groups.isOpen(source.id)}
+          onOpenChange={(open) => {
+            model.groups.setOpen(source.id, open)
+          }}
         />
       ))}
     </div>

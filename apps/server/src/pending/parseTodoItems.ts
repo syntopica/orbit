@@ -1,6 +1,7 @@
 import type { PendingView } from '@orbit/contract'
 
-import { appendTodoDetail } from './appendTodoDetail'
+import { appendTodoContinuation } from './appendTodoContinuation'
+import { capTodoTitle } from './capTodoTitle'
 import { createTodoItem } from './createTodoItem'
 import { todoState } from './todoState'
 
@@ -12,6 +13,7 @@ export const parseTodoItems = (
   const items: PendingView['items'][number][] = []
   let section: string | null = null
   let current: PendingView['items'][number] | null = null
+  let titleOpen = false
   for (const [index, raw] of content.split(/\r?\n/).entries()) {
     const line = raw.replace(/\r$/, '')
     if (line.startsWith('## ')) {
@@ -33,11 +35,13 @@ export const parseTodoItems = (
         title: marker[2] ?? '',
         section,
       })
+      titleOpen = true
       items.push(current)
       continue
     }
-    if (current !== null && /^\s+\S/.test(line)) appendTodoDetail(current, line)
+    if (current !== null && /^\s+\S/.test(line))
+      titleOpen = appendTodoContinuation(current, line, titleOpen)
     else current = null
   }
-  return items
+  return items.map(capTodoTitle)
 }

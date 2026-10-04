@@ -16,6 +16,9 @@ for (const colorScheme of ['dark', 'light'] as const) {
           page.getByRole('heading', { name: 'Pending', exact: true }),
         ).toBeVisible()
         await expect(page.getByText('Resolve placeholder item')).toBeVisible()
+        await page.getByRole('button', { name: 'Collapse all' }).click()
+        await expect(page.getByText('Resolve placeholder item')).toBeHidden()
+        await page.getByRole('button', { name: 'Expand all' }).click()
         await page.getByRole('button', { name: /blocked 1/ }).click()
         await expect(page).toHaveURL(/state=blocked/)
         await page.getByRole('button', { name: 'example 3' }).click()

@@ -6,6 +6,7 @@ import { useEffect } from 'react'
 import { apiJson } from '../api/apiJson'
 import { filterPendingItems } from '../selectors/filterPendingItems'
 import { validatePendingSearch } from '../validators/validatePendingSearch'
+import { usePendingGroups } from './usePendingGroups'
 
 export const usePendingBoard = () => {
   const filters = validatePendingSearch(useSearch({ strict: false }))
@@ -36,10 +37,7 @@ export const usePendingBoard = () => {
       replace: true,
     })
   }
-  return {
-    query,
-    filters,
-    select,
-    items: filterPendingItems(query.data?.items ?? [], filters),
-  }
+  const items = filterPendingItems(query.data?.items ?? [], filters)
+  const groups = usePendingGroups(items, filters)
+  return { query, filters, select, items, groups }
 }

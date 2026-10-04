@@ -72,7 +72,7 @@ describe('GET /api/pending', () => {
     const path = join(dir, 'TODO.md')
     await writeFile(
       path,
-      '## Queue\n- [!] Fix placeholder\n  More placeholder detail\n',
+      '## Queue\n- [!] Fix placeholder\n  - More placeholder detail\n',
     )
     const app = buildTestApp({
       todoFiles: [{ name: 'tasks', path }],
@@ -88,7 +88,7 @@ describe('GET /api/pending', () => {
     expect(board.items[0]).toMatchObject({
       state: 'blocked',
       title: 'Fix placeholder',
-      detail: '  More placeholder detail',
+      detail: '  - More placeholder detail',
       ref: { file: path, line: 2 },
     })
   })

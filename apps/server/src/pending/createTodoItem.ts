@@ -14,7 +14,7 @@ export const createTodoItem = (
   source,
   kind: 'todo',
   state: values.state,
-  title: values.title.slice(0, 300),
+  title: values.title,
   detail: '',
   section: values.section,
   ref: { file, line },
