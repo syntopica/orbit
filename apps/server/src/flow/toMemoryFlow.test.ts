@@ -32,6 +32,7 @@ const inputs: FlowInputs = {
       content: { at: null },
     }),
     synthesis: null,
+    doctor: null,
   },
   refreshIntervalMs: 3_600_000,
   labels: new Map([['curation' as const, 'com.example.curate']]),
@@ -126,6 +127,7 @@ describe('toMemoryFlow', () => {
       atrium: {
         refresh: atriumRefreshDocument({ archive: { at: iso(NOW) } }),
         synthesis: null,
+        doctor: null,
       },
     })
     expect(fresh.edges[1]).toMatchObject({ perHour: 2, flowing: true })

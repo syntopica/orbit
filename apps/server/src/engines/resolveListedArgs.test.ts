@@ -6,6 +6,7 @@ const table = [
   ['graph', '--json', '--no-html'],
   ['graph', '--json', '--related', '--limit', '50'],
   ['page', '--json', '--id', '{pageId}'],
+  ['context', '--json', '--', '{query}'],
 ]
 
 describe('resolveListedArgs', () => {
@@ -44,8 +45,21 @@ describe('resolveListedArgs', () => {
         resolveListedArgs(table, ['page', '--json', '--id', id]),
       ).toBeNull()
   })
+  it('fills the query placeholder only with a trimmed bounded query', () => {
+    const ask = (query: string) =>
+      resolveListedArgs(table, ['context', '--json', '--', query])
+    expect(ask('what changed --help')).toEqual([
+      'context',
+      '--json',
+      '--',
+      'what changed --help',
+    ])
+    for (const query of ['', ' padded ', 'a\nb', 'x'.repeat(501)])
+      expect(ask(query)).toBeNull()
+  })
   it('never completes a request into an unfilled placeholder', () => {
     expect(resolveListedArgs(table, ['page', '--json'])).toBeNull()
+    expect(resolveListedArgs(table, ['context', '--json', '--'])).toBeNull()
   })
   it('prefers an exact entry over longer leading matches', () => {
     expect(

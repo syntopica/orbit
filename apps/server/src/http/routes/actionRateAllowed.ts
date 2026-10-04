@@ -10,12 +10,13 @@ import { SESSION_COOKIE } from '../sessionCookieName'
 export const actionRateAllowed = (
   deps: AppDeps,
   c: Context<OrbitEnv>,
+  scope: string,
 ): boolean => {
   const cookie = getCookie(c, SESSION_COOKIE) ?? ''
   const hash = createHash('sha256').update(cookie).digest('hex')
   return consumeRateLimit(
     deps.authDb,
-    { key: `action:${hash}`, limit: 10 },
+    { key: `${scope}:${hash}`, limit: 10 },
     deps.now(),
   )
 }

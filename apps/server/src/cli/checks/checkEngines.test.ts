@@ -70,6 +70,7 @@ describe('checkEngines', () => {
           subcommands: [
             ['lint', '--json'],
             ['page', '--json', '--id', '{pageId}'],
+            ['context', '--json', '--', '{query}'],
           ],
         },
       },

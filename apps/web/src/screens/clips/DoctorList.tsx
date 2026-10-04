@@ -1,8 +1,8 @@
 import { CLIPS_LABELS } from '../../labels/clipsLabels'
 import type { DoctorListProps } from '../../types/DoctorListProps'
 
-// Check names and codes are identifiers from clips, shown verbatim.
-export const DoctorList = ({ doctor }: DoctorListProps) => {
+// Check names, severities and codes are identifiers, shown verbatim.
+export const DoctorList = ({ doctor, note }: DoctorListProps) => {
   const failing = doctor.checks.filter((check) => !check.ok)
   return (
     <section
@@ -19,6 +19,9 @@ export const DoctorList = ({ doctor }: DoctorListProps) => {
           {failing.map((check) => (
             <li key={check.name} className="wrap-anywhere">
               {check.name}
+              {check.severity === undefined ? null : (
+                <span> [{check.severity}]</span>
+              )}
               {check.code === null ? null : (
                 <span className="text-muted"> {check.code}</span>
               )}
@@ -26,6 +29,7 @@ export const DoctorList = ({ doctor }: DoctorListProps) => {
           ))}
         </ul>
       )}
+      {note === undefined ? null : <p className="text-muted text-xs">{note}</p>}
     </section>
   )
 }

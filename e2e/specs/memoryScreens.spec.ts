@@ -45,6 +45,32 @@ test('atrium shows sources, freshness, synthesis and index gaps', async ({
   ).toBeVisible()
 })
 
+test('atrium shows doctor codes and inspects a context query', async ({
+  page,
+}) => {
+  await signIn(page)
+  await page.goto('/atrium')
+  const doctor = page.getByRole('region', { name: 'Doctor' })
+  await expect(doctor).toContainText(
+    'synthesis [warn] synthesis_orphan_conversations',
+  )
+  await expect(doctor).toContainText('Published 2m ago.')
+  const inspector = page.getByRole('region', { name: 'Context inspector' })
+  await inspector.getByLabel('Query').fill('example project --help')
+  await expect(inspector).toContainText('22 / 500 characters')
+  await inspector.getByRole('button', { name: 'Inspect' }).click()
+  const blocks = inspector.getByRole('list', { name: 'Blocks' })
+  await expect(blocks.getByRole('listitem')).toHaveCount(2)
+  await expect(blocks.getByRole('listitem').first()).toContainText('Curated')
+  await expect(blocks.getByRole('listitem').nth(1)).toContainText(
+    '#2 · source-a · assistant · 00000000-000 · 2026-10-01',
+  )
+  await expect(inspector).toContainText('Warnings: lexical_budget_exhausted')
+  await inspector.getByLabel('Query').fill('nothing')
+  await inspector.getByRole('button', { name: 'Inspect' }).click()
+  await expect(inspector).toContainText('No evidence for this query.')
+})
+
 test('clips shows the funnel, intake, oldest waiting and doctor, no content', async ({
   page,
 }) => {

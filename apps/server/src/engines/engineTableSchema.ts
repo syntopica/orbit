@@ -1,14 +1,14 @@
 import { z } from 'zod'
 
 import { engineActionSchema } from './engineActionSchema'
-import { PAGE_ID_PLACEHOLDER } from './pageIdPlaceholder'
+import { isPlaceholder } from './isPlaceholder'
 
 // Per engine: the command (relative to the engine's checkout from the
 // instance config, or absolute), the argument lists orbit may run, and extra
-// environment variables beyond the allowlist (spec 5.3). `{pageId}` is the
-// only placeholder; any other `{...}` argument is refused.
+// environment variables beyond the allowlist (spec 5.3). `{pageId}` and
+// `{query}` are the only placeholders; any other `{...}` argument is refused.
 export const engineTableSchema = z.partialRecord(
-  z.enum(['brain', 'clips']),
+  z.enum(['atrium', 'brain', 'clips']),
   z
     .object({
       command: z.string().min(1),
@@ -19,9 +19,7 @@ export const engineTableSchema = z.partialRecord(
               z
                 .string()
                 .min(1)
-                .refine(
-                  (arg) => !/[{}]/.test(arg) || arg === PAGE_ID_PLACEHOLDER,
-                ),
+                .refine((arg) => !/[{}]/.test(arg) || isPlaceholder(arg)),
             )
             .min(1),
         )

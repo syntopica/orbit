@@ -35,6 +35,7 @@ describe('createApp static files', () => {
       catalog: null,
       worker: null,
       atrium: null,
+      atriumContext: null,
       clips: null,
       brain: null,
       workerActivity: null,

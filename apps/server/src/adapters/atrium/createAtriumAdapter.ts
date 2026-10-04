@@ -13,14 +13,11 @@ export const createAtriumAdapter = (deps: {
   timeoutMs: 5000,
   freshnessMs: deps.cadenceMs * 2,
   read: async (signal) => {
-    const { refresh, synthesis } = await readAtriumDocuments(
-      deps.statusDir,
-      signal,
-    )
+    const docs = await readAtriumDocuments(deps.statusDir, signal)
     const now = new Date()
     return {
       component: 'atrium',
-      ...summarizeAtrium(refresh, synthesis, deps.refreshIntervalMs, now),
+      ...summarizeAtrium(docs, deps.refreshIntervalMs, now),
       events: [],
       observedAt: now.toISOString(),
     }

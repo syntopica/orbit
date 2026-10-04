@@ -1,4 +1,4 @@
-import { PAGE_ID_PLACEHOLDER } from './pageIdPlaceholder'
+import { isPlaceholder } from './isPlaceholder'
 
 export const hasPlaceholder = (args: readonly string[]): boolean =>
-  args.includes(PAGE_ID_PLACEHOLDER)
+  args.some(isPlaceholder)

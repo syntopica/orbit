@@ -10,6 +10,17 @@ describe('engineTableSchema', () => {
     }
     expect(engineTableSchema.safeParse(table).success).toBe(true)
   })
+  it('accepts the query placeholder for the atrium engine', () => {
+    const table = {
+      atrium: {
+        command: 'bin/atrium',
+        subcommands: [
+          ['context', '--json', '--lane', 'words', '--', '{query}'],
+        ],
+      },
+    }
+    expect(engineTableSchema.safeParse(table).success).toBe(true)
+  })
   it('refuses any other placeholder', () => {
     for (const arg of [
       '{path}',
@@ -19,6 +30,8 @@ describe('engineTableSchema', () => {
       '{pageId',
       'pageId}',
       '{{pageId}}',
+      '{query}x',
+      '{Query}',
     ])
       expect(
         engineTableSchema.safeParse({

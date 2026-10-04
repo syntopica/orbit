@@ -35,6 +35,15 @@ const view: AtriumView = {
     failed: 0,
     deferred: 1,
   },
+  doctor: {
+    writtenAt: NOW - 120_000,
+    stale: false,
+    ok: true,
+    checks: [
+      { name: 'archive', ok: true, severity: 'ok', code: 'archive_fresh' },
+      { name: 'synthesis', ok: false, severity: 'warn', code: 'orphans' },
+    ],
+  },
 }
 const history: MetricHistory = {
   now: NOW,
@@ -47,7 +56,7 @@ const serve = (atrium: unknown, status = 200) => {
     'fetch',
     vi.fn(async (path: string) =>
       Promise.resolve(
-        path.startsWith('/api/atrium')
+        path === '/api/atrium'
           ? Response.json(atrium, { status })
           : Response.json(history),
       ),
@@ -79,19 +88,34 @@ describe('AtriumScreen', () => {
         name: 'Synthesized and deferred per bucket',
       }),
     ).toBeInTheDocument()
+    const doctor = screen.getByRole('region', { name: 'Doctor' })
+    expect(doctor).toHaveTextContent('synthesis [warn] orphans')
+    expect(doctor).not.toHaveTextContent('archive')
+    expect(doctor).toHaveTextContent('Published 2m ago.')
+    expect(
+      screen.getByRole('region', { name: 'Context inspector' }),
+    ).toBeInTheDocument()
     const results = await axe(container, {
       rules: { 'color-contrast': { enabled: false } },
     })
     expect(results.violations).toEqual([])
   })
   it('reports an absent pass and fully indexed populations', async () => {
-    serve({ ...view, synthesis: null, populations: [] })
+    serve({
+      ...view,
+      synthesis: null,
+      populations: [],
+      doctor: null,
+    })
     await renderAt('/atrium?range=7d')
     expect(
       await screen.findByText('No synthesis pass has been published yet.'),
     ).toBeInTheDocument()
     expect(
       screen.getByText('Every population is fully indexed.'),
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText('Atrium has not published a doctor result yet.'),
     ).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '7 days' })).toHaveAttribute(
       'aria-pressed',

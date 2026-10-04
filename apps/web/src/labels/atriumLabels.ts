@@ -25,4 +25,6 @@ export const ATRIUM_LABELS = {
   noPass: 'No synthesis pass has been published yet.',
   trend: 'Synthesized and deferred',
   trendChart: 'Synthesized and deferred per bucket',
+  doctor: 'Doctor',
+  noDoctor: 'Atrium has not published a doctor result yet.',
 } as const

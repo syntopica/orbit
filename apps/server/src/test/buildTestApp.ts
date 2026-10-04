@@ -18,6 +18,7 @@ export const buildTestApp = (overrides: Partial<AppDeps> = {}) => {
     catalog: null,
     stageLabels: new Map(),
     atrium: null,
+    atriumContext: null,
     clips: null,
     brain: null,
     worker: null,

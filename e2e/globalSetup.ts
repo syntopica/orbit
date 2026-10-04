@@ -32,7 +32,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
   await chmod(launchctl, 0o755)
   await chmod(brainAction, 0o755)
   const engineRoot = (name: string): string => join(E2E.root, 'engines', name)
-  for (const name of ['brain', 'clips']) {
+  for (const name of ['atrium', 'brain', 'clips']) {
     await mkdir(join(engineRoot(name), 'bin'), { recursive: true })
     const target = join(engineRoot(name), 'bin', name)
     await copyFile(join(E2E.fixtures, 'bin', `${name}.mjs`), target)
@@ -43,6 +43,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
     JSON.stringify({
       schemaVersion: 1,
       engines: {
+        atrium: { path: engineRoot('atrium') },
         brain: { path: engineRoot('brain') },
         clips: { path: engineRoot('clips') },
       },
@@ -89,6 +90,23 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       },
     }),
   )
+  await writeFile(
+    join(atriumStatusDir, 'doctor.json'),
+    JSON.stringify({
+      schemaVersion: 1,
+      ok: true,
+      writtenAt: ago(120_000),
+      checks: [
+        { name: 'archive', ok: true, severity: 'ok', code: 'archive_fresh' },
+        {
+          name: 'synthesis',
+          ok: false,
+          severity: 'warn',
+          code: 'synthesis_orphan_conversations',
+        },
+      ],
+    }),
+  )
   const workerToken = 'e2e-worker-token'
   const workerTokenFile = join(E2E.root, 'worker.token')
   await writeFile(workerTokenFile, workerToken, { mode: 0o600 })
@@ -121,6 +139,12 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       },
       atrium: { statusDir: atriumStatusDir },
       engines: {
+        atrium: {
+          command: 'bin/atrium',
+          subcommands: [
+            ['context', '--json', '--lane', 'words', '--', '{query}'],
+          ],
+        },
         brain: {
           command: brainAction,
           subcommands: [

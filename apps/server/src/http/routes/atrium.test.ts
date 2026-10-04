@@ -1,6 +1,7 @@
 import { atriumViewSchema } from '@orbit/contract'
 
 import { ProcessError } from '../../process/ProcessError'
+import { atriumDoctorDocument } from '../../test/atriumDoctorDocument'
 import { atriumRefreshDocument } from '../../test/atriumRefreshDocument'
 import { atriumSynthesisDocument } from '../../test/atriumSynthesisDocument'
 import { buildTestApp } from '../../test/buildTestApp'
@@ -17,6 +18,13 @@ const docs: AtriumDocuments = {
     ],
   }),
   synthesis: atriumSynthesisDocument({ producer: 'free text here' }),
+  doctor: atriumDoctorDocument({
+    checks: [
+      { name: 'archive', ok: true, severity: 'ok', code: 'archive_fresh' },
+      { name: 'bad name', ok: false, severity: 'broken', code: 'x' },
+      { name: 'refresh', ok: false, severity: 'warn', code: 'free text' },
+    ],
+  }),
 }
 const atriumWith = (read: () => Promise<AtriumDocuments>) => ({
   atrium: { read, refreshIntervalMs: 3_600_000 },
@@ -42,6 +50,21 @@ describe('GET /api/atrium', () => {
       producer: null,
       durationMs: 1_200_000,
     })
+    expect(view.doctor).toEqual({
+      writtenAt: Date.parse('2026-10-03T11:30:00Z'),
+      stale: false,
+      ok: false,
+      checks: [
+        { name: 'archive', ok: true, severity: 'ok', code: 'archive_fresh' },
+        { name: 'refresh', ok: false, severity: 'warn', code: null },
+      ],
+    })
+  })
+  it('answers a null doctor until atrium publishes one', async () => {
+    const res = await buildTestApp(
+      atriumWith(async () => Promise.resolve({ ...docs, doctor: null })),
+    ).get(ATRIUM)
+    expect(atriumViewSchema.parse(await res.json()).doctor).toBeNull()
   })
   it('answers a fixed 503 when atrium is not configured or unreadable', async () => {
     const off = await buildTestApp().get(ATRIUM)

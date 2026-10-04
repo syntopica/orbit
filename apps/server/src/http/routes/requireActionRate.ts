@@ -5,9 +5,9 @@ import type { OrbitEnv } from '../../types/OrbitEnv'
 import { actionRateAllowed } from './actionRateAllowed'
 
 export const requireActionRate =
-  (deps: AppDeps): MiddlewareHandler<OrbitEnv> =>
+  (deps: AppDeps, scope = 'action'): MiddlewareHandler<OrbitEnv> =>
   async (c, next) => {
-    if (!actionRateAllowed(deps, c))
+    if (!actionRateAllowed(deps, c, scope))
       return c.json({ error: 'rate_limited' }, 429)
     return next()
   }

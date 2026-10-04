@@ -3,6 +3,7 @@ import type { FlowStageId } from '@orbit/contract'
 import type { DatabaseSync } from 'node:sqlite'
 
 import type { ActionDeps } from './ActionDeps'
+import type { AtriumContextReader } from './AtriumContextReader'
 import type { AtriumDeps } from './AtriumDeps'
 import type { BrainReaders } from './BrainReaders'
 import type { ClipsReader } from './ClipsReader'
@@ -24,6 +25,7 @@ export type AppDeps = {
   readonly brain: BrainReaders | null
   readonly clips: ClipsReader | null
   readonly atrium: AtriumDeps | null
+  readonly atriumContext: AtriumContextReader | null
   readonly catalog: LaunchdCatalog | null
   readonly worker: WorkerReader | null
   readonly workerActivity: WorkerActivityReader | null

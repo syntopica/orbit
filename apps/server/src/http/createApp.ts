@@ -9,7 +9,6 @@ import { requireCsrfHeader } from './requireCsrfHeader'
 import { requireSameOrigin } from './requireSameOrigin'
 import { requireSession } from './requireSession'
 import { authBodyLimit } from './routes/authBodyLimit'
-import { getAtrium } from './routes/getAtrium'
 import { getClips } from './routes/getClips'
 import { getLaunchdHistory } from './routes/getLaunchdHistory'
 import { getLaunchdRows } from './routes/getLaunchdRows'
@@ -23,6 +22,7 @@ import { postPair } from './routes/postPair'
 import { postSession } from './routes/postSession'
 import { postStepUp } from './routes/postStepUp'
 import { registerActionRoutes } from './routes/registerActionRoutes'
+import { registerAtriumRoutes } from './routes/registerAtriumRoutes'
 import { registerBrainRoutes } from './routes/registerBrainRoutes'
 import { registerWorkerDetailRoutes } from './routes/registerWorkerDetailRoutes'
 import { registerWorkerJobRoutes } from './routes/registerWorkerJobRoutes'
@@ -63,7 +63,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   api.get('/history/metrics', getMetricHistory(deps.historyDb, deps.now))
   api.get('/clips', getClips(deps.clips, deps.hub, memoryPool, deps.now))
   api.get('/memory/flow', getMemoryFlow(deps, memoryPool))
-  api.get('/atrium', getAtrium(deps.atrium, memoryPool, deps.now))
+  registerAtriumRoutes(api, deps, memoryPool)
   api.get('/pending', getPending(deps, memoryPool))
   registerWorkerDetailRoutes(api, deps, workerPool)
   registerWorkerJobRoutes(api, deps, workerPool)

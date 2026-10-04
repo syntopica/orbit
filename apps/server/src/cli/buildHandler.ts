@@ -3,6 +3,7 @@ import { createApp } from '../http/createApp'
 import type { BuildHandlerArgs } from '../types/BuildHandlerArgs'
 import type { RequestHandler } from '../types/RequestHandler'
 import { buildActionDeps } from './buildActionDeps'
+import { buildAtriumContextReader } from './buildAtriumContextReader'
 import { buildAtriumReader } from './buildAtriumReader'
 import { buildBrainReaders } from './buildBrainReaders'
 import { buildClipsReader } from './buildClipsReader'
@@ -37,6 +38,10 @@ export const buildHandler = (
       config.cadenceMs.brain ?? 60_000,
     ),
     atrium: buildAtriumReader(config.atrium, config.cadenceMs.atrium ?? 60_000),
+    atriumContext: buildAtriumContextReader(
+      engines['atrium'],
+      config.engines.atrium !== undefined,
+    ),
     worker: buildWorkerReader(config.worker, fetch),
     workerActivity: buildWorkerActivityReader(config.worker, fetch),
     workerCosts: buildWorkerCostsReader(config.worker, fetch),

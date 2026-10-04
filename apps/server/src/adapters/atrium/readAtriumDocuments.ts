@@ -2,6 +2,7 @@ import { join } from 'node:path'
 
 import { ProcessError } from '../../process/ProcessError'
 import type { AtriumDocuments } from '../../types/AtriumDocuments'
+import { atriumDoctorSchema } from './atriumDoctorSchema'
 import { atriumRefreshSchema } from './atriumRefreshSchema'
 import { atriumSynthesisSchema } from './atriumSynthesisSchema'
 import { readStatusFile } from './readStatusFile'
@@ -22,5 +23,10 @@ export const readAtriumDocuments = async (
     atriumSynthesisSchema,
     signal,
   )
-  return { refresh, synthesis }
+  const doctor = await readStatusFile(
+    join(statusDir, 'doctor.json'),
+    atriumDoctorSchema,
+    signal,
+  )
+  return { refresh, synthesis, doctor }
 }

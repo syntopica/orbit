@@ -1,4 +1,5 @@
 import type { AtriumBodyProps } from '../../types/AtriumBodyProps'
+import { AtriumDoctorSection } from './AtriumDoctorSection'
 import { FreshnessCard } from './FreshnessCard'
 import { PopulationTable } from './PopulationTable'
 import { SourceBars } from './SourceBars'
@@ -12,5 +13,6 @@ export const AtriumBody = ({ view, model }: AtriumBodyProps) => (
     </div>
     <SynthesisSection view={view} model={model} />
     <PopulationTable populations={view.populations} />
+    <AtriumDoctorSection doctor={view.doctor} now={view.now} />
   </>
 )

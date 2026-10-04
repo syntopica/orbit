@@ -1,13 +1,10 @@
 import type { SnapshotCore } from '@orbit/contract'
-import type { z } from 'zod'
 
+import type { AtriumDocuments } from '../../types/AtriumDocuments'
 import { atriumHealth } from './atriumHealth'
-import type { atriumRefreshSchema } from './atriumRefreshSchema'
-import type { atriumSynthesisSchema } from './atriumSynthesisSchema'
 
 export const summarizeAtrium = (
-  refresh: z.infer<typeof atriumRefreshSchema>,
-  synthesis: z.infer<typeof atriumSynthesisSchema> | null,
+  { refresh, synthesis, doctor }: AtriumDocuments,
   refreshIntervalMs: number,
   now: Date,
 ): Pick<SnapshotCore, 'health' | 'metrics' | 'pending'> => {
@@ -31,7 +28,7 @@ export const summarizeAtrium = (
       { key: 'atrium.synth_failed', value: synthesis.lastPass.failed, at },
     )
   return {
-    health: atriumHealth(refresh.writtenAt, refreshIntervalMs, now),
+    health: atriumHealth(refresh.writtenAt, refreshIntervalMs, now, doctor),
     metrics,
     pending:
       notIndexed > 0

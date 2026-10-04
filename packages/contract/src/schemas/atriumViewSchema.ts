@@ -36,4 +36,20 @@ export const atriumViewSchema = z.object({
       deferred: countSchema,
     })
     .nullable(),
+  // doctor.json, or null until atrium publishes one; codes only (spec 4).
+  doctor: z
+    .object({
+      writtenAt: z.number(),
+      stale: z.boolean(),
+      ok: z.boolean(),
+      checks: z.array(
+        z.object({
+          name: identifierSchema,
+          ok: z.boolean(),
+          severity: z.enum(['ok', 'warn', 'broken']),
+          code: identifierSchema.nullable(),
+        }),
+      ),
+    })
+    .nullable(),
 })

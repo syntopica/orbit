@@ -24,7 +24,8 @@ describe('GET /api/memory/flow', () => {
     const res = await buildTestApp({
       historyDb,
       atrium: {
-        read: async () => Promise.resolve({ refresh, synthesis: null }),
+        read: async () =>
+          Promise.resolve({ refresh, synthesis: null, doctor: null }),
         refreshIntervalMs: 3_600_000,
       },
       stageLabels: new Map([['index' as const, 'com.example.refresh']]),

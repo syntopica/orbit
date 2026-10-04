@@ -3,6 +3,7 @@ import { formatDuration } from '../../formatters/formatDuration'
 import { useAtriumModel } from '../../hooks/useAtriumModel'
 import { ATRIUM_LABELS } from '../../labels/atriumLabels'
 import { AtriumBody } from './AtriumBody'
+import { ContextInspector } from './ContextInspector'
 
 export const AtriumScreen = () => {
   const model = useAtriumModel()
@@ -37,6 +38,7 @@ export const AtriumScreen = () => {
           <AtriumBody view={model.view} model={model} />
         </div>
       )}
+      <ContextInspector />
     </main>
   )
 }
