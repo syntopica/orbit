@@ -70,7 +70,7 @@ describe('job list metrics', () => {
       'State',
       'Privacy',
       'Model',
-      'Tokens',
+      'Tokens in → out',
       'Cost',
       'Duration',
       'Result',
@@ -78,12 +78,12 @@ describe('job list metrics', () => {
     ])
     const [first, second, third] = within(table).getAllByRole('row').slice(1)
     expect(first).toHaveTextContent('vendor/model:free')
-    expect(first).toHaveTextContent('1200 in · 300 out')
+    expect(first).toHaveTextContent('1200 → 300')
     expect(first).toHaveTextContent('$0.00')
     expect(first).toHaveTextContent('12.4s')
     expect(first).toHaveTextContent('succeeded')
     expect(second).toHaveTextContent('timeout')
-    expect(third).toHaveTextContent('— in · — out')
+    expect(third).toHaveTextContent('— → —')
     // Model, cost, duration and result are all unknown.
     expect(within(third as HTMLElement).getAllByText('—')).toHaveLength(4)
   })

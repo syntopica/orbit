@@ -7,6 +7,14 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Jobs table no longer cuts names to two letters. The table sizes
+  its columns to their content (no `table-fixed`), names and result wrap only at
+  their own width, numbers never wrap, tokens read `2525 → 267` under "Tokens in
+  → out", Cost shows only when a listed job has a cost (`hasJobCost`), producer
+  and privacy appear from the `xl` breakpoint, and cells use `px-2`. Evidence:
+  Orca screenshot at a 1083 px window, table scrollWidth 873 = clientWidth 873,
+  every column whole.
+
 - 2026-10-04 [x] Per-item clips in Pending and on the Clips screen. The clips
   engine (syntopica/clips `88d7544`) prints `items` with `status --json --items`
   from the same pass as the counts: a digest id (not the clip id), state, reason

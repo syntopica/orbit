@@ -27,11 +27,3 @@ This repository is public: entries describe engine behaviour only.
       labels (#828997 on #fcfcfe, 3.43); it passed 12 of 12 alone. Likely axe
       sampling mid theme transition. Next: wait for the computed colour to
       settle (or disable transitions) before axe in that spec.
-
-## Readability
-
-- [ ] Jobs table (`/worker/jobs`) at 1280-wide content truncates Queue,
-      Producer, Model and Result to two letters ("ve…", "qw…", "su…"), so the
-      list cannot say what each job is without opening it (Orca screenshot,
-      2026-10-04 20:46). Next: give those columns a min width or wrap them,
-      shorten Tokens to one line, and drop Cost when every row is "—".
