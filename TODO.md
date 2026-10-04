@@ -4,6 +4,18 @@ Active engine backlog. States: `[ ]` pending, `[~]` partial, `[!]` blocked,
 `[x]` verified complete, `[-]` obsolete. Closed items move to `TODO_LOG.md`.
 This repository is public: entries describe engine behaviour only.
 
+## Reads
+
+- [ ] Brain and clips adapter reads time out together every few minutes (25 s
+      timeout; ticker shows "went down: Read timed out" then "recovered"), and
+      the Clips screen can stay on "loading". Measured on 2026-10-04 with host
+      load 37-50: `clips status --json` 0.5-5.9 s,
+      `brain graph --json --no-html` 1.1-2.1 s, `brain graph --related` 0.8 s,
+      so a single command does not explain 25 s. Next: log per-read duration and
+      the phase that stalls (spawn, stdout drain, parse) for both adapters, and
+      check whether the Clips detail route's 10 s budget covers `clips status`
+      plus `clips doctor` run back to back.
+
 ## Memory (sub-project 1)
 
 - [ ] Atrium doctor panel (spec 7.4): needs atrium to publish its doctor result
