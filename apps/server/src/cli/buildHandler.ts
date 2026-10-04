@@ -50,6 +50,7 @@ export const buildHandler = (
     todoFiles: configuredTodoFiles(config),
     guard: {
       port,
+      remotePort: config.remotePort,
       allowedHosts: config.allowedHosts,
       allowedLogins: config.allowedLogins,
     },

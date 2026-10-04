@@ -58,4 +58,39 @@ describe('requireStepUp', () => {
     expect(refused.status).toBe(403)
     expect(await refused.json()).toEqual({ error: 'step_up_required' })
   })
+
+  it('exempts only the local listener, and only beside a remote port', async () => {
+    const test = buildTestApp({
+      guard: {
+        port: 8790,
+        remotePort: 8791,
+        allowedHosts: [],
+        allowedLogins: [],
+      },
+    })
+    const app = new Hono<OrbitEnv>()
+    app.post('/act', requireStepUp(test.deps), (c) => c.text('done'))
+    const post = async (localPort: number | undefined) =>
+      app.request(
+        'http://x/act',
+        { method: 'POST', headers: { Host: LOCAL, Cookie: test.cookie } },
+        localPort === undefined
+          ? undefined
+          : { incoming: { socket: { localPort } } },
+      )
+    expect((await post(8790)).status).toBe(200)
+    expect((await post(8791)).status).toBe(403)
+    expect((await post(undefined)).status).toBe(403)
+  })
+  it('exempts nothing without a remote port', async () => {
+    const test = buildTestApp()
+    const app = new Hono<OrbitEnv>()
+    app.post('/act', requireStepUp(test.deps), (c) => c.text('done'))
+    const response = await app.request(
+      'http://x/act',
+      { method: 'POST', headers: { Host: LOCAL, Cookie: test.cookie } },
+      { incoming: { socket: { localPort: test.deps.guard.port } } },
+    )
+    expect(response.status).toBe(403)
+  })
 })

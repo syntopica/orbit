@@ -5,7 +5,7 @@ import type { OrbitState } from '../types/OrbitState'
 import { assertWebRoot } from './assertWebRoot'
 import { buildHandler } from './buildHandler'
 import { buildScheduler } from './buildScheduler'
-import { listenLoopback } from './listenLoopback'
+import { listenOrbit } from './listenOrbit'
 import { startHistory } from './startHistory'
 
 // Resolves with the bound port once listening. Aborting the signal stops the
@@ -22,7 +22,7 @@ export const startServer = async (
   await assertWebRoot(options.webRoot)
   const hub = createServerHub()
   const poller = createPollerRegistry()
-  const { server, port } = await listenLoopback(state.config.port, (actual) =>
+  const { servers, port } = await listenOrbit(state.config, (actual) =>
     buildHandler(
       state,
       hub,
@@ -38,8 +38,10 @@ export const startServer = async (
   const stop = (): void => {
     stopScheduler()
     stopHistory()
-    server.close()
-    server.closeAllConnections()
+    for (const listening of servers) {
+      listening.close()
+      listening.closeAllConnections()
+    }
     state.close()
   }
   try {

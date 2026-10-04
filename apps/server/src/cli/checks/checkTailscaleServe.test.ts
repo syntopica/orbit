@@ -32,8 +32,15 @@ exit ${String(code)}`,
   }
 }
 
-const check = async (allowedHosts: string[]) => {
-  const state = await openTestState({ allowedHosts, port: 8790 }, env)
+const check = async (allowedHosts: string[], remotePort?: number) => {
+  const state = await openTestState(
+    {
+      allowedHosts,
+      port: 8790,
+      ...(remotePort === undefined ? {} : { remotePort }),
+    },
+    env,
+  )
   const result = await checkTailscaleServe(state)
   state.close()
   return result
@@ -88,5 +95,17 @@ describe('checkTailscaleServe', () => {
   it('warns when the tailscale CLI is absent', async () => {
     env = { PATH: '/nonexistent' }
     expect((await check([HOST])).level).toBe('warn')
+  })
+
+  it('expects Serve on the remote port when one is configured', async () => {
+    await fakeTailscale(web('/', 8791))
+    expect(await check([HOST], 8791)).toMatchObject({ level: 'ok' })
+  })
+
+  it('fails when Serve still targets the local port beside a remote port', async () => {
+    await fakeTailscale(web('/', 8790))
+    const result = await check([HOST], 8791)
+    expect(result.level).toBe('fail')
+    expect(result.detail).toContain('skips the action step-up')
   })
 })

@@ -40,11 +40,15 @@ review API), anything not listed in `orbit.json`.
 - **Step-up.** Every action also needs the admin token re-entered on that
   session within the last five minutes (`POST /api/session/step-up`, the same
   window as secret reveal); otherwise 403 `step_up_required`, and the
-  confirmation dialog asks for the token and retries. It applies to local and
-  remote sessions alike: Tailscale Serve also connects on loopback and the
-  `Host` header is the client's to choose, so neither tells a phone from the
-  machine itself. The worker job actions (`cancel`, `retry`, `ack`) follow the
-  same rule.
+  confirmation dialog asks for the token and retries. Tailscale Serve also
+  connects on loopback and the `Host` header is the client's to choose, so
+  neither tells a phone from the machine itself. The one exemption is the
+  listener: with `remotePort` set, orbit listens on that second loopback port
+  too, Serve is pointed at it, and requests whose socket arrived on `port`
+  (read from the connection, never a header) skip the step-up. Without
+  `remotePort` every session steps up. `orbit doctor` fails when Serve still
+  proxies to `port` beside a `remotePort`. The worker job actions (`cancel`,
+  `retry`, `ack`) follow the same rule.
 - **Single flight.** One run per action (or label) at a time; a second
   request while one runs answers 409 `already_running` with the start time.
 - **Rate limit.** 10 action requests per minute per session, counted like the

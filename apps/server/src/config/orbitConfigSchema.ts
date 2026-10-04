@@ -10,6 +10,7 @@ import { warningsConfigSchema } from './warningsConfigSchema'
 export const orbitConfigSchema = z
   .object({
     port: z.number().int().min(1024).max(65_535).default(8790),
+    remotePort: z.number().int().min(1024).max(65_535).optional(),
     allowedHosts: z.array(z.string().regex(/^[a-z0-9.-]{1,253}$/)).default([]),
     allowedLogins: z.array(z.string().min(3).max(254)).default([]),
     synthetic: z.boolean().default(false),
@@ -50,3 +51,7 @@ export const orbitConfigSchema = z
       .default({}),
   })
   .strict()
+  .refine((config) => config.remotePort !== config.port, {
+    message: 'remotePort must differ from port',
+    path: ['remotePort'],
+  })

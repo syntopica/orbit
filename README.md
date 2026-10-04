@@ -29,8 +29,15 @@ Remote access goes through Tailscale Serve only; orbit itself never leaves
 loopback:
 
 ```bash
-tailscale serve --bg --https=443 http://127.0.0.1:8790
+tailscale serve --bg --https=443 http://127.0.0.1:8791
 ```
+
+Set `"remotePort": 8791` in `orbit.json` for that: orbit then listens on both
+loopback ports, and only requests arriving on `port` (the machine itself) skip
+the admin-token step-up before a disruptive action. The listener is read from
+the socket, so a client cannot claim it. Without `remotePort`, point Serve at
+`port` and every session steps up; `orbit doctor` fails when Serve targets
+`port` while `remotePort` is set.
 
 Serve forwards the client's `Host` header unchanged (measured in
 `docs/measurements/2026-10-03-tailscale-serve.md`), so add the machine's tailnet
@@ -43,6 +50,7 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
 ```json
 {
   "port": 8790,
+  "remotePort": 8791,
   "allowedHosts": ["machine.example.ts.net"],
   "allowedLogins": ["you@example.com"],
   "worker": {

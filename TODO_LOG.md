@@ -7,6 +7,14 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Step-up exemption for the machine itself: `orbit.json`
+  `remotePort` makes orbit listen on a second loopback port for Tailscale Serve;
+  requests whose socket arrived on `port` skip the action step-up, requests on
+  `remotePort` and every request without one still step up. The listener is read
+  from the socket's local port, never a header. `orbit doctor` fails when Serve
+  proxies to `port` beside a `remotePort`. Evidence: `requireStepUp.test.ts`,
+  `startServer.remote.test.ts`, `checkTailscaleServe.test.ts`, server gate
+  green.
 - 2026-10-04 [x] Action outcomes survive a restart: runs live in the history
   database (`action_runs`, content-free, newest 50) and a run still `started` at
   startup becomes `interrupted`. Evidence: `createActionStore.restart.test.ts`,
