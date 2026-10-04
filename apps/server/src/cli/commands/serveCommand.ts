@@ -3,6 +3,7 @@ import { fileURLToPath } from 'node:url'
 
 import { resolveEngines } from '../../engines/resolveEngines'
 import { runProcess } from '../../process/runProcess'
+import { timedRunner } from '../../process/timedRunner'
 import type { CliIo } from '../../types/CliIo'
 import { openState } from '../openState'
 import { startServer } from '../startServer'
@@ -17,7 +18,7 @@ export const serveCommand = async (
   const { runners, failed } = await resolveEngines(
     state.config.engines,
     state.instance.engines,
-    runProcess,
+    timedRunner(runProcess, io.out),
   ).catch((error: unknown) => {
     state.close()
     throw error
