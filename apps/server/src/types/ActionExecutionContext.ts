@@ -9,4 +9,5 @@ export type ActionExecutionContext = {
   >
   readonly hub: Hub
   readonly now: () => number
+  readonly save: (run: ActionRun) => void
 }

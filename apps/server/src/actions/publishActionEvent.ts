@@ -1,10 +1,10 @@
-import type { ActionRun } from '../types/ActionRun'
 import type { Hub } from '../types/Hub'
+import type { LiveActionRun } from '../types/LiveActionRun'
 
 export const publishActionEvent = (
   hub: Hub,
   now: () => number,
-  run: ActionRun,
+  run: LiveActionRun,
   component: 'launchd' | 'brain' | 'clips',
 ): void => {
   hub.publishEvent({

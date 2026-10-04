@@ -3,7 +3,7 @@ export const ActionRunLink = ({
   state,
 }: {
   id: string | null
-  state: 'started' | 'succeeded' | 'failed' | undefined
+  state: 'started' | 'succeeded' | 'failed' | 'interrupted' | undefined
 }) => {
   if (id === null) return null
   const suffix = state === 'succeeded' || state === 'failed' ? '-complete' : ''

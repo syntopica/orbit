@@ -1,13 +1,14 @@
 import { eventSchema } from '@orbit/contract'
 
 import { createHub } from '../hub/createHub'
+import { openHistoryDb } from '../test/openHistoryDb'
 import { createActionStore } from './createActionStore'
 
 describe('createActionStore', () => {
   it('keeps the last 50 runs and publishes valid metadata only', async () => {
     const hub = createHub({ ringSize: 120, recentEvents: 120, firstId: 1 })
     let now = 1_790_000_000_000
-    const store = createActionStore(hub, () => now)
+    const store = createActionStore(hub, () => now, openHistoryDb())
     for (let index = 0; index < 51; index += 1) {
       const result = store.start({
         kind: 'refresh',
@@ -35,7 +36,11 @@ describe('createActionStore', () => {
   })
   it('refuses a second run and aborts active work on stop', async () => {
     const hub = createHub({ ringSize: 4, recentEvents: 4, firstId: 1 })
-    const store = createActionStore(hub, () => 1_790_000_000_000)
+    const store = createActionStore(
+      hub,
+      () => 1_790_000_000_000,
+      openHistoryDb(),
+    )
     let signal: AbortSignal | undefined
     const first = store.start({
       kind: 'run',

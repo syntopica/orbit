@@ -12,7 +12,7 @@ export const registerActionRoutes = (
   api: Hono<OrbitEnv>,
   deps: AppDeps,
 ): void => {
-  const store = createActionStore(deps.hub, deps.now)
+  const store = createActionStore(deps.hub, deps.now, deps.historyDb)
   deps.actionSignal?.addEventListener(
     'abort',
     () => {

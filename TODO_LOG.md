@@ -7,6 +7,10 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Action outcomes survive a restart: runs live in the history
+  database (`action_runs`, content-free, newest 50) and a run still `started` at
+  startup becomes `interrupted`. Evidence: `createActionStore.restart.test.ts`,
+  gate green.
 - 2026-10-04 [x] Action step-up: launchd run/restart, engine actions and worker
   cancel/retry/ack answer 403 `step_up_required` unless the admin token was
   re-entered on the session in the last five minutes; the confirmation dialogs

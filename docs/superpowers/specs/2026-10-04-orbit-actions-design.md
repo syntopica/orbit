@@ -53,7 +53,10 @@ review API), anything not listed in `orbit.json`.
   events `action.started`, `action.succeeded` or `action.failed` with
   `{ id, kind, target, exitCode, durationMs }` and nothing else: no stdout,
   no stderr (they may hold content; base 6.6). `GET /api/actions` lists the
-  last 50 runs with the same fields.
+  last 50 runs with the same fields. Runs are kept in the history database
+  (`action_runs`, the same content-free fields, newest 50), so they survive a
+  restart; at startup a run still `started` belonged to the previous process
+  and becomes `interrupted`.
 - Restarting orbit's own LaunchAgent is refused (400 `self`): the request
   would kill the process answering it.
 

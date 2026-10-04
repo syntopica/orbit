@@ -29,5 +29,3 @@ This repository is public: entries describe engine behaviour only.
       client cannot forge: point Tailscale Serve at a second loopback port and
       treat requests on it as remote (the `Host` header cannot be trusted for
       this).
-- [ ] 6. Action outcomes survive a restart: persist content-free run metadata
-      and mark interrupted runs at startup.
