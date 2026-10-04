@@ -7,6 +7,14 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Sub-project 2 (Worker), spec
+  `2026-10-04-orbit-worker-design.md`: Costs and Executors panels over
+  `/v1/costs` and `/v1/quality` (8590805); job browser, attempt waterfall,
+  content view with Reveal for personal and mail and a 5-minute admin-token
+  step-up for secret, 60 s auto-hide, cancel, retry and ack with confirmation
+  and audit events (72c4e5e); running attempts carry null token counts
+  (62e8f6c). Evidence: `pnpm gate` green (45 e2e); live: costs 63 rows, quality
+  43 executors, job detail 200, sensitive content without Reveal 403.
 - 2026-10-04 [x] Orbit polish: every 3D label has a leader line and anchor dot
   to its own sphere, placed away from neighbouring spheres; the light-theme core
   is a lit accent sphere; the Memory flow layout has no edge crossings (pure
