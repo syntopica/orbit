@@ -15,9 +15,17 @@ for (const colorScheme of ['dark', 'light'] as const) {
       }) => {
         await signIn(page)
         await page.goto('/worker/jobs')
+        const list = page.getByRole('region', { name: 'Job list' })
         await expect(
-          page.getByRole('region', { name: 'Job list' }),
-        ).toContainText('job-internal')
+          list.getByRole('link', { name: 'job-internal' }),
+        ).toBeVisible()
+        await page.getByRole('button', { name: 'Apply filters' }).click()
+        await expect(list.getByRole('status')).toHaveText(
+          '3 jobs, newest first',
+        )
+        expect(
+          await page.evaluate(() => document.documentElement.scrollWidth),
+        ).toBeLessThanOrEqual(width)
         expect((await new AxeBuilder({ page }).analyze()).violations).toEqual(
           [],
         )

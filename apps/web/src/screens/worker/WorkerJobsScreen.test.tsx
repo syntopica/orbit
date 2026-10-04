@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { axe } from 'vitest-axe'
 
@@ -37,6 +37,26 @@ describe('WorkerJobsScreen', () => {
     expect(
       await screen.findByRole('link', { name: 'job-1' }),
     ).toBeInTheDocument()
+    expect(
+      within(screen.getByRole('region', { name: 'Job list' })).getByRole(
+        'status',
+      ),
+    ).toHaveTextContent('1 job, newest first; older jobs on the next page')
+    const before = fetchMock.mock.calls.length
+    fireEvent.click(screen.getByRole('button', { name: 'Apply filters' }))
+    expect(
+      within(screen.getByRole('region', { name: 'Job list' })).getByRole(
+        'status',
+      ),
+    ).toHaveTextContent('Reading jobs…')
+    await waitFor(() => {
+      expect(
+        within(screen.getByRole('region', { name: 'Job list' })).getByRole(
+          'status',
+        ),
+      ).toHaveTextContent('1 job')
+    })
+    expect(fetchMock.mock.calls.length).toBeGreaterThan(before)
     fireEvent.change(screen.getByRole('textbox', { name: 'Queue' }), {
       target: { value: 'queue.a' },
     })

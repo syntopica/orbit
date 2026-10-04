@@ -16,7 +16,7 @@ export const WorkerJobsFilters = ({
         name="queue"
         key={model.filters.queue ?? ''}
         defaultValue={model.filters.queue ?? ''}
-        className="border-line bg-space text-ink mt-1 w-full rounded border p-2"
+        className="border-line bg-space text-ink mt-1 w-full rounded border p-2 text-base md:text-sm"
       />
     </label>
     <label className="text-sm">
@@ -26,7 +26,7 @@ export const WorkerJobsFilters = ({
         name="state"
         key={model.filters.state ?? ''}
         defaultValue={model.filters.state ?? ''}
-        className="border-line bg-space text-ink mt-1 w-full rounded border p-2"
+        className="border-line bg-space text-ink mt-1 w-full rounded border p-2 text-base md:text-sm"
       />
     </label>
     <label className="text-sm">
@@ -36,7 +36,7 @@ export const WorkerJobsFilters = ({
         name="producer"
         key={model.filters.producer ?? ''}
         defaultValue={model.filters.producer ?? ''}
-        className="border-line bg-space text-ink mt-1 w-full rounded border p-2"
+        className="border-line bg-space text-ink mt-1 w-full rounded border p-2 text-base md:text-sm"
       />
     </label>
     <button type="submit" className="bg-accent text-space self-end rounded p-2">
