@@ -7,11 +7,14 @@ import { ExecutorsSection } from './ExecutorsSection'
 import { FailureSection } from './FailureSection'
 import { NodeSection } from './NodeSection'
 import { QueueSection } from './QueueSection'
+import { RunningNowSection } from './RunningNowSection'
 
-// Queue state and failures first: they are what a visit is usually for.
+// What runs now, queue state and failures first: they are what a visit is
+// usually for.
 export const WorkerBody = ({ body, isPhone, activity }: WorkerBodyProps) => (
   <>
     <DiagnosisCard diagnosis={body.diagnosis} />
+    <RunningNowSection />
     <QueueSection
       active={body.activeQueues}
       idle={body.idleQueues}

@@ -31,7 +31,15 @@ export const startFakeWorker = async (
       const parts = url.pathname.split('/')
       const id = parts[4]
       const action = parts[5]
-      const ids = ['job-internal', 'job-secret', 'job-cancel']
+      const ids = ['job-internal', 'job-secret', 'job-cancel', 'job-running']
+      const stateOf = (item: string) =>
+        item === 'job-running'
+          ? 'running'
+          : item === 'job-cancel'
+            ? cancelled
+              ? 'cancelled'
+              : 'queued'
+            : 'failed'
       if (id && !ids.includes(id)) {
         response
           .writeHead(404, { 'Content-Type': 'application/json' })
@@ -44,27 +52,15 @@ export const startFakeWorker = async (
         request.method === 'POST'
       )
         cancelled = true
-      const row = fakeJob(
-        id ?? 'job-internal',
-        id === 'job-cancel' ? (cancelled ? 'cancelled' : 'queued') : 'failed',
-      )
+      const row = fakeJob(id ?? 'job-internal', stateOf(id ?? 'job-internal'))
+      const states = url.searchParams.get('state')?.split(',')
       const jobs = ids
-        .map((item) =>
-          fakeJob(
-            item,
-            item === 'job-cancel'
-              ? cancelled
-                ? 'cancelled'
-                : 'queued'
-              : 'failed',
-          ),
-        )
+        .map((item) => fakeJob(item, stateOf(item)))
         .filter(
           (item) =>
             (!url.searchParams.has('queue') ||
               item.queue === url.searchParams.get('queue')) &&
-            (!url.searchParams.has('state') ||
-              item.state === url.searchParams.get('state')) &&
+            (states === undefined || states.includes(item.state)) &&
             (!url.searchParams.has('producer') ||
               item.producer === url.searchParams.get('producer')),
         )
@@ -92,6 +88,20 @@ export const startFakeWorker = async (
                       ended: 1_790_000_002,
                       tokens_in: 2,
                       tokens_out: 3,
+                      wall_s: 1.5,
+                      cost_usd: 0,
+                    },
+                  ],
+                  results: [
+                    {
+                      result_id: 'result-demo',
+                      control: 'failed',
+                      detail: { error: 'timeout' },
+                      executor: null,
+                      usage: null,
+                      rating: null,
+                      created: 1_790_000_002,
+                      acked: null,
                     },
                   ],
                   has_input: true,

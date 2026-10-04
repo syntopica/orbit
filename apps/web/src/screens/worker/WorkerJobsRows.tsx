@@ -1,9 +1,10 @@
 import { formatJobCreated } from '../../formatters/formatJobCreated'
 import type { WorkerJobsTableProps } from '../../types/WorkerJobsTableProps'
 import { JobIdLink } from './JobIdLink'
+import { JobMetricsLine } from './JobMetricsLine'
 import { JobStateBadge } from './JobStateBadge'
 
-// Phones: two compact lines per job instead of a six-column table.
+// Phones: three compact lines per job instead of the wide table.
 export const WorkerJobsRows = ({ jobs }: WorkerJobsTableProps) => (
   <ul className="divide-line border-line bg-panel divide-y rounded-xl border text-sm">
     {jobs.map((job) => (
@@ -24,6 +25,7 @@ export const WorkerJobsRows = ({ jobs }: WorkerJobsTableProps) => (
             {formatJobCreated(job.createdAt)}
           </time>
         </div>
+        <JobMetricsLine job={job} />
       </li>
     ))}
   </ul>

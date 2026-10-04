@@ -3,6 +3,8 @@ import { Link } from '@tanstack/react-router'
 import { useWorkerJobScreen } from '../../hooks/useWorkerJobScreen'
 import { AttemptWaterfall } from './AttemptWaterfall'
 import { JobContentPanel } from './JobContentPanel'
+import { JobHeader } from './JobHeader'
+import { JobResultPanel } from './JobResultPanel'
 import { WorkerJobActions } from './WorkerJobActions'
 
 export const WorkerJobScreen = () => {
@@ -17,27 +19,9 @@ export const WorkerJobScreen = () => {
       {model.job.isError ? <p role="alert">Could not read job.</p> : null}
       {job ? (
         <>
-          <header className="space-y-2">
-            <h1 className="font-mono text-2xl font-semibold break-all">
-              {job.id}
-            </h1>
-            <p className="text-muted flex flex-wrap gap-x-4 text-sm">
-              <span>{job.queue}</span>
-              <span>{job.producer}</span>
-              <span>{job.state}</span>
-              <span>{job.privacy}</span>
-              <span>{job.tier}</span>
-            </p>
-            <p className="text-muted text-sm">
-              Created {new Date(job.createdAt).toLocaleString()} · Updated{' '}
-              {new Date(job.updatedAt).toLocaleString()} · {job.attempts}{' '}
-              attempts
-            </p>
-            {job.lastError ? (
-              <p className="text-warn font-mono text-sm">{job.lastError}</p>
-            ) : null}
-          </header>
+          <JobHeader job={job} />
           <AttemptWaterfall attempts={job.attemptDetails} />
+          <JobResultPanel job={job} />
           <JobContentPanel
             key={`${model.id ?? ''}-${String(model.revision)}`}
             job={job}

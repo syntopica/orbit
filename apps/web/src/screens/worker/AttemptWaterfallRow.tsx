@@ -1,7 +1,7 @@
 import type { WorkerJobDetail } from '@orbit/contract'
 
 import { formatAttemptSpan } from '../../formatters/formatAttemptSpan'
-import { formatAttemptTokens } from '../../formatters/formatAttemptTokens'
+import { formatAttemptUsage } from '../../formatters/formatAttemptUsage'
 
 export const AttemptWaterfallRow = ({
   attempt,
@@ -45,7 +45,7 @@ export const AttemptWaterfallRow = ({
       </div>
       <p className="text-muted mt-1">
         {formatAttemptSpan(attempt.startedAt, attempt.endedAt)} ·{' '}
-        {formatAttemptTokens(attempt.tokensIn, attempt.tokensOut)}
+        {formatAttemptUsage(attempt)}
       </p>
     </li>
   )

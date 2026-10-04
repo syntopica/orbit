@@ -1,4 +1,5 @@
 import type { useJobContentPanel } from '../../hooks/useJobContentPanel'
+import { JobContentPane } from './JobContentPane'
 
 export const RevealedJobContent = ({
   model,
@@ -18,14 +19,18 @@ export const RevealedJobContent = ({
       <p role="alert">Could not reveal content.</p>
     ) : null}
     {model.content.query.data ? (
-      <>
-        <button type="button" onClick={model.copy} className="ml-3 underline">
-          Copy
-        </button>
-        <pre className="bg-space overflow-x-auto rounded p-3 text-xs whitespace-pre-wrap">
-          {model.text}
-        </pre>
-      </>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <JobContentPane
+          title="Input"
+          text={model.inputText}
+          onCopy={model.copy}
+        />
+        <JobContentPane
+          title="Output"
+          text={model.outputText}
+          onCopy={model.copy}
+        />
+      </div>
     ) : null}
   </>
 )
