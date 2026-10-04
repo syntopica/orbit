@@ -14,4 +14,6 @@ export const REASON_LABELS: Record<ReasonCode, string> = {
   check_failed: 'Health check failed',
   permission_denied: 'Permission denied',
   backlog: 'Backlog past its limit',
+  pass_timeout: 'Last pass hit its time box',
+  pass_failed: 'Last pass failed',
 }
