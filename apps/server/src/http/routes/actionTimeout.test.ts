@@ -8,6 +8,8 @@ import { runProcess } from '../../process/runProcess'
 import { buildSteppedApp } from '../../test/buildSteppedApp'
 
 describe('engine action timeout', () => {
+  // A 3 s action budget: at host load ~50 the spawned node child needed more
+  // than 1 s to install its SIGTERM handler, so the marker never appeared.
   it('kills the action process group and reports no output', async () => {
     const dir = await mkdtemp(join(tmpdir(), 'orbit-action-'))
     try {
@@ -27,7 +29,7 @@ setInterval(() => {}, 1000)
             command,
             subcommands: [['status']],
             actions: {
-              rebuild: { args: ['action'], label: 'Rebuild', timeoutS: 1 },
+              rebuild: { args: ['action'], label: 'Rebuild', timeoutS: 3 },
             },
           },
         },
@@ -62,13 +64,13 @@ setInterval(() => {}, 1000)
             ).runs[0]?.state,
           ).toBe('failed')
         },
-        { timeout: 5000 },
+        { timeout: 10_000 },
       )
       await vi.waitFor(
         async () => {
           expect(await readFile(marker, 'utf8')).toBe('stopped')
         },
-        { timeout: 5000 },
+        { timeout: 10_000 },
       )
       expect(JSON.stringify(app.deps.hub.recentEvents())).not.toContain(
         'PRIVATE',
@@ -76,5 +78,5 @@ setInterval(() => {}, 1000)
     } finally {
       await rm(dir, { recursive: true, force: true })
     }
-  }, 10_000)
+  }, 25_000)
 })
