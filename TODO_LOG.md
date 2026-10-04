@@ -7,6 +7,11 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Tests under load: the web tests that hit vitest's 5 s limit are
+  CPU-bound jsdom route renders (slowest 1.2 s at load 28; the three that failed
+  take 0.1-0.6 s) and wait on no real timer or process, so the web suite's
+  `testTimeout` is 15 s; the server keeps 5 s. Evidence: verbose durations, gate
+  green.
 - 2026-10-04 [x] Detail pool bounded: TODO files and the clips aggregate are
   read outside the pool (they start no process), and at most 8 live requests
   wait for a slot; one more is refused `lagging` at once. Evidence:

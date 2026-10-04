@@ -32,8 +32,6 @@ This repository is public: entries describe engine behaviour only.
   orbit's queue; by hand `clips status` takes 0.6 s at load 15-23. Next: confirm
   the slow runs coincide with high load, then decide between a lighter status
   read in the engine and a measured per-engine budget.
-- [ ] 7. Tests under load: find what the 5 s vitest timeouts wait on and fix the
-      cause (fake clocks or targeted limits).
 - [ ] 5. Per-item clips waiting in Pending, with a content-safe item list from
       the clips engine.
 - [ ] 8. Backlog warnings: oldest waiting clip and blocked TODO count thresholds
