@@ -1,5 +1,6 @@
 import type { WorkerJobDetail } from '@orbit/contract'
 
+import { formatAttemptSpan } from '../../formatters/formatAttemptSpan'
 import { formatAttemptTokens } from '../../formatters/formatAttemptTokens'
 
 export const AttemptWaterfallRow = ({
@@ -34,11 +35,8 @@ export const AttemptWaterfallRow = ({
         className="bg-space relative mt-2 h-3 rounded"
       >
         <div
-          className={
-            attempt.outcome === 'succeeded'
-              ? 'bg-ok absolute h-3 rounded'
-              : 'bg-warn absolute h-3 rounded'
-          }
+          data-outcome={attempt.outcome ?? 'pending'}
+          className="bg-warn data-[outcome=pending]:bg-accent data-[outcome=succeeded]:bg-ok absolute h-3 rounded"
           style={{
             left: `${String(left)}%`,
             width: `${String(Math.min(width, 100 - left))}%`,
@@ -46,6 +44,7 @@ export const AttemptWaterfallRow = ({
         />
       </div>
       <p className="text-muted mt-1">
+        {formatAttemptSpan(attempt.startedAt, attempt.endedAt)} ·{' '}
         {formatAttemptTokens(attempt.tokensIn, attempt.tokensOut)}
       </p>
     </li>

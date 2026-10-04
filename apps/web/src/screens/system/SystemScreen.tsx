@@ -2,8 +2,9 @@ import { ConnectionIndicator } from '../../components/shell/ConnectionIndicator'
 import { HISTORY_RANGE_OPTIONS } from '../../heartbeat/historyRangeOptions'
 import { useSystemModel } from '../../hooks/useSystemModel'
 import { SYSTEM_LABELS } from '../../labels/systemLabels'
+import { groupRowsByComponent } from '../../selectors/groupRowsByComponent'
 import { HeartbeatLegend } from './HeartbeatLegend'
-import { LaunchdRowView } from './LaunchdRowView'
+import { LaunchdGroup } from './LaunchdGroup'
 import { RangePicker } from './RangePicker'
 
 export const SystemScreen = () => {
@@ -28,11 +29,9 @@ export const SystemScreen = () => {
       {model.rows !== null && model.rows.length > 0 ? (
         <HeartbeatLegend range={model.range} />
       ) : null}
-      <ul className="space-y-3">
-        {(model.rows ?? []).map((row) => (
-          <LaunchdRowView key={row.label} row={row} range={model.range} />
-        ))}
-      </ul>
+      {groupRowsByComponent(model.rows ?? []).map((group) => (
+        <LaunchdGroup key={group.component} group={group} range={model.range} />
+      ))}
     </main>
   )
 }

@@ -1,3 +1,4 @@
+import { formatCheckedAt } from '../../formatters/formatCheckedAt'
 import { CLIPS_LABELS } from '../../labels/clipsLabels'
 import { selectFunnel } from '../../selectors/selectFunnel'
 import type { ClipsBodyProps } from '../../types/ClipsBodyProps'
@@ -23,7 +24,7 @@ export const ClipsBody = ({ view, model }: ClipsBodyProps) => {
         range={model.range}
         setRange={model.setRange}
       />
-      <DoctorList doctor={view.doctor} />
+      <DoctorList doctor={view.doctor} note={formatCheckedAt(view.now)} />
     </>
   )
 }

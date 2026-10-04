@@ -13,5 +13,9 @@ export const useBrainChecks = (): BrainChecksState => {
     gcTime: 0,
     refetchOnWindowFocus: false,
   })
-  return { checks: query.data ?? null, failed: query.isError }
+  return {
+    checks: query.data ?? null,
+    failed: query.isError,
+    checkedAt: query.data === undefined ? null : query.dataUpdatedAt,
+  }
 }

@@ -1,3 +1,4 @@
+import { formatCheckedAt } from '../../formatters/formatCheckedAt'
 import { formatCount } from '../../formatters/formatCount'
 import { BRAIN_LABELS } from '../../labels/brainLabels'
 import { groupIssues } from '../../selectors/groupIssues'
@@ -5,7 +6,7 @@ import type { LintPanelProps } from '../../types/LintPanelProps'
 import { PageLink } from './PageLink'
 
 // D13: one disclosure per code; each page selects itself on the graph.
-export const LintPanel = ({ checks, search }: LintPanelProps) => {
+export const LintPanel = ({ checks, search, checkedAt }: LintPanelProps) => {
   const groups = groupIssues(checks.issues)
   return (
     <section
@@ -17,7 +18,10 @@ export const LintPanel = ({ checks, search }: LintPanelProps) => {
         <p className="text-warn">{BRAIN_LABELS.indexStale}</p>
       ) : null}
       {groups.length === 0 ? (
-        <p className="text-muted">{BRAIN_LABELS.lintNone}</p>
+        <p className="text-muted">
+          {BRAIN_LABELS.lintNone}
+          {checkedAt === null ? '' : ` ${formatCheckedAt(checkedAt)}`}
+        </p>
       ) : null}
       {groups.map((group) => (
         <details key={group.code}>

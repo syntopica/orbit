@@ -1,5 +1,6 @@
 import type { useWorkerJobActions } from '../../hooks/useWorkerJobActions'
 
+// Retry is the recovery and leads; acknowledge only clears the failure.
 export const JobActionButtons = ({
   model,
 }: {
@@ -19,7 +20,7 @@ export const JobActionButtons = ({
       <button
         type="button"
         onClick={model.selectRetry}
-        className="border-line rounded border px-3 py-2"
+        className="bg-accent text-space rounded px-3 py-2 font-semibold"
       >
         Retry job
       </button>
@@ -32,6 +33,15 @@ export const JobActionButtons = ({
       >
         Acknowledge job
       </button>
+    ) : null}
+    {model.ackable ? (
+      <p className="text-muted basis-full text-xs">
+        {model.retryable
+          ? 'Retry runs a new job with the same input and acknowledges this one. '
+          : ''}
+        Acknowledge removes this failure from the outstanding count and the
+        recent failures without running anything.
+      </p>
     ) : null}
   </div>
 )

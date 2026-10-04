@@ -9,5 +9,5 @@ export type DoctorListProps = {
       readonly severity?: 'ok' | 'warn' | 'broken'
     }[]
   }
-  readonly note?: string
+  readonly note?: string | undefined
 }
