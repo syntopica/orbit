@@ -6,6 +6,8 @@ export const CLIPS_LABELS = {
   loading: 'loading',
   unavailable: 'Could not read clips.',
   funnel: 'Funnel',
+  funnelHint:
+    'Clips in each stage now; bars compare stage sizes, not conversion.',
   funnelList: 'Funnel stages',
   captureLane: 'capture API',
   waiting: 'waiting',

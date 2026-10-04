@@ -36,10 +36,10 @@ This repository is public: entries describe engine behaviour only.
       shorter charts for flat series; legible time labels everywhere.
 - [~] Pending: two-line titles on phone and search first with the source chips
   folded are done; blocked-first group order is not.
-- [ ] System: a legend and start/end times on the history strips; group
-      services; actions visually below status.
-- [ ] Clips: funnel bars read as conversion; label them as counts or drop the
-      funnel shape; flag the oldest waiting age against a threshold.
+- [~] System: a shared legend (colours, bar span, time direction) is in;
+  grouping services and quieter actions are not.
+- [~] Clips: the funnel now says its bars compare stage sizes, not conversion;
+  flagging the oldest waiting age needs a threshold.
 - [~] Job detail: the reveal reads "Reveal content"; attempts as a labelled
   timeline and one primary recovery action are not done.
 - [ ] Empty and success states: add scope or a timestamp ("All checks pass" as

@@ -11,7 +11,10 @@ export const ClipsFunnel = ({ rows, capture, now }: ClipsFunnelProps) => {
       aria-label={CLIPS_LABELS.funnel}
       className="border-line bg-panel space-y-3 rounded-xl border p-4"
     >
-      <h2 className="text-lg font-semibold">{CLIPS_LABELS.funnel}</h2>
+      <div className="space-y-1">
+        <h2 className="text-lg font-semibold">{CLIPS_LABELS.funnel}</h2>
+        <p className="text-muted text-xs">{CLIPS_LABELS.funnelHint}</p>
+      </div>
       <ol aria-label={CLIPS_LABELS.funnelList} className="space-y-2 text-sm">
         {capture === null ? null : (
           <li className="flex flex-wrap justify-between gap-x-3">
