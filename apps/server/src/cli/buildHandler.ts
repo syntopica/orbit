@@ -17,7 +17,7 @@ import { buildWorkerReader } from './buildWorkerReader'
 
 // The HTTP application over the state, for the port the server really got.
 export const buildHandler = (
-  ...[state, hub, webRoot, port, engines, actionSignal]: BuildHandlerArgs
+  ...[state, hub, webRoot, port, engines, signal, poller]: BuildHandlerArgs
 ): RequestHandler => {
   const { config, historyDb } = state
   const catalog = buildLaunchdCatalog(state)
@@ -56,7 +56,8 @@ export const buildHandler = (
     webRoot,
     now: Date.now,
     actions: buildActionDeps(state, engines),
-    actionSignal,
+    actionSignal: signal,
+    poller,
   })
   return async (request, env) => app.fetch(request, env)
 }

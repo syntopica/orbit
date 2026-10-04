@@ -567,6 +567,16 @@ observations and runs, and the strip is built against that value, not the
 client clock. Clock skew, or the 60 s run-interval touch, therefore cannot push
 the newest bucket past the 90 s coverage slack and turn it `unknown`.
 
+**Orbit polling.** `GET /api/poller` (session-guarded) answers the server's
+`now` and one row per adapter loop: `running`, `lastAttemptAt`,
+`lastSuccessAt`, `lastDurationMs`, consecutive `failures` and `nextAt`, all
+kept in memory and none content-bearing. System lists them under "Orbit
+polling", each `reading`, `not read yet`, `late` (the planned tick is more than
+30 s past), `failing` (at least one failure in a row) or `ok`, so a stuck loop
+is told apart from a component that answers `down`. Each engine command also
+writes one log line with its subcommand name, duration, outcome and how many
+commands were running, never its later arguments.
+
 **Command palette.** A plain dialog around cmdk's `Command`, not
 `Command.Dialog`: Radix injects a runtime `<style>` element that the CSP
 (`default-src 'self'`) blocks. The dialog traps Tab and restores focus on

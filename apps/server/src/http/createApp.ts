@@ -15,6 +15,7 @@ import { getLaunchdRows } from './routes/getLaunchdRows'
 import { getMemoryFlow } from './routes/getMemoryFlow'
 import { getMetricHistory } from './routes/getMetricHistory'
 import { getPending } from './routes/getPending'
+import { getPoller } from './routes/getPoller'
 import { getSnapshots } from './routes/getSnapshots'
 import { getStream } from './routes/getStream'
 import { postLogout } from './routes/postLogout'
@@ -54,6 +55,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   api.post('/logout', postLogout(auth))
   api.post('/session/step-up', authBodyLimit(), postStepUp(auth))
   api.get('/snapshots', getSnapshots(deps.hub))
+  api.get('/poller', getPoller(deps.poller, deps.now))
   api.get('/stream', refuseHead(), getStream(deps.hub, deps.authDb, deps.now))
   api.get('/launchd', getLaunchdRows(deps.catalog, pool))
   api.get(

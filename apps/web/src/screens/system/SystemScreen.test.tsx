@@ -82,9 +82,12 @@ describe('SystemScreen', () => {
       vi.fn(async () => Promise.resolve(new Response(null, { status: 503 }))),
     )
     await renderAt('/system')
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      'Could not read the launchd catalog.',
-    )
+    expect(
+      await screen.findByText('Could not read the launchd catalog.'),
+    ).toHaveAttribute('role', 'alert')
+    expect(
+      await screen.findByText('Could not read the poll loops.'),
+    ).toHaveAttribute('role', 'alert')
   })
   it('shows history unavailable for one row when its history fails', async () => {
     vi.stubGlobal(

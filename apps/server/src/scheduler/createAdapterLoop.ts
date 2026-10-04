@@ -1,17 +1,20 @@
 import type { Adapter } from '../types/Adapter'
 import type { LoopHandle } from '../types/LoopHandle'
+import type { PollTracker } from '../types/PollTracker'
 import type { SnapshotSink } from '../types/SnapshotSink'
 import { backoffDelay } from './backoffDelay'
 import { createEmitter } from './createEmitter'
 import { createRecorder } from './createRecorder'
 import { guardedRead } from './guardedRead'
+import { noopTracker } from './noopTracker'
 
 export const createAdapterLoop = (
   adapter: Adapter,
   sink: SnapshotSink,
+  track: PollTracker = noopTracker,
 ): LoopHandle => {
   const emitter = createEmitter(adapter, sink)
-  const recorder = createRecorder(adapter, emitter)
+  const recorder = createRecorder(adapter, emitter, track)
   let running = false
   let generation = 0
   let next: NodeJS.Timeout | undefined
@@ -20,6 +23,7 @@ export const createAdapterLoop = (
   const current = (own: number): boolean => running && own === generation
   const readOnce = async (own: number): Promise<void> => {
     controller = new AbortController()
+    track.attempt()
     try {
       await guardedRead(adapter, emitter, controller, (result) => {
         if (current(own)) recorder.record(result)
@@ -28,11 +32,9 @@ export const createAdapterLoop = (
       return
     }
     if (!current(own)) return
-    next = setTimeout(
-      tick,
-      backoffDelay(adapter.cadenceMs, recorder.failures()),
-      own,
-    )
+    const delay = backoffDelay(adapter.cadenceMs, recorder.failures())
+    track.scheduled(delay)
+    next = setTimeout(tick, delay, own)
   }
 
   const tick = (own: number): void => void (inflight = readOnce(own))

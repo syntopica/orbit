@@ -5,6 +5,7 @@ import { SYSTEM_LABELS } from '../../labels/systemLabels'
 import { groupRowsByComponent } from '../../selectors/groupRowsByComponent'
 import { HeartbeatLegend } from './HeartbeatLegend'
 import { LaunchdGroup } from './LaunchdGroup'
+import { PollerSection } from './PollerSection'
 import { RangePicker } from './RangePicker'
 
 export const SystemScreen = () => {
@@ -32,6 +33,7 @@ export const SystemScreen = () => {
       {groupRowsByComponent(model.rows ?? []).map((group) => (
         <LaunchdGroup key={group.component} group={group} range={model.range} />
       ))}
+      <PollerSection />
     </main>
   )
 }

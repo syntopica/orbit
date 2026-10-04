@@ -1,4 +1,5 @@
 import { createServerHub } from '../hub/createServerHub'
+import { createPollerRegistry } from '../scheduler/createPollerRegistry'
 import type { EngineRunner } from '../types/EngineRunner'
 import type { OrbitState } from '../types/OrbitState'
 import { assertWebRoot } from './assertWebRoot'
@@ -20,6 +21,7 @@ export const startServer = async (
 ): Promise<{ port: number }> => {
   await assertWebRoot(options.webRoot)
   const hub = createServerHub()
+  const poller = createPollerRegistry()
   const { server, port } = await listenLoopback(state.config.port, (actual) =>
     buildHandler(
       state,
@@ -28,6 +30,7 @@ export const startServer = async (
       actual,
       options.engines,
       options.signal,
+      poller,
     ),
   )
   let stopScheduler = (): void => undefined
@@ -40,7 +43,7 @@ export const startServer = async (
     state.close()
   }
   try {
-    const scheduler = buildScheduler(state, hub, options.engines)
+    const scheduler = buildScheduler(state, hub, options.engines, poller)
     stopScheduler = () => {
       scheduler.stop()
     }

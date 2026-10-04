@@ -1,0 +1,15 @@
+export const POLLER_LABELS = {
+  title: 'Orbit polling',
+  failed: 'Could not read the poll loops.',
+  empty: 'No poll loops are running.',
+  ok: 'ok',
+  reading: 'reading',
+  failing: 'failing',
+  overdue: 'late',
+  waiting: 'not read yet',
+  lastSuccess: 'last success',
+  never: 'never',
+  took: 'took',
+  next: 'next in',
+  failedInARow: 'failed in a row',
+} as const

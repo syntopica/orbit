@@ -10,6 +10,7 @@ import type { ClipsReader } from './ClipsReader'
 import type { GuardConfig } from './GuardConfig'
 import type { Hub } from './Hub'
 import type { LaunchdCatalog } from './LaunchdCatalog'
+import type { PollerRegistry } from './PollerRegistry'
 import type { TodoFile } from './TodoFile'
 import type { WorkerActivityReader } from './WorkerActivityReader'
 import type { WorkerCostsReader } from './WorkerCostsReader'
@@ -38,4 +39,5 @@ export type AppDeps = {
   readonly now: () => number
   readonly actions?: ActionDeps
   readonly actionSignal?: AbortSignal | undefined
+  readonly poller?: PollerRegistry | undefined
 }
