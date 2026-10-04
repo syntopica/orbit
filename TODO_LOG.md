@@ -130,3 +130,9 @@ result and the evidence. Active work lives in `TODO.md`.
 - 2026-10-03 [x] `readPlistTemplate` stops at the workspace root
   (`pnpm-workspace.yaml`). Evidence: `readPlistTemplate.test.ts` "stops at the
   workspace root".
+- 2026-10-04 [x] The initial-route size budget covers the entry's static-import
+  closure: `.size-limit.mjs` reads the entry from the built `index.html` and
+  follows `from"./x.js"` and `import"./x.js"` edges (`size/entryClosure.mjs`),
+  leaving dynamic `import()` out. Evidence: a synthetic build gives entry,
+  shared and side-effect chunks without the lazy one; live 139.8 KB of 150 KB;
+  `pnpm gate` green.

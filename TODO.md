@@ -13,11 +13,6 @@ This repository is public: entries describe engine behaviour only.
 - [ ] Atrium context inspector (spec 7 item 4, 7.4): needs `schemaVersion` on
       `atrium context --json`, a benchmark against the budget, and an engine
       table form for one bounded free argument (spec 5.3, 500 characters).
-- [ ] size-limit measures only `index-*.js`, not the chunks the entry imports
-      statically: on 2026-10-04 the entry was 103.6 KB brotli while the initial
-      download (entry plus two shared chunks) was about the same 137 KB that a
-      later build put in the entry alone. Next: measure the entry with its
-      static-import closure so the 150 KB budget covers what loads.
 - [!] Web type coverage is 99.89 % (7772/7780, strict, tests excluded); spec 11
   says 100 %. The floor cannot be raised here: `baseline-type-coverage` reads
   the shared `TYPE_COVERAGE_THRESHOLD` (99) from `@syntopica/quality-config` and
