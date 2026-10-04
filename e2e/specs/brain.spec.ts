@@ -14,7 +14,7 @@ test('draws the brain graph and opens a page without its raw HTML', async ({
   await page.getByText('Show pages').click()
   await page.getByRole('button', { name: 'notes/a' }).click()
   await expect(page).toHaveURL(/page=notes%2Fa/)
-  const panel = page.getByRole('region', { name: 'Page' })
+  const panel = page.getByRole('region', { name: 'Page', exact: true })
   await expect(
     panel.getByRole('heading', { name: 'Fixture page A' }),
   ).toBeVisible()

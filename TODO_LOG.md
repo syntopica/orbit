@@ -7,6 +7,12 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Sub-project 4 (Remote), spec
+  `2026-10-04-orbit-remote-design.md`: phone bar with Orbit, Memory, Worker,
+  Pending and a More sheet (focus trapped, Escape closes), icons and untruncated
+  labels, web app manifest and touch icons without a service worker, safe-area
+  insets, focusable scrollers on wide tables. Evidence: `pnpm gate` green (54
+  e2e), screenshots at 375 px dark and light.
 - 2026-10-04 [x] Sub-project 3 (Pending), spec
   `2026-10-04-orbit-pending-design.md`: `/api/pending` and the `/pending` board
   over the TODO files in `pending.todoFiles`, brain lint, unacknowledged worker

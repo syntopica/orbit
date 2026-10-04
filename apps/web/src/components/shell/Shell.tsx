@@ -10,7 +10,7 @@ export const Shell = () => (
   <StreamProvider>
     <div className="min-h-dvh md:grid md:grid-cols-[9rem_1fr]">
       <NavRail />
-      <div className="p-4 pb-24 md:p-8">
+      <div className="min-w-0 p-4 pt-[calc(1rem+env(safe-area-inset-top))] pb-[calc(6rem+env(safe-area-inset-bottom))] md:p-8">
         <Outlet />
       </div>
       <TabBar />

@@ -21,12 +21,12 @@ export const WorkerJobsList = ({
             <Link
               to="/worker/jobs/$id"
               params={{ id: job.id }}
-              className="text-accent font-mono underline"
+              className="text-accent font-mono break-all underline"
             >
               {job.id}
             </Link>
             <div className="text-muted mt-1 flex flex-wrap gap-x-4 text-sm">
-              <span>{job.queue}</span>
+              <span className="break-all">{job.queue}</span>
               <span>{job.producer}</span>
               <span>{job.state}</span>
               <span>{job.privacy}</span>

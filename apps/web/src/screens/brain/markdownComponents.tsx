@@ -22,6 +22,16 @@ export const markdownComponents = (search: BrainSearch): Components => ({
     )
   },
   img: ({ alt }) => <span className="text-muted italic">{alt}</span>,
+  table: ({ children }) => (
+    <div
+      role="region"
+      aria-label="Page content table"
+      tabIndex={0}
+      className="max-w-full overflow-x-auto"
+    >
+      <table className="min-w-max">{children}</table>
+    </div>
+  ),
   h1: ({ children }) => <h3 className="text-lg font-semibold">{children}</h3>,
   h2: ({ children }) => <h4 className="font-semibold">{children}</h4>,
   h3: ({ children }) => <h5 className="font-semibold">{children}</h5>,

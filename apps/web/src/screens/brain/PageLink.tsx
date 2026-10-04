@@ -8,7 +8,7 @@ export const PageLink = ({ id, search }: PageLinkProps) => (
   <Link
     to="/brain"
     search={withPage(search, id)}
-    className="font-mono underline"
+    className="font-mono break-all underline"
   >
     {id}
   </Link>

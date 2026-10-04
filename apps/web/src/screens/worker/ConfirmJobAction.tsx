@@ -34,7 +34,7 @@ export const ConfirmJobAction = ({
           Confirm {action}
         </h2>
         <p>
-          {action} job <code>{id}</code>?
+          {action} job <code className="break-all">{id}</code>?
         </p>
         {model.error ? (
           <p role="alert">Action failed. Check the job state and try again.</p>

@@ -9,7 +9,12 @@ export const TrendTable = ({ model }: TrendTableProps) => (
     <summary className="text-muted cursor-pointer">
       {TREND_LABELS.showTable}
     </summary>
-    <div className="mt-2 overflow-x-auto">
+    <div
+      role="region"
+      aria-label="Trend table"
+      tabIndex={0}
+      className="mt-2 overflow-x-auto"
+    >
       <table className="w-full text-xs">
         <thead>
           <tr className="text-muted">

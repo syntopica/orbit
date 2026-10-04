@@ -12,7 +12,12 @@ export const ActivityTable = ({ columns }: ActivityTableProps) => (
     <summary className="text-muted cursor-pointer">
       {ACTIVITY_LABELS.showTable}
     </summary>
-    <div className="mt-2 overflow-x-auto">
+    <div
+      role="region"
+      aria-label="Activity table"
+      tabIndex={0}
+      className="mt-2 overflow-x-auto"
+    >
       <table className="w-full text-xs">
         <ActivityTableHead />
         <tbody className="divide-line divide-y tabular-nums">

@@ -15,7 +15,12 @@ export const PopulationTable = ({ populations }: PopulationTableProps) => {
       {missing.length === 0 ? (
         <p className="text-muted text-sm">{ATRIUM_LABELS.allIndexed}</p>
       ) : (
-        <div className="overflow-x-auto">
+        <div
+          role="region"
+          aria-label="Population table"
+          tabIndex={0}
+          className="overflow-x-auto"
+        >
           <table className="w-full text-sm tabular-nums">
             <PopulationHeaders />
             <tbody className="divide-line divide-y">

@@ -17,6 +17,8 @@ const makeWebRoot = async () => {
     '<!doctype html><title>orbit</title>',
   )
   await writeFile(join(webRoot, 'app.js'), 'console.log(1)')
+  await writeFile(join(webRoot, 'manifest.webmanifest'), '{"name":"orbit"}')
+  await writeFile(join(webRoot, 'icon-192.png'), Buffer.from([137, 80, 78, 71]))
   return webRoot
 }
 
@@ -50,6 +52,19 @@ describe('createApp static files', () => {
     const asset = await get('/app.js')
     expect(await asset.text()).toBe('console.log(1)')
     expect(asset.headers.get('content-type')).toContain('javascript')
+    const manifest = await get('/manifest.webmanifest')
+    expect(manifest.headers.get('content-type')).toContain(
+      'application/manifest+json',
+    )
+    expect(await manifest.json()).toEqual({ name: 'orbit' })
+    expect(manifest.headers.get('content-security-policy')).toContain(
+      "default-src 'self'",
+    )
+    const icon = await get('/icon-192.png')
+    expect(icon.headers.get('content-type')).toContain('image/png')
+    expect(new Uint8Array(await icon.arrayBuffer())).toEqual(
+      new Uint8Array([137, 80, 78, 71]),
+    )
     const page = await get('/system')
     expect(await page.text()).toContain('<title>orbit</title>')
     expect(page.headers.get('content-security-policy')).toContain(

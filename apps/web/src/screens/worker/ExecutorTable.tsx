@@ -4,7 +4,12 @@ import { ExecutorTableRow } from './ExecutorTableRow'
 export const ExecutorTable = ({ rows }: ExecutorListProps) => (
   <details className="text-sm">
     <summary className="text-muted cursor-pointer">Show table</summary>
-    <div className="mt-2 overflow-x-auto">
+    <div
+      role="region"
+      aria-label="Executor table"
+      tabIndex={0}
+      className="mt-2 overflow-x-auto"
+    >
       <table className="w-full text-left text-xs tabular-nums">
         <thead>
           <tr className="text-muted border-line border-b">

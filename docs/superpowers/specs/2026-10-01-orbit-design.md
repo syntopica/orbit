@@ -6,6 +6,10 @@ implementation of sub-project 0). Scope: sub-project 0 (Base) and sub-project 1
 
 ### Change log
 
+**Revision 13 (remote phone shell).** Five phone slots, the More sheet,
+installable static assets, safe-area layout and phone tests follow
+`2026-10-04-orbit-remote-design.md`.
+
 **Revision 5 (implementation of sub-project 0).** What building the Base
 decided differently from revision 4, applied in place in the sections named:
 
