@@ -64,10 +64,10 @@ one tab stop per chart.
 ### 3.1 Worker routes (admin)
 
 - `GET /v1/admin/jobs?queue=&state=&producer=&before=<cursor>&limit=` lists
-  jobs newest first, at most 100 per page: `id, queue, producer, state,
+  jobs newest first, at most 100 per page, as `{ jobs, next }`: `id, queue, producer, state,
   privacy, tier, created, updated, attempts, last_error, acked` and a
   `sampling` flag. No payload, no result.
-- `GET /v1/admin/jobs/{id}` returns the same fields plus the attempts
+- `GET /v1/admin/jobs/{id}` returns the same fields plus `attempt_details`
   (`node, provider, model, outcome, error, started, ended, tokens_in,
   tokens_out`) and whether an input and an output payload are still stored.
 - `GET /v1/admin/jobs/{id}/content` returns `{ input, output }` for a job of
@@ -76,8 +76,8 @@ one tab stop per chart.
   class, else 403 `reveal_required`. A payload already deleted is `null`, and
   a job whose payloads are both gone answers 410 `content_gone`.
 - Every content read of a sensitive class appends an audit row (job id,
-  class, time, principal) without content; `worker reveals --days N` lists
-  them.
+  class, time, principal) without content; `GET /v1/admin/audit?days=N`
+  and `worker audit --days N` list them, with the admin actions of 4.1.
 
 ### 3.2 orbit routes
 
@@ -121,8 +121,12 @@ outcome, with node, provider, model and error), and a Content panel.
   queue, producer, privacy, tier and input, a fresh id, `retry_of` set to
   the original. The original is acknowledged.
 - `POST /v1/admin/jobs/{id}/ack` acknowledges a failed or control result so it
-  leaves the producer's outstanding count and recent failures.
-- Each answers `{ id, state }` and records an audit row (action, job id,
+  leaves the producer's outstanding count and recent failures; a job with an
+  unacknowledged output answers 409 `not_ackable`, since that output is the
+  producer's to collect.
+- Each answers `{ id, state }` (retry adds `retry_of`, 201 when it created
+  the job, 200 when the same retry was already made: the new job's
+  idempotency key is `retry:<original id>`) and records an audit row (action, job id,
   principal, time).
 
 ### 4.2 orbit
