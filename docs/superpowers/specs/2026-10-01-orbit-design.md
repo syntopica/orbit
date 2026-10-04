@@ -46,6 +46,9 @@ five-minute session step-up, and confirmed worker actions follow sections 3
 and 4 of `2026-10-04-orbit-worker-design.md`; the worker-only write exception
 in that spec amends section 1.
 
+**Revision 12 (pending board).** The read-only Pending board, TODO sources,
+detail route and counts-only snapshot follow `2026-10-04-orbit-pending-design.md`.
+
 **Revision 8 (memory screens).** 7.4 (new): the detail routes
 `GET /api/history/metrics`, `GET /api/atrium`, `GET /api/clips` and
 `GET /api/memory/flow`; flow stages and edges as data with freshness sources;

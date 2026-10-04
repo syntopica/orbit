@@ -1,4 +1,5 @@
 import { createLaunchdCatalog } from '../adapters/launchd/createLaunchdCatalog'
+import { configuredTodoFiles } from '../config/configuredTodoFiles'
 import { recordLaunchdObservation } from '../history/recordLaunchdObservation'
 import { createApp } from '../http/createApp'
 import { runProcess } from '../process/runProcess'
@@ -19,14 +20,13 @@ export const buildHandler = (
   ...[state, hub, webRoot, port, engines]: BuildHandlerArgs
 ): RequestHandler => {
   const { config, historyDb } = state
-  const uid = process.getuid?.() ?? 0
   const launchd = config.launchd
   const catalog =
     launchd === undefined
       ? null
       : createLaunchdCatalog({
           ...launchd,
-          uid,
+          uid: process.getuid?.() ?? 0,
           cadenceMs: config.cadenceMs.launchd ?? 10_000,
           run: runProcess,
           record: (observation) => {
@@ -55,6 +55,7 @@ export const buildHandler = (
     workerCosts: buildWorkerCostsReader(config.worker, fetch),
     workerQuality: buildWorkerQualityReader(config.worker, fetch),
     workerJobs: buildWorkerJobClient(config.worker, fetch),
+    todoFiles: configuredTodoFiles(config),
     guard: {
       port,
       allowedHosts: config.allowedHosts,

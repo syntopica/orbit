@@ -7,5 +7,8 @@ export const PENDING_KEYS = [
   'clips.pending',
   'clips.needs_claude',
   'capture.undrained',
+  'pending.open',
+  'pending.partial',
+  'pending.blocked',
   'synthetic.items',
 ] as const

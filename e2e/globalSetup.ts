@@ -89,6 +89,16 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
   const worker = await startFakeWorker(workerToken)
   const plist = (label: string) =>
     join(E2E.fixtures, 'plists', `${label}.plist`)
+  const todoPath = join(E2E.root, 'TODO.md')
+  const secondTodoPath = join(E2E.root, 'SECOND-TODO.md')
+  await writeFile(
+    todoPath,
+    '## Example section\n- [!] Resolve placeholder item\n  Placeholder detail\n- [~] Review placeholder item\n- [ ] Open placeholder item\n',
+  )
+  await writeFile(
+    secondTodoPath,
+    '## Extra section\n- [ ] Another placeholder item\n',
+  )
   await writeFile(
     join(E2E.stateDir, 'orbit.json'),
     JSON.stringify({
@@ -97,6 +107,12 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       allowedHosts: ['orbit.example.ts.net'],
       allowedLogins: ['owner@example.com'],
       worker: { url: worker.url, tokenFile: workerTokenFile },
+      pending: {
+        todoFiles: [
+          { name: 'example', path: todoPath },
+          { name: 'extra', path: secondTodoPath },
+        ],
+      },
       atrium: { statusDir: atriumStatusDir },
       engines: {
         brain: {

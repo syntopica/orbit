@@ -19,6 +19,7 @@ for (const width of [375, 768, 1280]) {
         '/atrium',
         '/clips',
         '/worker',
+        '/pending',
         '/system',
         '/brain',
       ]) {

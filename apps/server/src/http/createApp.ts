@@ -15,6 +15,7 @@ import { getLaunchdHistory } from './routes/getLaunchdHistory'
 import { getLaunchdRows } from './routes/getLaunchdRows'
 import { getMemoryFlow } from './routes/getMemoryFlow'
 import { getMetricHistory } from './routes/getMetricHistory'
+import { getPending } from './routes/getPending'
 import { getSnapshots } from './routes/getSnapshots'
 import { getStream } from './routes/getStream'
 import { postLogout } from './routes/postLogout'
@@ -62,6 +63,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   api.get('/clips', getClips(deps.clips, deps.hub, memoryPool, deps.now))
   api.get('/memory/flow', getMemoryFlow(deps, memoryPool))
   api.get('/atrium', getAtrium(deps.atrium, memoryPool, deps.now))
+  api.get('/pending', getPending(deps, memoryPool))
   registerWorkerDetailRoutes(api, deps, workerPool)
   registerWorkerJobRoutes(api, deps, workerPool)
   registerBrainRoutes(api, deps.brain, memoryPool, deps.now)

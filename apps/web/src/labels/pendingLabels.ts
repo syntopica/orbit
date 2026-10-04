@@ -9,5 +9,8 @@ export const PENDING_LABELS: Record<Pending['key'], string> = {
   'clips.pending': 'clips pending',
   'clips.needs_claude': 'clips needing review',
   'capture.undrained': 'captures waiting',
+  'pending.open': 'open TODOs',
+  'pending.partial': 'partial TODOs',
+  'pending.blocked': 'blocked TODOs',
   'synthetic.items': 'probe items',
 }

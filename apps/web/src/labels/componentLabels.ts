@@ -7,5 +7,6 @@ export const COMPONENT_LABELS: Record<ComponentId, string> = {
   brain: 'Brain',
   clips: 'Clips',
   capture: 'Capture',
+  pending: 'Pending',
   synthetic: 'Synthetic probe',
 }

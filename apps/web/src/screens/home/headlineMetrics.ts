@@ -7,5 +7,6 @@ export const HEADLINE_METRICS: Partial<Record<ComponentId, Metric['key']>> = {
   brain: 'brain.lint_issues',
   clips: 'clips.pending',
   capture: 'capture.undrained',
+  pending: 'pending.blocked',
   synthetic: 'synthetic.value',
 }

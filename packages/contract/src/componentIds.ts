@@ -5,5 +5,6 @@ export const COMPONENT_IDS = [
   'brain',
   'clips',
   'capture',
+  'pending',
   'synthetic',
 ] as const

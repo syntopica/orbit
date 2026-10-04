@@ -54,6 +54,9 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
     "url": "https://capture.example",
     "tokenFile": "/path/to/instance/capture.token"
   },
+  "pending": {
+    "todoFiles": [{ "name": "project", "path": "/path/to/project/TODO.md" }]
+  },
   "engines": {
     "brain": {
       "command": "bin/brain",
@@ -84,7 +87,9 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
 ```
 
 `worker.url` and `capture.url` are origins: a path prefix is ignored, because
-requests are built as `/api/...` against the origin.
+requests are built as `/api/...` against the origin. `pending.todoFiles` is
+optional. Each entry has an identifier name and an absolute path; when absent,
+the Pending board has no TODO sources.
 
 ## Update
 

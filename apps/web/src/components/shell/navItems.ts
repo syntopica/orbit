@@ -7,5 +7,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { to: '/brain', label: 'Brain' },
   { to: '/clips', label: 'Clips' },
   { to: '/worker', label: 'Worker' },
+  { to: '/pending', label: 'Pending' },
   { to: '/system', label: 'System' },
 ]

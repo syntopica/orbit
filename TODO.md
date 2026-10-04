@@ -18,6 +18,9 @@ This repository is public: entries describe engine behaviour only.
       download (entry plus two shared chunks) was about the same 137 KB that a
       later build put in the entry alone. Next: measure the entry with its
       static-import closure so the 150 KB budget covers what loads.
+- [ ] Phone navigation holds eight screens since Pending joined; at 375 px the
+      bar truncates labels ("Mem…", "Pendi…"). Sub-project 4: group screens or
+      switch the phone bar to icons with labels on focus.
 - [!] Web type coverage is 99.89 % (7772/7780, strict, tests excluded); spec 11
   says 100 %. The floor cannot be raised here: `baseline-type-coverage` reads
   the shared `TYPE_COVERAGE_THRESHOLD` (99) from `@syntopica/quality-config` and

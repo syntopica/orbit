@@ -3,6 +3,7 @@ import { isAbsolute } from 'node:path'
 import { z } from 'zod'
 
 import { engineTableSchema } from '../engines/engineTableSchema'
+import { pendingConfigSchema } from './pendingConfigSchema'
 
 export const orbitConfigSchema = z
   .object({
@@ -52,6 +53,7 @@ export const orbitConfigSchema = z
       .strict()
       .optional(),
     engines: engineTableSchema.default({}),
+    pending: pendingConfigSchema.optional(),
     cadenceMs: z
       .partialRecord(z.enum(COMPONENT_IDS), z.number().int().min(1000))
       .default({}),

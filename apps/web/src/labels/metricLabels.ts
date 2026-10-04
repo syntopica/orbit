@@ -24,5 +24,8 @@ export const METRIC_LABELS: Record<Metric['key'], string> = {
   'clips.needs_claude': 'need review',
   'clips.intake_today': 'captured today',
   'capture.undrained': 'waiting',
+  'pending.open': 'open TODOs',
+  'pending.partial': 'partial TODOs',
+  'pending.blocked': 'blocked TODOs',
   'synthetic.value': 'value',
 }

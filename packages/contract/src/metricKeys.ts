@@ -22,5 +22,8 @@ export const METRIC_KEYS = [
   'clips.needs_claude',
   'clips.intake_today',
   'capture.undrained',
+  'pending.open',
+  'pending.partial',
+  'pending.blocked',
   'synthetic.value',
 ] as const

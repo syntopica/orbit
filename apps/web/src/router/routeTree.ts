@@ -5,6 +5,7 @@ import { homeRoute } from './homeRoute'
 import { loginRoute } from './loginRoute'
 import { memoryRoute } from './memoryRoute'
 import { pairRoute } from './pairRoute'
+import { pendingRoute } from './pendingRoute'
 import { rootRoute } from './rootRoute'
 import { shellRoute } from './shellRoute'
 import { systemRoute } from './systemRoute'
@@ -22,6 +23,7 @@ export const routeTree = rootRoute.addChildren([
     workerRoute,
     workerJobsRoute,
     workerJobRoute,
+    pendingRoute,
     systemRoute,
   ]),
   loginRoute,
