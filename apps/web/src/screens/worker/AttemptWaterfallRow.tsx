@@ -1,5 +1,7 @@
 import type { WorkerJobDetail } from '@orbit/contract'
 
+import { formatAttemptTokens } from '../../formatters/formatAttemptTokens'
+
 export const AttemptWaterfallRow = ({
   attempt,
   first,
@@ -44,7 +46,7 @@ export const AttemptWaterfallRow = ({
         />
       </div>
       <p className="text-muted mt-1">
-        {attempt.tokensIn} in · {attempt.tokensOut} out
+        {formatAttemptTokens(attempt.tokensIn, attempt.tokensOut)}
       </p>
     </li>
   )
