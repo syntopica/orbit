@@ -4,7 +4,7 @@ import { describe, expect, it } from 'vitest'
 import { dimColor } from '../charts/dimColor'
 import { edgePositions3d } from '../geometry/edgePositions3d'
 import { nodeRadius3d } from '../geometry/nodeRadius3d'
-import { SCENE_RADIUS_3D } from '../geometry/sceneRadius3d'
+import { sceneExtent3d } from '../geometry/sceneExtent3d'
 import { edgeHighlighter } from '../graph/edgeHighlighter'
 import { nodeHighlighter } from '../graph/nodeHighlighter'
 import { labelledNodes3d } from '../selectors/labelledNodes3d'
@@ -37,15 +37,13 @@ const distance = (a: readonly number[], b: readonly number[]) =>
   Math.hypot(...a.map((value, axis) => value - (b[axis] ?? 0)))
 
 describe('layoutScene3d', () => {
-  it('is deterministic, finite and fits the scene radius', () => {
+  it('is deterministic, finite and lifted off the plane', () => {
     const points = layoutScene3d(scene)
     expect(layoutScene3d(scene)).toEqual(points)
     const all = [...points.values()]
     expect(all.flat().every(Number.isFinite)).toBe(true)
-    expect(
-      Math.max(...all.map((point) => Math.hypot(...point))),
-    ).toBeLessThanOrEqual(SCENE_RADIUS_3D)
     expect(all.some((point) => point[2] !== 0)).toBe(true)
+    expect(sceneExtent3d(scene, points)).toBeGreaterThan(1)
   })
   it('keeps linked nodes closer than unlinked ones', () => {
     const points = layoutScene3d(scene)
@@ -110,23 +108,24 @@ describe('2D highlight reducers', () => {
       hidden: true,
     })
   })
-  it('keeps big spheres apart and inside the scene', () => {
+  it('keeps big spheres apart however close they start', () => {
     // Eleven community-sized spheres stacked near one point, as an opened
-    // overview group used to draw them.
+    // overview group used to draw them, plus one far outlier.
     const crowded: GraphScene = {
-      nodes: Array.from({ length: 11 }, (_, index) => ({
-        ...node(`c${String(index)}`, index * 0.01),
-        size: 23 - index,
-      })),
+      nodes: [
+        ...Array.from({ length: 11 }, (_, index) => ({
+          ...node(`c${String(index)}`, index * 0.01),
+          size: 23 - index,
+        })),
+        { ...node('far', 500), size: 23 },
+      ],
       edges: [],
     }
     const points = layoutScene3d(crowded)
-    const radius = (index: number) => nodeRadius3d(23 - index)
-    const at = [...points.values()]
+    const at = crowded.nodes.map((n) => points.get(n.id) ?? [0, 0, 0])
+    const radius = (index: number) =>
+      nodeRadius3d(crowded.nodes[index]?.size ?? 0)
     at.forEach((point, i) => {
-      expect(Math.hypot(...point) + radius(i)).toBeLessThanOrEqual(
-        SCENE_RADIUS_3D + 1e-6,
-      )
       for (let j = i + 1; j < at.length; j += 1)
         expect(distance(point, at[j] ?? [0, 0, 0])).toBeGreaterThanOrEqual(
           radius(i) + radius(j) - 1e-6,

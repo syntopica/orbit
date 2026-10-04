@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 
+import { sceneExtent3d } from '../geometry/sceneExtent3d'
 import { layoutScene3d } from '../layout/layoutScene3d'
 import { litNodes } from '../selectors/litNodes'
 import { sceneNeighbours } from '../selectors/sceneNeighbours'
@@ -23,5 +24,6 @@ export const useScene3d = (
     () => ({ scene, points, palette, lit }),
     [scene, points, palette, lit],
   )
-  return { part, hover: setHovered }
+  const extent = useMemo(() => sceneExtent3d(scene, points), [scene, points])
+  return { part, extent, hover: setHovered }
 }

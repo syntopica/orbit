@@ -8,9 +8,17 @@ export const SceneLabel3d = ({ text, color, position }: SceneLabel3dProps) => {
   return (
     <sprite
       position={[x, y, z]}
+      center={[0.5, 0]}
+      renderOrder={1}
       scale={[LABEL_HEIGHT_3D * label.aspect, LABEL_HEIGHT_3D, 1]}
     >
-      <spriteMaterial map={label.texture} transparent depthWrite={false} />
+      <spriteMaterial
+        map={label.texture}
+        transparent
+        depthWrite={false}
+        depthTest={false}
+        sizeAttenuation={false}
+      />
     </sprite>
   )
 }
