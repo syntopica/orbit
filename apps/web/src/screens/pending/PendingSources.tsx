@@ -1,4 +1,5 @@
 import type { usePendingBoard } from '../../hooks/usePendingBoard'
+import { sortSourcesByBlocked } from '../../selectors/sortSourcesByBlocked'
 import { PendingGroupToggle } from './PendingGroupToggle'
 import { PendingSourceIssues } from './PendingSourceIssues'
 import { PendingSourceSection } from './PendingSourceSection'
@@ -18,7 +19,7 @@ export const PendingSources = ({
       ) : (
         <PendingGroupToggle model={model} />
       )}
-      {data.sources.map((source) => (
+      {sortSourcesByBlocked(data.sources, model.items).map((source) => (
         <PendingSourceSection
           key={source.id}
           source={source}

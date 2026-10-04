@@ -170,3 +170,6 @@ result and the evidence. Active work lives in `TODO.md`.
 - 2026-10-04 [-] Design review "phone navigation covers content": not a defect;
   the page already pads `6rem` plus the safe area below the fixed tab bar, and
   the bar only appears mid-page in full-page screenshots.
+- 2026-10-04 [x] Design review, Pending: two-line titles on phone, search before
+  the filters with the source chips folded, sources with the most blocked items
+  first. Evidence: `sortSourcesByBlocked` test, `pnpm gate` green.

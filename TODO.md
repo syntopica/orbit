@@ -34,8 +34,6 @@ This repository is public: entries describe engine behaviour only.
       the graph.
 - [ ] Charts: current value and change over the range next to each chart;
       shorter charts for flat series; legible time labels everywhere.
-- [~] Pending: two-line titles on phone and search first with the source chips
-  folded are done; blocked-first group order is not.
 - [~] System: a shared legend (colours, bar span, time direction) is in;
   grouping services and quieter actions are not.
 - [~] Clips: the funnel now says its bars compare stage sizes, not conversion;
