@@ -43,6 +43,7 @@ export const ActionButton = ({
           confirm={model.confirm}
           error={model.error}
           sending={model.sending}
+          stepUp={model.stepUp}
         />
       ) : null}
     </span>

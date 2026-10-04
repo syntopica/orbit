@@ -1,4 +1,7 @@
+import { ConfirmDialogFrame } from '../../components/ConfirmDialogFrame'
+import { StepUpTokenForm } from '../../components/StepUpTokenForm'
 import { actionDescription } from '../../formatters/actionDescription'
+import type { StepUpPrompt } from '../../types/StepUpPrompt'
 import { ActionConfirmButtons } from './ActionConfirmButtons'
 
 export const ActionConfirmDialog = ({
@@ -8,6 +11,7 @@ export const ActionConfirmDialog = ({
   confirm,
   error,
   sending,
+  stepUp,
 }: {
   target: string
   action: string
@@ -15,39 +19,36 @@ export const ActionConfirmDialog = ({
   confirm: () => Promise<void>
   error: boolean
   sending: boolean
+  stepUp: StepUpPrompt
 }) => {
   return (
-    <div>
-      <button
-        type="button"
-        tabIndex={-1}
-        aria-label="Close confirmation"
-        onClick={close}
-        className="bg-space/70 fixed inset-0 z-40"
-      />
-      <dialog
-        open
-        aria-modal="true"
-        aria-labelledby="action-confirm-heading"
-        className="border-line bg-panel text-ink fixed inset-x-4 top-1/3 z-50 mx-auto max-w-md space-y-4 rounded-xl border p-5"
-      >
-        <h2 id="action-confirm-heading" className="text-lg font-semibold">
-          Confirm {action}
-        </h2>
-        <p>
-          {actionDescription(action)}:{' '}
-          <code className="break-all">{target}</code>?
-        </p>
-        {error ? (
-          <p role="alert">Action failed. Check its state and try again.</p>
-        ) : null}
+    <ConfirmDialogFrame
+      headingId="action-confirm-heading"
+      title={`Confirm ${action}`}
+      close={close}
+    >
+      <p>
+        {actionDescription(action)}: <code className="break-all">{target}</code>
+        ?
+      </p>
+      {error ? (
+        <p role="alert">Action failed. Check its state and try again.</p>
+      ) : null}
+      {stepUp.prompt ? (
+        <StepUpTokenForm
+          model={stepUp}
+          inputLabel="Admin token for this action"
+          submitLabel={`Confirm ${action}`}
+          onAccepted={() => void confirm()}
+        />
+      ) : (
         <ActionConfirmButtons
           action={action}
           close={close}
           confirm={confirm}
           sending={sending}
         />
-      </dialog>
-    </div>
+      )}
+    </ConfirmDialogFrame>
   )
 }

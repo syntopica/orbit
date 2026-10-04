@@ -1,8 +1,8 @@
 import type { WorkerJobDetail } from '@orbit/contract'
 
+import { StepUpTokenForm } from '../../components/StepUpTokenForm'
 import { useJobContentPanel } from '../../hooks/useJobContentPanel'
 import { RevealedJobContent } from './RevealedJobContent'
-import { SecretTokenForm } from './SecretTokenForm'
 
 export const JobContentPanel = ({ job }: { job: WorkerJobDetail }) => {
   const model = useJobContentPanel(job)
@@ -25,7 +25,13 @@ export const JobContentPanel = ({ job }: { job: WorkerJobDetail }) => {
             : 'Reveal content'}
         </button>
       ) : null}
-      {model.prompt ? <SecretTokenForm model={model} /> : null}
+      {model.prompt ? (
+        <StepUpTokenForm
+          model={model}
+          inputLabel="Admin token for reveal"
+          submitLabel="Reveal content"
+        />
+      ) : null}
       {model.content.open ? <RevealedJobContent model={model} /> : null}
     </section>
   )

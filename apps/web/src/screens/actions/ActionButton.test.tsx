@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
+import { requestUrl } from '../../test/requestUrl'
 import { ActionButton } from './ActionButton'
 
 describe('ActionButton', () => {
@@ -95,5 +96,47 @@ describe('ActionButton', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
     client.clear()
     vi.unstubAllGlobals()
+  })
+  it('asks for the admin token on step_up_required and retries the action', async () => {
+    let steppedUp = false
+    const request = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        await Promise.resolve()
+        const url = requestUrl(input)
+        if (url.endsWith('/session/step-up')) {
+          steppedUp = true
+          return new Response(null, { status: 204 })
+        }
+        if (init?.method === 'POST')
+          return steppedUp
+            ? Response.json({ id: 'run-2', state: 'started' }, { status: 202 })
+            : Response.json({ error: 'step_up_required' }, { status: 403 })
+        return Response.json({ runs: [] })
+      },
+    )
+    vi.stubGlobal('fetch', request)
+    const client = new QueryClient({
+      defaultOptions: { queries: { retry: false } },
+    })
+    render(
+      <QueryClientProvider client={client}>
+        <ActionButton
+          target="com.example.service"
+          action="restart"
+          label="Restart"
+          path="/api/launchd/com.example.service/restart"
+        />
+      </QueryClientProvider>,
+    )
+    fireEvent.click(screen.getByRole('button', { name: 'Restart' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm restart' }))
+    const input = await screen.findByLabelText('Admin token for this action')
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    fireEvent.change(input, { target: { value: 'token-value' } })
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm restart' }))
+    await waitFor(() =>
+      expect(screen.getByRole('link', { name: 'View run' })).toBeVisible(),
+    )
+    client.clear()
   })
 })

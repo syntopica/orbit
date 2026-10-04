@@ -1,5 +1,6 @@
 import { workerJobActionSchema } from '@orbit/contract'
 
+import { actionFailure } from './actionFailure'
 import { apiFetch } from './apiFetch'
 
 export const postWorkerJobAction = async (
@@ -10,6 +11,6 @@ export const postWorkerJobAction = async (
     `/api/worker/jobs/${encodeURIComponent(id)}/${action}`,
     { method: 'POST' },
   )
-  if (!response.ok) throw new Error(String(response.status))
+  if (!response.ok) throw await actionFailure(response)
   workerJobActionSchema.parse(await response.json())
 }

@@ -1,12 +1,16 @@
 import { useState, type SubmitEvent } from 'react'
 
 import { apiFetch } from '../api/apiFetch'
+import type { StepUpPrompt } from '../types/StepUpPrompt'
 
-export const useStepUpPrompt = (onSuccess: () => void) => {
+export const useStepUpPrompt = (onSuccess: () => void): StepUpPrompt => {
   const [token, setToken] = useState('')
   const [stepError, setStepError] = useState(false)
   const [prompt, setPrompt] = useState(false)
-  const submit = (event: SubmitEvent<HTMLFormElement>) => {
+  const submit = (
+    event: SubmitEvent<HTMLFormElement>,
+    accepted?: () => void,
+  ) => {
     event.preventDefault()
     const body = JSON.stringify({ token })
     setToken('')
@@ -20,6 +24,7 @@ export const useStepUpPrompt = (onSuccess: () => void) => {
         if (response.ok) {
           setPrompt(false)
           onSuccess()
+          accepted?.()
         }
       } catch {
         setStepError(true)

@@ -37,6 +37,12 @@ review API), anything not listed in `orbit.json`.
 - All require a session and the CSRF header (base 6.5). An unknown label,
   engine or action, or an action the label does not list, is 404 with a fixed
   body.
+- **Remote step-up.** A request whose `Host` is a published (tailnet) host
+  also needs the admin token re-entered on that session within the last five
+  minutes (`POST /api/session/step-up`, the same window as secret reveal);
+  otherwise 403 `step_up_required`, and the confirmation dialog asks for the
+  token and retries. Loopback requests, from the machine itself, skip it. The
+  worker job actions (`cancel`, `retry`, `ack`) follow the same rule.
 - **Single flight.** One run per action (or label) at a time; a second
   request while one runs answers 409 `already_running` with the start time.
 - **Rate limit.** 10 action requests per minute per session, counted like the

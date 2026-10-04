@@ -1,15 +1,26 @@
-import type { useJobContentPanel } from '../../hooks/useJobContentPanel'
+import type { StepUpPrompt } from '../types/StepUpPrompt'
 
-export const SecretTokenForm = ({
+export const StepUpTokenForm = ({
   model,
+  inputLabel,
+  submitLabel,
+  onAccepted,
 }: {
-  model: ReturnType<typeof useJobContentPanel>
+  model: StepUpPrompt
+  inputLabel: string
+  submitLabel: string
+  onAccepted?: () => void
 }) => (
-  <form onSubmit={model.submit} className="space-y-2">
+  <form
+    onSubmit={(event) => {
+      model.submit(event, onAccepted)
+    }}
+    className="space-y-2"
+  >
     <label className="block text-sm">
       Admin token
       <input
-        aria-label="Admin token for reveal"
+        aria-label={inputLabel}
         type="password"
         autoComplete="off"
         value={model.token}
@@ -25,7 +36,7 @@ export const SecretTokenForm = ({
       disabled={!model.token}
       className="bg-accent text-space rounded px-3 py-2"
     >
-      Reveal content
+      {submitLabel}
     </button>
     <button
       type="button"

@@ -7,6 +7,12 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Remote step-up: launchd run/restart, engine actions and worker
+  cancel/retry/ack reached through a published host answer 403
+  `step_up_required` unless the admin token was re-entered in the last five
+  minutes; the confirmation dialogs ask for it and retry. Loopback skips it.
+  Evidence: `requireRemoteStepUp.test.ts`, `ActionButton.test.tsx`,
+  `WorkerJobStepUp.test.tsx`, gate green.
 - 2026-10-04 [x] Backlog warnings: `orbit.json` `warnings.pendingBlocked` and
   `warnings.clipsOldestDays` turn a healthy pending or clips card `warn` with
   the new reason `backlog`; without them counts never warn. Replaces the blocked
