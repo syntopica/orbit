@@ -7,6 +7,12 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Sub-project 3 (Pending), spec
+  `2026-10-04-orbit-pending-design.md`: `/api/pending` and the `/pending` board
+  over the TODO files in `pending.todoFiles`, brain lint, unacknowledged worker
+  failures and clips counts, with URL filters, client-side search, plain-text
+  detail and source status (17d8601). Evidence: `pnpm gate` green (49 e2e);
+  live: 13 TODO files and 3 engine sources, 429 items.
 - 2026-10-04 [x] Sub-project 2 (Worker), spec
   `2026-10-04-orbit-worker-design.md`: Costs and Executors panels over
   `/v1/costs` and `/v1/quality` (8590805); job browser, attempt waterfall,
