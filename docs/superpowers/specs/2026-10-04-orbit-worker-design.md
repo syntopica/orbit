@@ -1,6 +1,6 @@
 # orbit sub-project 2 (Worker) - design
 
-Status: draft, revision 1. Scope: sub-project 2 of
+Status: draft, revision 2 (3.4 adds job metrics and running now). Scope: sub-project 2 of
 `2026-10-01-orbit-design.md` section 2: costs, executors, a job browser,
 results with a content view and `secret` reveal, and worker actions. Every
 rule of the base spec holds unless this one says otherwise; section numbers
@@ -109,6 +109,68 @@ outcome, with node, provider, model and error), and a Content panel.
   only garbage-collected.
 - Content is shown as plain text in a monospace block (JSON pretty-printed),
   never rendered as Markdown or HTML, with a copy button.
+
+### 3.4 Job metrics and running now (amendment 2026-10-04)
+
+The owner needs to see what is being processed now, and for each job its
+input, output, the tokens it spent and its result. The worker's amendment
+"admin job metrics and running-now filter" adds the metadata; nothing here
+relaxes 3.2's content rules.
+
+**Worker fields.** `state` on `GET /v1/admin/jobs` takes a comma-separated
+list. A row adds `kind, model` (requested), `priority, finished, deadline,
+lease_node, lease_expires, parent_id, preemptions`, the attempt sums
+`tokens_in, tokens_out, cost_usd, wall_s` and the newest attempt's
+`last_model, last_provider, last_started, last_outcome`. Each of
+`attempt_details` adds `wall_s` and `cost_usd`. The detail adds `results`:
+`result_id, control, detail, executor, usage, rating, created, acked`, never
+an output body.
+
+**orbit routes.** `GET /api/worker/jobs` accepts `state` as one identifier or
+a comma-separated list of at most 13, each an identifier, else 400. The
+contract adds to a job row `kind, model, priority, finishedAt, deadlineAt,
+leaseNode, leaseExpiresAt, parentId, preemptions, tokensIn, tokensOut,
+costUsd, wallMs, lastModel, lastProvider, lastStartedAt, lastOutcome`; to an
+attempt `wallMs, costUsd`; and to the detail `results`, each `{ resultId,
+control, error, schemaPath, node, provider, model, tokensIn, tokensOut,
+costUsd, rating, createdAt, ackedAt }`. Only the allowlisted `detail` keys
+(`error`, `schema_path`) and the `executor` and `usage` keys named here are
+read; anything else is stripped. Every new field is secondary: one that
+fails its rule (identifier, non-negative integer count, finite non-negative
+amount) is blanked to `null`, never the row. Backward compatibility: every
+new field is optional in the worker reports and in the contract, read as
+`null` (and `results` as `[]`), so an older worker or server still parses.
+
+**Screens.**
+
+- **Running now**, on the Worker screen under the diagnosis: the jobs in
+  `leased`, `running` or `draining`, read every 5 s from
+  `/api/worker/jobs?state=leased,running,draining&limit=100`. One row per job:
+  the job link, state, queue, elapsed time on the current attempt (from
+  `lastStartedAt`, else `updatedAt`, ticking every second), kind, model (the
+  newest attempt's, else the requested one), node and the tokens of earlier
+  attempts. A running attempt reports tokens only when it settles, so the
+  label says "Tokens so far". It is a list, not a table, at every width. An
+  unreadable list says so without hiding the rest of the screen.
+- **Job list** adds Model, Tokens (in and out), Cost, Duration (the sum of
+  attempt wall times) and Result (the newest attempt's error code, else its
+  outcome). Below the large breakpoint Producer and Privacy are hidden; the
+  phone list adds a third line with the same metrics. A cost of zero is
+  `$0.00`; an unknown value is a dash.
+- **Job detail** adds a summary under the header (kind, requested and
+  latest model, priority, node, lease expiry, deadline, finished,
+  preemptions, parent, and token, cost and run-time totals), each attempt's
+  run time and cost, and a **Result** pane listing each stored result's
+  outcome, error, schema path, executor, tokens, cost, rating and times. The
+  Result pane is metadata and needs no reveal. The Content panel keeps the
+  reveal, step-up, 60 s auto-hide and query removal of 3.3, and shows the
+  revealed payloads as two panes, **Input** and **Output**, each with its
+  own copy button and "Not stored." when that payload is gone.
+
+**Known gaps (worker).** OpenRouter routes accept `:free` endpoints only, so
+recorded cost is `0` until a paid rung exists; the task runners (codex, agy,
+cursor) record no tokens or cost, so their jobs show dashes. Both are tracked
+in the worker's TODO.
 
 ## 4. Worker actions (2c)
 
