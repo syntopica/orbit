@@ -1,8 +1,10 @@
 import type { PendingView } from '@orbit/contract'
 
 import { PENDING_STATE_TONES } from '../../labels/pendingStateTones'
+import { PendingPlainText } from './PendingPlainText'
 import { PendingRef } from './PendingRef'
 import { PendingTitle } from './PendingTitle'
+import { PendingTitleLinks } from './PendingTitleLinks'
 
 // One dense row: the state in a fixed first column so titles align, the
 // title cut by CSS and wrapped in full once the row is open.
@@ -23,9 +25,10 @@ export const PendingItemRow = ({
       </span>
     </summary>
     <div className="space-y-3 px-3 pb-3 md:pl-26">
+      <PendingTitleLinks title={item.title} />
       {item.detail ? (
         <pre className="text-muted font-sans text-sm wrap-break-word whitespace-pre-wrap">
-          {item.detail}
+          <PendingPlainText text={item.detail} />
         </pre>
       ) : null}
       <PendingRef item={item} />
