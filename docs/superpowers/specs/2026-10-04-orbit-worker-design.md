@@ -65,7 +65,7 @@ one tab stop per chart.
 
 - `GET /v1/admin/jobs?queue=&state=&producer=&before=<cursor>&limit=` lists
   jobs newest first, at most 100 per page, as `{ jobs, next }`: `id, queue, producer, state,
-  privacy, tier, created, updated, attempts, last_error, acked` and a
+  privacy, tier, created, updated, attempts, last_error, acked, retry_of` and a
   `sampling` flag. No payload, no result.
 - `GET /v1/admin/jobs/{id}` returns the same fields plus `attempt_details`
   (`node, provider, model, outcome, error, started, ended, tokens_in,
