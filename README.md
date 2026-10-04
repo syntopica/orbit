@@ -68,7 +68,12 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
   "engines": {
     "atrium": {
       "command": "bin/atrium",
-      "subcommands": [["context", "--json", "--lane", "words", "--", "{query}"]]
+      "subcommands": [
+        ["context", "--json", "--lane", "words", "--", "{query}"],
+        ["synthesis", "passes", "--json", "--limit", "20"],
+        ["synthesis", "recent", "--json", "--limit", "50", "--days", "14"],
+        ["synthesis", "show", "--json", "--job-key", "{jobKey}"]
+      ]
     },
     "brain": {
       "command": "bin/brain",
@@ -129,6 +134,13 @@ characters, no control characters) as one argument. orbit passes no `--project`,
 so a query searches across projects. The Atrium doctor panel needs no engine
 entry: it reads `doctor.json`, which `atrium doctor --publish` writes into
 `atrium.statusDir`.
+
+The three `synthesis` entries feed the Atrium screen's synthesis activity:
+`passes` is read at the atrium cadence for the last pass and its exit code,
+`recent` when the screen opens (held five minutes), and `show` only when a
+record's title and summary are revealed, with `{jobKey}` filled by a 32-hex job
+key. Without them the screen says the pass log or the registry could not be
+read.
 
 ## Update
 

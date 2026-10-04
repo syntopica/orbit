@@ -6,6 +6,13 @@ implementation of sub-project 0). Scope: sub-project 0 (Base) and sub-project 1
 
 ### Change log
 
+**Revision 16 (synthesis activity).** 4: atrium answers `synthesis passes`,
+`synthesis recent` and `synthesis show`, read from its tick log and the
+synthesis registry. 5.3: a third placeholder, `{jobKey}`. 7 item 4 and 7.4:
+the pass history, recent syntheses with tokens per day, and per-record content
+behind the `personal` reveal; a timed-out or failed last pass warns the atrium
+component.
+
 **Revision 15 (atrium doctor and context inspector).** 4: atrium publishes
 `doctor.json` at the end of its hourly refresh, and `atrium context --json`
 is versioned and measured on the words lane. 5.3: a second placeholder,
@@ -209,6 +216,9 @@ a file at the end of work it already does, and orbit reads the file.
 | atrium | `atrium/status/refresh.json`, written only by the refresh job at its end | records per source; archive, refresh and content ages; per-population registry/intended/indexed; `writtenAt` | written by a job that already runs; orbit reads a file |
 | atrium | `atrium/status/synthesis.json`, written only by the synthesis job at its end | last pass: synthesized, deferred, started, finished; `writtenAt` | same |
 | atrium | `atrium/status/doctor.json`, written by `atrium doctor --publish` at the end of the refresh job | checks `name`, `ok`, `severity`, `code`; `ok`; `writtenAt`; `schemaVersion` | `atrium doctor --json` takes minutes, so the refresh job publishes it; orbit reads a file |
+| atrium | `atrium synthesis passes --json --limit 20` | `schemaVersion`; every pass start and end from the wrapper's tick log (`synthesis.log`): lane, producer and model flags, start and end instants, `exitCode`, `state` (`ok`, `timeout` for 124, `killed` for 137, `failed`, `interrupted`, `running`), tallies; `unsuccessfulStreak`; counts-only progress of the running pass | `synthesis.json` is published only on a clean end, so a timed-out pass never reaches it; measured 0.13 s, so the atrium adapter reads it at the atrium cadence |
+| atrium | `atrium synthesis recent --json --limit 50 --days 14` | `schemaVersion`; registry record count; the newest records' metadata (job key, kind, source, conversation and episode ids, event count, session window, authored and written instants, requested and resolved model, input and output tokens, `durationMs`, map chunks, worker results, fact and open-end counts) and tokens per UTC day; never text | opens every record file of the window, measured 2-6 s on the full instance, so it is an on-demand detail call; `durationMs` exists only on records written after 2026-10-04 |
+| atrium | `atrium synthesis show --json --job-key <32 hex>` | one record's metadata plus `content` (`title`, `summary`, `facts`, `openEnds`); a missing key prints `error: not_found` and exits 1 | the only atrium call that returns synthesized text; run per reveal, never cached |
 | atrium | `atrium context --json --lane words -- <query>` | versioned contract with `schemaVersion`; evidence `text`, `trust`, `role`, `provider`, `conversation_id`, `note_path`, `authored_at`, `truncated`; `freshness.status`, `warnings`, `limit`, `max_chars`, `text_chars` | on-demand detail call; the words lane measured at most 1.8 s and 42 MB on the full instance, while the default lane needs 1.6 GB, so orbit always passes `--lane words` |
 | brain | `brain lint --json` | issues `page`, `code`; `indexStale` | benchmarked |
 | brain | `brain doctor --json` | checks `name`, `ok`, `code` | benchmarked |
@@ -312,11 +322,12 @@ An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, 
   whole entry, so the appended tail, such as `--skip credentials`, comes from
   `orbit.json` and never from the caller. The command is resolved once at start to an absolute path; a missing or
   non-executable file is `not_found`.
-- An argument in the table may be exactly `{pageId}` or `{query}`, the only
-  placeholders. The runner accepts a requested argument in a `{pageId}`
-  position only when it matches the page id pattern (section 7.5), and in a
-  `{query}` position only when it is already trimmed, 1 to 500 characters
-  long and free of control characters; any other `{...}` argument is a
+- An argument in the table may be exactly `{pageId}`, `{query}` or
+  `{jobKey}`, the only placeholders. The runner accepts a requested argument
+  in a `{pageId}` position only when it matches the page id pattern (section
+  7.5), in a `{query}` position only when it is already trimmed, 1 to 500
+  characters long and free of control characters, and in a `{jobKey}`
+  position only when it is 32 lowercase hex characters; any other `{...}` argument is a
   configuration error. `orbit doctor` skips entries that hold a placeholder.
 - `spawn` with `shell: false`, a fixed argument list, `detached: true` so the
   child leads its own process group; on timeout or abort the whole group gets
@@ -528,8 +539,9 @@ indicator (live, stale, offline), and a toast when a component turns `down`.
    plain-language explanation, its metrics, pending items and launchd label.
 4. **Atrium.** Records per source, index/archive/refresh freshness, synthesis
    trend (synthesized and deferred as sampled from the status file at each
-   read; a per-pass history needs a durable pass ledger in atrium and is out of
-   scope),
+   read), every pass end from atrium's tick log with its exit code, recent
+   syntheses with model, tokens, duration and result, tokens per day, and a
+   record's title and summary behind a reveal,
    populations not in the index, doctor checks, and a context inspector:
    a query box running `atrium context --json`, showing what a session would
    receive as labelled blocks with their sizes.
@@ -712,6 +724,39 @@ the index freshness and a warnings row; while it runs it says so, a failure
 shows a fixed message per code, and an empty result says no evidence was
 found. The result lives in component state only and is gone when the screen
 unmounts.
+
+**Synthesis activity.** `GET /api/atrium/passes` runs the `atrium` entry
+`synthesis passes --json --limit 20` under the detail pool (6 s, cached for
+the atrium cadence) and answers `{ now, lastPass, unsuccessfulStreak,
+progress, passes }`; lanes, producers and models are identifiers or `null`.
+The atrium adapter reads the same command at its own cadence: when the newest
+pass with an exit code ended `timeout` or `killed` the atrium component turns
+`warn` with `pass_timeout`, `failed` turns it `warn` with `pass_failed`, and
+a stale or down status still wins. The Synthesis card shows that pass with its
+exit code, the unsuccessful streak when it is above one, and the running
+pass's progress as counts.
+
+`GET /api/atrium/syntheses` runs `synthesis recent --json --limit 50 --days 14`
+under the detail pool (31 s) and is held five minutes in memory, because the
+read opens every record of the window; the screen fetches it when it opens and
+never polls. It answers `{ now, records, rows, daily }`: rows carry metadata
+only (a job key that is not 32 hex drops the row, a name that is not an
+identifier becomes `null`), and `daily` is input and output tokens and records
+per UTC day. The screen's Recent syntheses section shows the registry count,
+a stacked tokens-per-day chart (input under output, with a table fallback) and
+a table of time, source, model, tokens in and out, duration (or "not
+recorded") and result; each row opens a detail with the input by reference
+(conversation, episode and event count, or the session window), the requested
+and resolved model and the job key.
+
+`GET /api/atrium/syntheses/:jobKey/content` is the only route that returns
+synthesized text. The key must be 32 hex (otherwise 400 `bad_request`), the
+request must carry `X-Orbit-Reveal: personal` (otherwise 403
+`reveal_required`), and it runs `synthesis show --json --job-key {jobKey}`
+under the detail pool (6 s), never cached. Each reveal publishes
+`atrium.revealed` with the key and class only. The detail's reveal button
+fetches it, the text lives in the query cache only while revealed, and hiding
+it or closing the row removes it.
 
 **Clips.** `GET /api/clips` runs `clips status --json` and
 `clips doctor --json` through the engine table under the detail pool (10 s,
