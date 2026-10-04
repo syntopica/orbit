@@ -353,9 +353,6 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.170.41
         version: 1.170.41(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      '@visx/responsive':
-        specifier: ^4.0.0
-        version: 4.0.0(@types/react@19.3.0)(react@19.3.0)
       '@visx/scale':
         specifier: ^4.0.0
         version: 4.0.0
@@ -2622,15 +2619,6 @@ packages:
 
   '@visx/group@4.0.0':
     resolution: {integrity: sha512-HGAq8BCqn5x0t94CJOLJeKtWss9LFpF3HY69HbuO1PlR+B9c4aVT9xbjfudmU8wGQZLT6JNt+PJvxbO2aJ+1aA==}
-    peerDependencies:
-      '@types/react': ^18.0.0 || ^19.0.0
-      react: ^18.0.0 || ^19.0.0
-    peerDependenciesMeta:
-      '@types/react':
-        optional: true
-
-  '@visx/responsive@4.0.0':
-    resolution: {integrity: sha512-MGPK8AeiBIhzz34o9TNJIyUDQIdWEj5mt+U/Je4qVRRXpXSMhor1IE7v71czAS5b90OrFxC9L3w27AV+szG25w==}
     peerDependencies:
       '@types/react': ^18.0.0 || ^19.0.0
       react: ^18.0.0 || ^19.0.0
@@ -7250,12 +7238,6 @@ snapshots:
   '@visx/group@4.0.0(@types/react@19.3.0)(react@19.3.0)':
     dependencies:
       classnames: 2.5.1
-      react: 19.3.0
-    optionalDependencies:
-      '@types/react': 19.3.0
-
-  '@visx/responsive@4.0.0(@types/react@19.3.0)(react@19.3.0)':
-    dependencies:
       react: 19.3.0
     optionalDependencies:
       '@types/react': 19.3.0

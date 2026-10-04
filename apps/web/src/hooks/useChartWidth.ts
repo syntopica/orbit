@@ -1,13 +1,24 @@
-import { useParentSize } from '@visx/responsive'
+import { useCallback, useEffect, useState } from 'react'
 
-// The chart's own width; a first render before measuring uses 640 px, and the
-// SVG scales to its box either way, so nothing overflows meanwhile. The first
-// measurement applies at once; only later resizes are debounced.
+// The chart's own width, read when its box mounts and on every resize with
+// no timer in between, so a capture or a slow tab never keeps a stale size.
+// Before the first read it is 640 px; the SVG scales to its box meanwhile.
 export const useChartWidth = () => {
-  const { parentRef, width } = useParentSize({
-    initialSize: { width: 640 },
-    debounceTime: 50,
-    enableDebounceLeadingCall: true,
-  })
-  return { parentRef, width: width > 0 ? width : 640 }
+  const [node, setNode] = useState<HTMLDivElement | null>(null)
+  const [width, setWidth] = useState(640)
+  const parentRef = useCallback((element: HTMLDivElement | null) => {
+    setNode(element)
+    if (element && element.clientWidth > 0) setWidth(element.clientWidth)
+  }, [])
+  useEffect(() => {
+    if (!node || typeof ResizeObserver === 'undefined') return undefined
+    const observer = new ResizeObserver(() => {
+      if (node.clientWidth > 0) setWidth(node.clientWidth)
+    })
+    observer.observe(node)
+    return () => {
+      observer.disconnect()
+    }
+  }, [node])
+  return { parentRef, width }
 }
