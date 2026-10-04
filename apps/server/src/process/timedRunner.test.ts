@@ -26,6 +26,7 @@ describe('timedRunner', () => {
         }),
       (line) => lines.push(line),
       () => clock,
+      () => 42.25,
     )
     const first = run(request(['page', '--id', 'secret/page']))
     const second = run(request(['graph']))
@@ -34,8 +35,8 @@ describe('timedRunner', () => {
     release[1]?.()
     await second
     expect(lines).toEqual([
-      'engine-run brain page 250ms exit 0 concurrent=1',
-      'engine-run brain graph 500ms exit 0 concurrent=2',
+      'engine-run brain page 250ms exit 0 concurrent=1 load=42.3',
+      'engine-run brain graph 500ms exit 0 concurrent=2 load=42.3',
     ])
     expect(lines.join(' ')).not.toContain('secret')
   })
@@ -46,17 +47,19 @@ describe('timedRunner', () => {
       async () => Promise.reject(new ProcessError('timeout')),
       (line) => lines.push(line),
       () => 0,
+      () => 1,
     )
     await expect(run(request([]))).rejects.toThrow('timeout')
     const other = timedRunner(
       async () => Promise.reject(new Error('boom')),
       (line) => lines.push(line),
       () => 0,
+      () => 1,
     )
     await expect(other(request(['status']))).rejects.toThrow('boom')
     expect(lines).toEqual([
-      'engine-run brain - 0ms timeout concurrent=1',
-      'engine-run brain status 0ms error concurrent=1',
+      'engine-run brain - 0ms timeout concurrent=1 load=1.0',
+      'engine-run brain status 0ms error concurrent=1 load=1.0',
     ])
   })
 
@@ -68,7 +71,7 @@ describe('timedRunner', () => {
     )
     await run(request(['status']))
     expect(lines[0]).toMatch(
-      /^engine-run brain status \d+ms exit 3 concurrent=1$/u,
+      /^engine-run brain status \d+ms exit 3 concurrent=1 load=\d+\.\d$/u,
     )
   })
 })
