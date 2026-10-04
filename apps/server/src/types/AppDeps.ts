@@ -5,6 +5,7 @@ import type { DatabaseSync } from 'node:sqlite'
 import type { ActionDeps } from './ActionDeps'
 import type { AtriumContextReader } from './AtriumContextReader'
 import type { AtriumDeps } from './AtriumDeps'
+import type { AtriumSynthesisReaders } from './AtriumSynthesisReaders'
 import type { BrainReaders } from './BrainReaders'
 import type { ClipsDocuments } from './ClipsDocuments'
 import type { ClipsReader } from './ClipsReader'
@@ -31,6 +32,7 @@ export type AppDeps = {
   readonly clipsLatest?: (() => ClipsDocuments | null) | undefined
   readonly atrium: AtriumDeps | null
   readonly atriumContext: AtriumContextReader | null
+  readonly atriumSyntheses: AtriumSynthesisReaders | null
   readonly catalog: LaunchdCatalog | null
   readonly worker: WorkerReader | null
   readonly workerActivity: WorkerActivityReader | null

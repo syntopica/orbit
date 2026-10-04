@@ -1,12 +1,15 @@
 import type { SnapshotCore } from '@orbit/contract'
 
 import type { AtriumDocuments } from '../../types/AtriumDocuments'
+import type { AtriumPassesDocument } from '../../types/AtriumPassesDocument'
 import { atriumHealth } from './atriumHealth'
+import { synthesisPassHealth } from './synthesisPassHealth'
 
 export const summarizeAtrium = (
   { refresh, synthesis, doctor }: AtriumDocuments,
   refreshIntervalMs: number,
   now: Date,
+  passes: AtriumPassesDocument | null = null,
 ): Pick<SnapshotCore, 'health' | 'metrics' | 'pending'> => {
   const at = now.toISOString()
   const notIndexed = refresh.populations.reduce(
@@ -27,8 +30,11 @@ export const summarizeAtrium = (
       { key: 'atrium.synth_deferred', value: synthesis.lastPass.deferred, at },
       { key: 'atrium.synth_failed', value: synthesis.lastPass.failed, at },
     )
+  const health = atriumHealth(refresh.writtenAt, refreshIntervalMs, now, doctor)
   return {
-    health: atriumHealth(refresh.writtenAt, refreshIntervalMs, now, doctor),
+    // A pass that ended badly warns only when nothing worse already does.
+    health:
+      health.state === 'ok' ? (synthesisPassHealth(passes) ?? health) : health,
     metrics,
     pending:
       notIndexed > 0

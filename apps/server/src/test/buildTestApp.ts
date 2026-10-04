@@ -23,6 +23,7 @@ export const buildTestApp = (
     stageLabels: new Map(),
     atrium: null,
     atriumContext: null,
+    atriumSyntheses: null,
     clips: null,
     brain: null,
     worker: null,

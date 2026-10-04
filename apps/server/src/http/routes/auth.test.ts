@@ -20,6 +20,7 @@ const setup = () => {
     worker: null,
     atrium: null,
     atriumContext: null,
+    atriumSyntheses: null,
     clips: null,
     brain: null,
     workerActivity: null,

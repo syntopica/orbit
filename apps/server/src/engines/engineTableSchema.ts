@@ -6,8 +6,8 @@ import { isPlaceholder } from './isPlaceholder'
 // Per engine: the command (relative to the engine's checkout from the
 // instance config, or absolute), the argument lists orbit may run, and extra
 // environment variables beyond the allowlist (spec 5.3), and the timeout
-// each read gets unless its caller sets one. `{pageId}` and
-// `{query}` are the only placeholders; any other `{...}` argument is refused.
+// each read gets unless its caller sets one. `{pageId}`, `{query}` and
+// `{jobKey}` are the only placeholders; any other `{...}` argument is refused.
 export const engineTableSchema = z.partialRecord(
   z.enum(['atrium', 'brain', 'clips']),
   z
