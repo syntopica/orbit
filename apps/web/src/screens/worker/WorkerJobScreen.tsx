@@ -9,7 +9,7 @@ export const WorkerJobScreen = () => {
   const model = useWorkerJobScreen()
   const job = model.job.data
   return (
-    <main className="mx-auto max-w-5xl space-y-6">
+    <main className="mx-auto max-w-7xl space-y-6">
       <Link to="/worker/jobs" className="text-accent text-sm underline">
         ← Jobs
       </Link>

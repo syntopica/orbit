@@ -7,7 +7,7 @@ import { WorkerJobsList } from './WorkerJobsList'
 export const WorkerJobsScreen = () => {
   const model = useWorkerJobsScreen()
   return (
-    <main className="mx-auto max-w-5xl space-y-6">
+    <main className="mx-auto max-w-7xl space-y-6">
       <header className="space-y-2">
         <Link
           to="/worker"

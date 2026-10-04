@@ -5,7 +5,7 @@ import { PendingSources } from './PendingSources'
 export const PendingScreen = () => {
   const model = usePendingBoard()
   return (
-    <main className="mx-auto max-w-5xl space-y-6">
+    <main className="mx-auto max-w-7xl space-y-6">
       <header className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

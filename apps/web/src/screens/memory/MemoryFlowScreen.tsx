@@ -7,7 +7,7 @@ import { MemoryFlowBody } from './MemoryFlowBody'
 export const MemoryFlowScreen = () => {
   const model = useMemoryFlow()
   return (
-    <main className="mx-auto max-w-6xl space-y-6">
+    <main className="mx-auto max-w-7xl space-y-6">
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">
           {FLOW_LABELS.title}

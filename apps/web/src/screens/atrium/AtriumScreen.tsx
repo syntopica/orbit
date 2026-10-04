@@ -7,7 +7,7 @@ import { AtriumBody } from './AtriumBody'
 export const AtriumScreen = () => {
   const model = useAtriumModel()
   return (
-    <main className="mx-auto max-w-5xl space-y-6">
+    <main className="mx-auto max-w-7xl space-y-6">
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">
           {ATRIUM_LABELS.title}

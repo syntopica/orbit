@@ -9,7 +9,7 @@ export const WorkerScreen = () => {
   const model = useWorkerModel()
   const activity = useWorkerActivity()
   return (
-    <main className="mx-auto max-w-5xl space-y-8">
+    <main className="mx-auto max-w-7xl space-y-8">
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">
           {WORKER_LABELS.title}

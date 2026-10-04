@@ -31,7 +31,6 @@ test('engine action needs confirmation and reports failure', async ({
 }) => {
   await signIn(page)
   await page.goto('/brain')
-  await page.locator('summary').filter({ hasText: 'Actions' }).click()
   await page.getByRole('button', { name: 'Fail graph action' }).click()
   const dialog = page.getByRole('dialog', { name: 'Confirm fail' })
   await expect(dialog).toContainText('brain')

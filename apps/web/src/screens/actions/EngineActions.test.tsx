@@ -1,11 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { fireEvent, render, screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { EngineActions } from './EngineActions'
 
 describe('EngineActions', () => {
-  it('lists configured actions in a menu', async () => {
+  it('lists configured actions as buttons', async () => {
     vi.stubGlobal(
       'fetch',
       vi.fn(async () => {
@@ -31,12 +31,10 @@ describe('EngineActions', () => {
         <EngineActions engine="brain" />
       </QueryClientProvider>,
     )
-    const summary = await screen.findByText('Actions')
-    const menu = screen.getByRole('group')
-    expect(menu).not.toHaveAttribute('open')
-    fireEvent.click(summary)
-    expect(menu).toHaveAttribute('open')
-    expect(screen.getByRole('button', { name: 'Refresh graph' })).toBeVisible()
+    const group = await screen.findByRole('group', { name: 'Actions' })
+    expect(group).toContainElement(
+      screen.getByRole('button', { name: 'Refresh graph' }),
+    )
     client.clear()
     vi.unstubAllGlobals()
   })

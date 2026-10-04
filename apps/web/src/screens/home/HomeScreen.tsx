@@ -13,7 +13,7 @@ export const HomeScreen = () => {
   const model = useHomeModel()
   const orbit3d = useOrbitCapability(model.isPhone, model.animate)
   return (
-    <main className="mx-auto max-w-5xl space-y-8">
+    <main className="mx-auto max-w-7xl space-y-8">
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold tracking-tight">Orbit</h1>
         {model.isPhone ? <ConnectionIndicator /> : null}
