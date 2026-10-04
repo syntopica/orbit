@@ -54,8 +54,12 @@ detail route below, never in snapshots, events or logs.
   page id, a job id, or a route. `ageMs` is known for jobs and clips, `null`
   otherwise.
 
-Each source is read under the detail pool with its own 4 s abort; one slow or
-failing source answers `unavailable` without failing the others. At most 2000
+Each source is read with its own 4 s abort; one slow or failing source answers
+`unavailable` without failing the others. Only sources that run an engine
+command or call the worker (brain lint, worker failures) take a detail-pool
+slot; TODO files are local reads and the clips aggregate comes from the
+in-memory snapshot, so they never queue behind them. (Queuing every source
+behind two slots made the last ones time out from their enqueue deadline.) At most 2000
 items, blocked first, then partial, then by source.
 
 The snapshot of a new `pending` component carries counts only

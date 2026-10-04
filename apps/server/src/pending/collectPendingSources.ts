@@ -5,6 +5,7 @@ import { readBrainPending } from './readBrainPending'
 import { readClipsPending } from './readClipsPending'
 import { readTodoSource } from './readTodoSource'
 import { readWorkerPending } from './readWorkerPending'
+import { runLocalSource } from './runLocalSource'
 import { runPendingSource } from './runPendingSource'
 
 export const collectPendingSources = async (
@@ -14,8 +15,7 @@ export const collectPendingSources = async (
 ): Promise<PendingSourceResult[]> => {
   const tasks = (deps.todoFiles ?? []).map(
     async (file) =>
-      await runPendingSource(
-        pool,
+      await runLocalSource(
         async (signal) => await readTodoSource(file, signal),
         { id: `todo:${file.name}`, kind: 'todo', name: file.name },
       ),
@@ -40,8 +40,7 @@ export const collectPendingSources = async (
     )
   if (deps.clips !== null)
     tasks.push(
-      runPendingSource(
-        pool,
+      runLocalSource(
         () =>
           readClipsPending(
             deps.hub.snapshots().find((row) => row.component === 'clips'),
