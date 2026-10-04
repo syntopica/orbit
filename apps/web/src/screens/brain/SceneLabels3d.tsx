@@ -1,4 +1,4 @@
-import { NODE_SCALE_3D } from '../../geometry/nodeScale3d'
+import { nodeRadius3d } from '../../geometry/nodeRadius3d'
 import { labelledNodes3d } from '../../selectors/labelledNodes3d'
 import type { Scene3dPartProps } from '../../types/Scene3dPartProps'
 import { SceneLabel3d } from './SceneLabel3d'
@@ -17,7 +17,7 @@ export const SceneLabels3d = ({
         key={node.id}
         text={node.label}
         color={palette.ink}
-        position={[x, y + node.size * NODE_SCALE_3D + 0.5, z]}
+        position={[x, y + nodeRadius3d(node.size) + 0.5, z]}
       />
     )
   })

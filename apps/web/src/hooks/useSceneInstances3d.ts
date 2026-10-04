@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef } from 'react'
 import type { InstancedMesh } from 'three'
 import { Color, Matrix4 } from 'three'
 
-import { NODE_SCALE_3D } from '../geometry/nodeScale3d'
+import { nodeRadius3d } from '../geometry/nodeRadius3d'
 import type { Scene3dPartProps } from '../types/Scene3dPartProps'
 
 // One instanced sphere per node: placed and sized from the 3D layout,
@@ -25,7 +25,7 @@ export const useSceneInstances3d = ({
     const faded = new Color(palette.line)
     scene.nodes.forEach((node, index) => {
       const [x, y, z] = points.get(node.id) ?? [0, 0, 0]
-      const radius = node.size * NODE_SCALE_3D
+      const radius = nodeRadius3d(node.size)
       current.setMatrixAt(
         index,
         matrix.makeScale(radius, radius, radius).setPosition(x, y, z),

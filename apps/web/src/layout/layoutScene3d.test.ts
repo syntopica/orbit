@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { dimColor } from '../charts/dimColor'
 import { edgePositions3d } from '../geometry/edgePositions3d'
+import { nodeRadius3d } from '../geometry/nodeRadius3d'
 import { SCENE_RADIUS_3D } from '../geometry/sceneRadius3d'
 import { edgeHighlighter } from '../graph/edgeHighlighter'
 import { nodeHighlighter } from '../graph/nodeHighlighter'
@@ -41,9 +42,9 @@ describe('layoutScene3d', () => {
     expect(layoutScene3d(scene)).toEqual(points)
     const all = [...points.values()]
     expect(all.flat().every(Number.isFinite)).toBe(true)
-    expect(Math.max(...all.map((point) => Math.hypot(...point)))).toBeCloseTo(
-      SCENE_RADIUS_3D,
-    )
+    expect(
+      Math.max(...all.map((point) => Math.hypot(...point))),
+    ).toBeLessThanOrEqual(SCENE_RADIUS_3D)
     expect(all.some((point) => point[2] !== 0)).toBe(true)
   })
   it('keeps linked nodes closer than unlinked ones', () => {
@@ -107,6 +108,29 @@ describe('2D highlight reducers', () => {
     })
     expect(reduce(second ?? '', { color: '#line00', size: 1 })).toMatchObject({
       hidden: true,
+    })
+  })
+  it('keeps big spheres apart and inside the scene', () => {
+    // Eleven community-sized spheres stacked near one point, as an opened
+    // overview group used to draw them.
+    const crowded: GraphScene = {
+      nodes: Array.from({ length: 11 }, (_, index) => ({
+        ...node(`c${String(index)}`, index * 0.01),
+        size: 23 - index,
+      })),
+      edges: [],
+    }
+    const points = layoutScene3d(crowded)
+    const radius = (index: number) => nodeRadius3d(23 - index)
+    const at = [...points.values()]
+    at.forEach((point, i) => {
+      expect(Math.hypot(...point) + radius(i)).toBeLessThanOrEqual(
+        SCENE_RADIUS_3D + 1e-6,
+      )
+      for (let j = i + 1; j < at.length; j += 1)
+        expect(distance(point, at[j] ?? [0, 0, 0])).toBeGreaterThanOrEqual(
+          radius(i) + radius(j) - 1e-6,
+        )
     })
   })
 })
