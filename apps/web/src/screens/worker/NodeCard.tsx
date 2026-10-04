@@ -17,7 +17,7 @@ export const NodeCard = ({ node }: NodeCardProps) => (
         {NODE_STATE_LABELS[nodeState(node)]}
       </span>
     </div>
-    <dl className="text-muted grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-xs">
+    <dl className="text-muted grid grid-cols-[6.5rem_minmax(0,1fr)] gap-x-3 gap-y-1 text-xs">
       <dt>{WORKER_LABELS.idleFor}</dt>
       <dd>
         {node.idleMs === null

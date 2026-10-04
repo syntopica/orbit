@@ -14,10 +14,13 @@ export const CooldownSection = ({ cooldowns, now }: CooldownSectionProps) => (
     {cooldowns.length === 0 ? (
       <p className="text-muted text-sm">{WORKER_LABELS.noCooldowns}</p>
     ) : (
-      <ul className="divide-line border-line bg-panel divide-y rounded-xl border text-sm">
+      <ul className="divide-line border-line bg-panel grid grid-cols-[minmax(0,max-content)_1fr] divide-y rounded-xl border text-sm md:grid-cols-[minmax(0,max-content)_max-content_1fr]">
         {cooldowns.map((c) => (
-          <li key={c.runner} className="flex flex-wrap gap-x-3 px-3 py-2">
-            <code className="font-mono">{c.runner}</code>
+          <li
+            key={c.runner}
+            className="col-span-full grid grid-cols-subgrid gap-x-4 px-3 py-2"
+          >
+            <code className="font-mono break-all">{c.runner}</code>
             <span>
               {WORKER_LABELS.availableIn} {formatSpan(c.availableAt - now)}
             </span>

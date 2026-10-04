@@ -22,6 +22,10 @@ export const WorkerBody = ({ body, isPhone, activity }: WorkerBodyProps) => (
     <NodeSection nodes={body.view.nodes} />
     <FailureSection groups={body.failures} activity={activity} />
     <CostsSection />
-    <ExecutorsSection cooldowns={body.view.cooldowns} now={body.view.now} />
+    <ExecutorsSection
+      cooldowns={body.view.cooldowns}
+      now={body.view.now}
+      isPhone={isPhone}
+    />
   </>
 )

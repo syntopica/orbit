@@ -1,6 +1,7 @@
 import { ACTIVITY_FILLS } from '../../charts/activityFills'
 import { ACTIVITY_KEYS } from '../../charts/activityKeys'
 import { formatCostSummary } from '../../formatters/formatCostSummary'
+import { isCostEmpty } from '../../selectors/isCostEmpty'
 import { selectCostColumns } from '../../selectors/selectCostColumns'
 import { selectCostTableRows } from '../../selectors/selectCostTableRows'
 import { selectCostTotals } from '../../selectors/selectCostTotals'
@@ -27,16 +28,22 @@ export const CostsPanel = ({ view, range, stale }: CostsPanelProps) => {
       <CostStats totals={selectCostTotals(view.rows)} />
       <div className="border-line bg-panel space-y-3 rounded-xl border p-4">
         <p className="text-sm">Cost per day by provider</p>
-        <ChartLegend keys={keys} swatches={ACTIVITY_KEYS} />
-        <StackedColumns
-          columns={columns}
-          bucketMs={86_400_000}
-          fills={ACTIVITY_FILLS}
-          label="Cost per day by provider"
-          height={180}
-          describe={formatCostSummary}
-          renderTooltip={(column) => <CostTooltip column={column} />}
-        />
+        {isCostEmpty(columns) ? (
+          <p className="text-muted text-sm">No spend in this range.</p>
+        ) : (
+          <>
+            <ChartLegend keys={keys} swatches={ACTIVITY_KEYS} />
+            <StackedColumns
+              columns={columns}
+              bucketMs={86_400_000}
+              fills={ACTIVITY_FILLS}
+              label="Cost per day by provider"
+              height={180}
+              describe={formatCostSummary}
+              renderTooltip={(column) => <CostTooltip column={column} />}
+            />
+          </>
+        )}
         <CostsTable
           rows={selectCostTableRows(view.rows)}
           dailyRows={selectDailyCostRows(view.rows)}

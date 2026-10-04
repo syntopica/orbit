@@ -1,10 +1,13 @@
 import { useWorkerQuality } from '../../hooks/useWorkerQuality'
 import { selectExecutors } from '../../selectors/selectExecutors'
 import type { ExecutorsSectionProps } from '../../types/ExecutorsSectionProps'
-import { ExecutorList } from './ExecutorList'
-import { ExecutorTable } from './ExecutorTable'
+import { ExecutorResults } from './ExecutorResults'
 
-export const ExecutorsSection = ({ cooldowns, now }: ExecutorsSectionProps) => {
+export const ExecutorsSection = ({
+  cooldowns,
+  now,
+  isPhone,
+}: ExecutorsSectionProps) => {
   const quality = useWorkerQuality()
   const rows =
     quality.view === null ? [] : selectExecutors(quality.view, cooldowns)
@@ -28,10 +31,7 @@ export const ExecutorsSection = ({ cooldowns, now }: ExecutorsSectionProps) => {
         </p>
       ) : null}
       {rows.length > 0 ? (
-        <>
-          <ExecutorList rows={rows} now={now} />
-          <ExecutorTable rows={rows} now={now} />
-        </>
+        <ExecutorResults rows={rows} now={now} isPhone={isPhone} />
       ) : null}
     </section>
   )

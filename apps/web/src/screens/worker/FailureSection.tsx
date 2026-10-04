@@ -23,10 +23,13 @@ export const FailureSection = ({ groups, activity }: FailureSectionProps) => (
     ) : (
       <ol
         aria-label={WORKER_LABELS.failedJobs}
-        className="divide-line border-line bg-panel divide-y rounded-xl border text-sm"
+        className="divide-line border-line bg-panel divide-y rounded-xl border text-sm md:grid md:grid-cols-[max-content_minmax(0,max-content)_minmax(0,max-content)_max-content_1fr]"
       >
         {groups.map(({ latest, count }) => (
-          <li key={latest.id} className="flex flex-wrap gap-x-3 px-3 py-2">
+          <li
+            key={latest.id}
+            className="flex flex-wrap gap-x-4 px-3 py-2 md:col-span-full md:grid md:grid-cols-subgrid"
+          >
             <span className="text-muted">
               {latest.finishedAt === null
                 ? '—'
