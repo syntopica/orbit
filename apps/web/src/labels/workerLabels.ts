@@ -3,7 +3,7 @@ export const WORKER_LABELS = {
   loading: 'Reading the worker…',
   unavailable: 'Could not read the worker.',
   diagnosis: 'Diagnosis',
-  nothingWaiting: 'Nothing waiting.',
+  nothingWaiting: 'No jobs waiting in any queue.',
   working: 'running,',
   waiting: 'waiting.',
   blockedLead: 'waiting and nothing running right now. Why:',

@@ -7,7 +7,8 @@ import { PendingTitle } from './PendingTitle'
 import { PendingTitleLinks } from './PendingTitleLinks'
 
 // One dense row: the state in a fixed first column so titles align, the
-// title cut by CSS and wrapped in full once the row is open.
+// title cut by CSS (two lines on a phone, one on a desktop) and wrapped in
+// full once the row is open.
 export const PendingItemRow = ({
   item,
 }: {
@@ -20,7 +21,7 @@ export const PendingItemRow = ({
       >
         {item.state}
       </span>
-      <span className="min-w-0 truncate group-open/item:wrap-break-word group-open/item:whitespace-normal">
+      <span className="line-clamp-2 min-w-0 wrap-break-word group-open/item:line-clamp-none md:line-clamp-none md:truncate md:group-open/item:whitespace-normal">
         <PendingTitle text={item.title} />
       </span>
     </summary>

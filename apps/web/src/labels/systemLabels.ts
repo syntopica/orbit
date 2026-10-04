@@ -3,7 +3,7 @@ export const SYSTEM_LABELS = {
   range: 'Range',
   loading: 'loading',
   historyUnavailable: 'history unavailable',
-  allHealthy: 'all healthy',
+  allHealthy: 'all up',
   catalogFailed: 'Could not read the launchd catalog.',
   empty:
     'No launchd labels are registered. Add them to launchd.labels in orbit.json.',

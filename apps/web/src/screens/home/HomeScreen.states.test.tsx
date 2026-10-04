@@ -98,7 +98,7 @@ describe('HomeScreen states', () => {
     expect(down).toHaveAttribute('opacity', '0.5')
     expect(down).toHaveTextContent('last reading 5m')
     expect(within(down).queryByTestId('pulse')).toBeNull()
-    const fresh = screen.getByRole('img', { name: /^Scheduled jobs: Healthy/ })
+    const fresh = screen.getByRole('img', { name: /^Scheduled jobs: Up/ })
     expect(fresh).toHaveAttribute('opacity', '1')
     expect(fresh).not.toHaveTextContent('last reading')
     vi.useRealTimers()
@@ -130,7 +130,7 @@ describe('HomeScreen states', () => {
     expect(row).toHaveAttribute('data-greyed', 'true')
     expect(row).toHaveTextContent('2 running')
     expect(
-      screen.getByRole('listitem', { name: /Scheduled jobs: Healthy/ }),
+      screen.getByRole('listitem', { name: /Scheduled jobs: Up/ }),
     ).toHaveTextContent('1 failing')
     expect(screen.getByText('last known')).toBeInTheDocument()
   })

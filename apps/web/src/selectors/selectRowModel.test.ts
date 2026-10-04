@@ -22,7 +22,7 @@ describe('selectRowModel', () => {
       runs: [{ started: 0, stopped: now }],
     }
     const model = selectRowModel(history, { ...row, schedule: null }, '24h')
-    expect(model.summary).toBe('com.example.job, last 24 hours: all healthy')
+    expect(model.summary).toBe('com.example.job, last 24 hours: all up')
     expect(model.state).toBe('last exit 0')
   })
   it('counts the unhealthy buckets by state', () => {

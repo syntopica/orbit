@@ -22,7 +22,7 @@ export const JobContentPanel = ({ job }: { job: WorkerJobDetail }) => {
         >
           {job.privacy === 'public' || job.privacy === 'internal'
             ? 'Open content'
-            : 'Reveal'}
+            : 'Reveal content'}
         </button>
       ) : null}
       {model.prompt ? <SecretTokenForm model={model} /> : null}

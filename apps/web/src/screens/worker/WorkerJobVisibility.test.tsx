@@ -39,7 +39,9 @@ describe('job content visibility', () => {
     const { client } = await renderAt('/worker/jobs/job-mail')
     const panel = await screen.findByRole('region', { name: 'Content' })
     expect(within(panel).queryByText(/Example message/)).not.toBeInTheDocument()
-    fireEvent.click(within(panel).getByRole('button', { name: 'Reveal' }))
+    fireEvent.click(
+      within(panel).getByRole('button', { name: 'Reveal content' }),
+    )
     expect(
       await within(panel).findByText(/Example message/),
     ).toBeInTheDocument()

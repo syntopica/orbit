@@ -21,6 +21,7 @@ for (const colorScheme of ['dark', 'light'] as const) {
         await page.getByRole('button', { name: 'Expand all' }).click()
         await page.getByRole('button', { name: /blocked 1/ }).click()
         await expect(page).toHaveURL(/state=blocked/)
+        await page.getByText(/^Sources \(/).click()
         await page.getByRole('button', { name: 'example 3' }).click()
         await expect(page).toHaveURL(/source=todo%3Aexample/)
         await page.getByText('Resolve placeholder item').click()

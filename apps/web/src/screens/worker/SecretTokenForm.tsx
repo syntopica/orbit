@@ -25,7 +25,7 @@ export const SecretTokenForm = ({
       disabled={!model.token}
       className="bg-accent text-space rounded px-3 py-2"
     >
-      Reveal
+      Reveal content
     </button>
     <button
       type="button"

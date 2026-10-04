@@ -45,6 +45,7 @@ test('charts worker activity with a tooltip, a queue detail and a range', async 
     'ollama',
     'failed',
   ])
+  await chart.scrollIntoViewIfNeeded()
   const box = await chart.boundingBox()
   if (box === null) throw new Error('chart has no box')
   await page.mouse.move(box.x + box.width - 6, box.y + box.height / 2)

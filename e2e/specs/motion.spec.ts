@@ -24,7 +24,7 @@ test.describe('with reduced motion requested', () => {
       page.getByRole('status', { name: 'Connection' }).first(),
     ).toHaveText('Live')
     await expect(
-      page.getByRole('img', { name: /^Synthetic probe: Healthy/ }),
+      page.getByRole('img', { name: /^Synthetic probe: Up/ }),
     ).toBeVisible()
     expect(await page.getByTestId('pulse').count()).toBe(0)
     // The JS gate renders no pulse; this probe proves the stylesheet rule alone also stops an animation.

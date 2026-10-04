@@ -61,11 +61,11 @@ test('secret content needs step-up and auto-hides after 60 seconds', async ({
   await signIn(page)
   await page.goto('/worker/jobs/job-secret')
   const panel = page.getByRole('region', { name: 'Content' })
-  await panel.getByRole('button', { name: 'Reveal' }).click()
+  await panel.getByRole('button', { name: 'Reveal content' }).click()
   await panel
     .getByLabel('Admin token for reveal')
     .fill(readFileSync(join(E2E.root, 'token'), 'utf8').trim())
-  await panel.getByRole('button', { name: 'Reveal' }).click()
+  await panel.getByRole('button', { name: 'Reveal content' }).click()
   await expect(panel.locator('pre')).toContainText('Example output')
   await page.clock.fastForward(60_000)
   await expect(panel.locator('pre')).toHaveCount(0)

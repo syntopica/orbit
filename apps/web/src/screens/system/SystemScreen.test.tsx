@@ -131,7 +131,7 @@ describe('SystemScreen', () => {
     )
     await renderAt('/system')
     expect(
-      await screen.findByRole('img', { name: /last 24 hours: all healthy/ }),
+      await screen.findByRole('img', { name: /last 24 hours: all up/ }),
     ).toBeInTheDocument()
   })
 })

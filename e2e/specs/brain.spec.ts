@@ -6,7 +6,7 @@ test('draws the brain graph and opens a page without its raw HTML', async ({
   page,
 }) => {
   await signIn(page)
-  await expect(page.getByRole('img', { name: /^Brain: Healthy/ })).toBeVisible()
+  await expect(page.getByRole('img', { name: /^Brain: Up/ })).toBeVisible()
   await page.getByRole('link', { name: 'Brain' }).first().click()
   await expect(
     page.getByRole('img', { name: 'Brain graph: 3 pages, 2 links, 1 orphan' }),

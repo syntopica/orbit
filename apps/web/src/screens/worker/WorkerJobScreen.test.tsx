@@ -103,11 +103,15 @@ describe('WorkerJobScreen', () => {
     vi.stubGlobal('fetch', fetchMock)
     const { client } = await renderAt('/worker/jobs/job-secret')
     const panel = await screen.findByRole('region', { name: 'Content' })
-    fireEvent.click(within(panel).getByRole('button', { name: 'Reveal' }))
+    fireEvent.click(
+      within(panel).getByRole('button', { name: 'Reveal content' }),
+    )
     fireEvent.change(within(panel).getByLabelText('Admin token for reveal'), {
       target: { value: 'wrong' },
     })
-    fireEvent.click(within(panel).getByRole('button', { name: 'Reveal' }))
+    fireEvent.click(
+      within(panel).getByRole('button', { name: 'Reveal content' }),
+    )
     expect(await within(panel).findByRole('alert')).toHaveTextContent(
       'Token rejected',
     )
@@ -115,7 +119,9 @@ describe('WorkerJobScreen', () => {
       target: { value: 'valid' },
     })
     const timeout = vi.spyOn(window, 'setTimeout')
-    fireEvent.click(within(panel).getByRole('button', { name: 'Reveal' }))
+    fireEvent.click(
+      within(panel).getByRole('button', { name: 'Reveal content' }),
+    )
     expect(await within(panel).findByText(/Example output/)).toBeInTheDocument()
     const contentCall = fetchMock.mock.calls.find(([path]) =>
       requestUrl(path).endsWith('/content'),

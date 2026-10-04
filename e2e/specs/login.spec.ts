@@ -8,7 +8,7 @@ test('signs in and shows live satellites', async ({ page }) => {
     page.getByRole('status', { name: 'Connection' }).first(),
   ).toHaveText('Live')
   await expect(
-    page.getByRole('img', { name: /^Synthetic probe: Healthy/ }),
+    page.getByRole('img', { name: /^Synthetic probe: Up/ }),
   ).toBeVisible()
   await expect(
     page.getByRole('img', { name: /^Scheduled jobs:/ }),

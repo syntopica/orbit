@@ -84,7 +84,9 @@ describe('WorkerScreen', () => {
   it('says nothing is waiting and shows empty sections', async () => {
     serve(workerView())
     await renderAt('/worker')
-    expect(await screen.findByText('Nothing waiting.')).toBeInTheDocument()
+    expect(
+      await screen.findByText('No jobs waiting in any queue.'),
+    ).toBeInTheDocument()
     expect(screen.getByText('No runner is cooling down.')).toBeInTheDocument()
     expect(screen.getByText('No node has reported.')).toBeInTheDocument()
     expect(screen.getByText('No recent failures.')).toBeInTheDocument()

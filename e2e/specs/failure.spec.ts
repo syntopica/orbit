@@ -13,7 +13,7 @@ test.afterEach(async () => rm(flag, { force: true }))
 test('one failing component goes down alone and recovers', async ({ page }) => {
   await signIn(page)
   await expect(
-    page.getByRole('img', { name: /^Synthetic probe: Healthy/ }),
+    page.getByRole('img', { name: /^Synthetic probe: Up/ }),
   ).toBeVisible()
   await writeFile(flag, '')
   await expect(
@@ -29,6 +29,6 @@ test('one failing component goes down alone and recovers', async ({ page }) => {
   ).toHaveCount(0)
   await rm(flag)
   await expect(
-    page.getByRole('img', { name: /^Synthetic probe: Healthy/ }),
+    page.getByRole('img', { name: /^Synthetic probe: Up/ }),
   ).toBeVisible({ timeout: 10_000 })
 })

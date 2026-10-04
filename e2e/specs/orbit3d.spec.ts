@@ -12,9 +12,7 @@ for (const colorScheme of ['dark', 'light'] as const) {
       await signIn(page)
       const orbit = page.getByRole('group', { name: 'Components' })
       await expect(orbit.locator('canvas')).toBeVisible()
-      await expect(
-        orbit.getByRole('img', { name: /^Brain: Healthy/ }),
-      ).toBeVisible()
+      await expect(orbit.getByRole('img', { name: /^Brain: Up/ })).toBeVisible()
       await expect(orbit.getByRole('img', { name: /^Worker:/ })).toBeVisible()
       const collisions = await orbit.evaluate((stage) => {
         const labels = [...stage.querySelectorAll<HTMLElement>('.orbit-label')]
