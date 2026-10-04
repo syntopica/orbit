@@ -6,6 +6,7 @@ import { toBrainRelated } from '../../brainView/toBrainRelated'
 import type { BrainReaders } from '../../types/BrainReaders'
 import type { DetailPool } from '../../types/DetailPool'
 import type { OrbitEnv } from '../../types/OrbitEnv'
+import { BRAIN_READ_MS } from './brainReadMs'
 import { getBrainDetail } from './getBrainDetail'
 import { getBrainPage } from './getBrainPage'
 
@@ -19,15 +20,33 @@ export const registerBrainRoutes = (
 ): void => {
   api.get(
     '/brain/graph',
-    getBrainDetail(brain?.graph ?? null, toBrainGraph, pool, now, 10_000),
+    getBrainDetail(
+      brain?.graph ?? null,
+      toBrainGraph,
+      pool,
+      now,
+      BRAIN_READ_MS,
+    ),
   )
   api.get(
     '/brain/related',
-    getBrainDetail(brain?.related ?? null, toBrainRelated, pool, now, 10_000),
+    getBrainDetail(
+      brain?.related ?? null,
+      toBrainRelated,
+      pool,
+      now,
+      BRAIN_READ_MS,
+    ),
   )
   api.get(
     '/brain/checks',
-    getBrainDetail(brain?.checks ?? null, toBrainChecks, pool, now, 15_000),
+    getBrainDetail(
+      brain?.checks ?? null,
+      toBrainChecks,
+      pool,
+      now,
+      BRAIN_READ_MS,
+    ),
   )
   api.get('/brain/page', getBrainPage(brain?.page ?? null, pool))
 }
