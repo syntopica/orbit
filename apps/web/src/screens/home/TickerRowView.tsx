@@ -25,7 +25,9 @@ export const TickerRowView = ({ row: { event, ranMs } }: TickerRowProps) => (
       className="bg-unknown data-[severity=error]:bg-down data-[severity=warn]:bg-warn mt-1.5 size-2 rounded-full"
     />
     {formatActionEvent(event) === null ? (
-      <span className="font-semibold">{COMPONENT_LABELS[event.component]}</span>
+      <span className="w-28 shrink-0 font-semibold">
+        {COMPONENT_LABELS[event.component]}
+      </span>
     ) : null}
     <span>
       {formatActionEvent(event) ??

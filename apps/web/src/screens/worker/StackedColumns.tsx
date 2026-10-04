@@ -19,7 +19,7 @@ export const StackedColumns = <C extends StackColumn>(
   const shown = columns[focus.active ?? columns.length - 1]
   const place = layout.columns[focus.active ?? -1]
   return (
-    <div ref={parentRef} className="relative">
+    <div ref={parentRef} className="relative w-full min-w-0">
       <ChartSlider
         label={label}
         count={columns.length}
