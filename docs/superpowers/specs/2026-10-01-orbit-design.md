@@ -681,8 +681,10 @@ action limit's form: 10 per minute per session, then 429 `rate_limited`. The
 query is trimmed and must be 1 to 500 characters without control characters,
 otherwise 400 `bad_request` before anything runs. It runs the engine table's
 `atrium` entry `context --json --lane words -- {query}` under the memory
-detail pool (5 s, stdout capped like every engine run), with no `--project`,
-so a query searches across projects; results are not cached. Another schema
+detail pool (15 s, stdout capped like every engine run), with no `--project`,
+so a query searches across projects; results are not cached. It is run on
+request, never polled, so section 4's polling budget does not bound it: an
+unscoped words query measured 2.9-6.5 s on the full instance under load. Another schema
 major answers 503 `engine_schema_unsupported`, any other failure 503
 `unavailable`. It answers `{ now, blocks, textChars, limit, maxChars,
 warnings, freshnessStatus }`, each block `{ rank, trust, role, provider,

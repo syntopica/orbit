@@ -22,7 +22,7 @@ export const postAtriumContext =
     if (read === null) return c.json({ error: 'unavailable' }, 503)
     const { query } = body.data
     const result = await pool
-      .run(async (signal) => read(query, signal), 5000)
+      .run(async (signal) => read(query, signal), 15_000)
       .then(
         (doc) => ({ doc }),
         (error: unknown) => ({ error: contextErrorCode(error) }),

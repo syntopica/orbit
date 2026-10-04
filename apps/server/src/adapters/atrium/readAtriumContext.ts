@@ -11,6 +11,6 @@ export const readAtriumContext = async (
   signal: AbortSignal,
 ): Promise<AtriumContextDocument> =>
   parseEngineDocument(
-    await run([...ATRIUM_CONTEXT_ARGS, query], signal, 5000),
+    await run([...ATRIUM_CONTEXT_ARGS, query], signal, 15_000),
     atriumContextDocumentSchema,
   )
