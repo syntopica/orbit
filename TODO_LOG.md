@@ -173,3 +173,12 @@ result and the evidence. Active work lives in `TODO.md`.
 - 2026-10-04 [x] Design review, Pending: two-line titles on phone, search before
   the filters with the source chips folded, sources with the most blocked items
   first. Evidence: `sortSourcesByBlocked` test, `pnpm gate` green.
+- 2026-10-04 [x] Design review, the rest: trend charts lead with each line's
+  current value and its change in range; all-clear panels say when they were
+  checked; job attempts are labelled with start, end and length, Retry is the
+  primary action and acknowledge is explained; System groups services by
+  component with the actions beside each row's state; on a phone the selected
+  brain page sits right under the graph. Not done by decision: folding the
+  worker's costs and executors (named sections already, read daily) and
+  shrinking flat trend charts (already 120 px; flatness comes from scale).
+  Evidence: `pnpm gate` green, `codeality-ui check` 0 findings.

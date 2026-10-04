@@ -25,20 +25,6 @@ This repository is public: entries describe engine behaviour only.
 
 ## Design review (external critique, 2026-10-04)
 
-- [~] Separate service availability from backlog state on the home screen and
-  the orbit: the ok state now reads "Up" (it is adapter health, spec 5.1); a
-  backlog severity still needs thresholds the spec does not define.
-- [~] Worker: queues and failures now follow the diagnosis; secondary analysis
-  is not collapsed yet.
-- [ ] Brain on phone: show labels on selection and the selected page right under
-      the graph.
-- [ ] Charts: current value and change over the range next to each chart;
-      shorter charts for flat series; legible time labels everywhere.
-- [~] System: a shared legend (colours, bar span, time direction) is in;
-  grouping services and quieter actions are not.
-- [~] Clips: the funnel now says its bars compare stage sizes, not conversion;
-  flagging the oldest waiting age needs a threshold.
-- [~] Job detail: the reveal reads "Reveal content"; attempts as a labelled
-  timeline and one primary recovery action are not done.
-- [ ] Empty and success states: add scope or a timestamp ("All checks pass" as
-      of when).
+- [!] Backlog severity on the home cards and a warning for the oldest waiting
+  clip need thresholds the spec does not define. Blocked on the owner naming
+  them (count or age per component); the ok state already reads "Up".
