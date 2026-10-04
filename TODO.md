@@ -13,9 +13,6 @@ This repository is public: entries describe engine behaviour only.
 - [ ] Atrium context inspector (spec 7 item 4, 7.4): needs `schemaVersion` on
       `atrium context --json`, a benchmark against the budget, and an engine
       table form for one bounded free argument (spec 5.3, 500 characters).
-- [ ] Memory flow diagram: two long edges cross (curation to brain upkeep and
-      session-stop hook to index); lay the stages out so no edge crosses
-      another.
 - [!] Web type coverage is 99.89 % (7772/7780, strict, tests excluded); spec 11
   says 100 %. The floor cannot be raised here: `baseline-type-coverage` reads
   the shared `TYPE_COVERAGE_THRESHOLD` (99) from `@syntopica/quality-config` and

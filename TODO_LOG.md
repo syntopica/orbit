@@ -7,6 +7,11 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Orbit polish: every 3D label has a leader line and anchor dot
+  to its own sphere, placed away from neighbouring spheres; the light-theme core
+  is a lit accent sphere; the Memory flow layout has no edge crossings (pure
+  segment-intersection test). Evidence: `pnpm gate` green (34 e2e), commit
+  b522c0a.
 - 2026-10-03 [x] Brain screen (sub-project 1c): engine table `{pageId}`
   placeholder, brain graph, related, page and checks routes, sigma graph with
   ForceAtlas2 and Louvain in a Vite module worker, filters, local view, page
