@@ -19,6 +19,8 @@ export default [
       'src/adapters/synthetic/createSyntheticAdapter.ts',
       'src/state/ensureStateDir.ts',
       'src/state/openDatabase.ts',
+      'src/watch/readFailureCount.ts',
+      'src/watch/writeFailureCount.ts',
       'src/**/*.test.ts',
       'src/test/**/*.ts',
     ],

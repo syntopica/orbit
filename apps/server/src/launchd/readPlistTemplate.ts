@@ -4,14 +4,14 @@ import { dirname, join } from 'node:path'
 // Walks up from the running file (the bundle in dist/, or the source tree in
 // tests) to the repository's launchd/ folder, and no further than the
 // workspace root, so a stray template elsewhere on disk is never picked up.
-export const readPlistTemplate = (from: string): string => {
+export const readPlistTemplate = (
+  from: string,
+  name = 'com.syntopica.orbit.plist.template',
+): string => {
   let dir = from
   for (;;) {
     try {
-      return readFileSync(
-        join(dir, 'launchd', 'com.syntopica.orbit.plist.template'),
-        'utf8',
-      )
+      return readFileSync(join(dir, 'launchd', name), 'utf8')
     } catch {
       const parent = dirname(dir)
       if (parent === dir || existsSync(join(dir, 'pnpm-workspace.yaml')))

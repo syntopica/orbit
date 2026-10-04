@@ -59,4 +59,16 @@ describe('timedRunner', () => {
       'engine-run brain status 0ms error concurrent=1',
     ])
   })
+
+  it('times with the real clock by default', async () => {
+    const lines: string[] = []
+    const run = timedRunner(
+      async () => Promise.resolve({ code: 3, stdout: '' }),
+      (line) => lines.push(line),
+    )
+    await run(request(['status']))
+    expect(lines[0]).toMatch(
+      /^engine-run brain status \d+ms exit 3 concurrent=1$/u,
+    )
+  })
 })

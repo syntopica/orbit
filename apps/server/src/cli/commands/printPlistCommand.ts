@@ -6,17 +6,16 @@ import { readPlistTemplate } from '../../launchd/readPlistTemplate'
 import { renderPlistTemplate } from '../../launchd/renderPlistTemplate'
 import type { CliIo } from '../../types/CliIo'
 
-// Prints the LaunchAgent plist for this node, this bundle and this instance.
-export const printPlistCommand = (io: CliIo): number => {
+// Prints a LaunchAgent plist for this node, this bundle and this instance.
+export const printPlistCommand = (io: CliIo, template?: string): number => {
   const data = io.env['SYNTOPICA_DATA']
   if (data === undefined || !isAbsolute(data)) {
     io.err('orbit: set SYNTOPICA_DATA to the absolute path of the instance')
     return 1
   }
   const bundle = fileURLToPath(import.meta.url)
-  const template = readPlistTemplate(dirname(bundle))
   io.out(
-    renderPlistTemplate(template, {
+    renderPlistTemplate(readPlistTemplate(dirname(bundle), template), {
       node: process.execPath,
       orbit: bundle,
       data,

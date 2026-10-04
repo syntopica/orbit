@@ -4,6 +4,7 @@ import { pairCommand } from './commands/pairCommand'
 import { serveCommand } from './commands/serveCommand'
 import { sessionsCommand } from './commands/sessionsCommand'
 import { tokenCommand } from './commands/tokenCommand'
+import { watchCommand } from './commands/watchCommand'
 
 export const runCli = async (
   argv: readonly string[],
@@ -18,13 +19,14 @@ export const runCli = async (
     pair: pairCommand,
     sessions: sessionsCommand,
     doctor: doctorCommand,
+    watch: watchCommand,
   }
   const command = Object.hasOwn(commands, argv[0] ?? '')
     ? commands[argv[0] ?? '']
     : undefined
   if (command === undefined) {
     io.err(
-      'usage: orbit serve | token create | pair | sessions list|revoke <prefix> | doctor',
+      'usage: orbit serve | token create | pair | sessions list|revoke <prefix> | doctor | watch',
     )
     return 2
   }

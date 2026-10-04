@@ -846,6 +846,13 @@ highlight, hidden types and trend range are kept in the URL.
 
 - `orbit serve` runs the server; `launchd/com.syntopica.orbit.plist.template`
   runs it as a user LaunchAgent with `KeepAlive`.
+- `orbit watch`, run every 300 s by its own LaunchAgent
+  (`launchd/com.syntopica.orbit.watch.plist.template`, printed by
+  `orbit watch --print-plist`), asks `GET /` on loopback with a 10 s limit. Any
+  status below 500 clears its count; after 2 misses in a row it runs
+  `launchctl kickstart -k` on orbit and exits 1. `KeepAlive` only restarts an
+  orbit that exited; this catches one that is alive but no longer serving. The
+  count lives in `orbit/watch-failures`, and each miss writes one log line.
 - `tailscale serve --bg --https=443 http://127.0.0.1:<port>` publishes it;
   `orbit doctor` checks that the published name is in the Host allowlist.
 - `pnpm build` writes the web bundle into `apps/server/dist/public`; never
