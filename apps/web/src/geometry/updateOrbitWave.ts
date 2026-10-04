@@ -1,4 +1,5 @@
-import type { Camera, Mesh, MeshBasicMaterial } from 'three'
+import type { Camera, Mesh } from 'three'
+import { MeshBasicMaterial } from 'three'
 
 import type { CardModel } from '../types/CardModel'
 import { orbitPulsePeriod } from './orbitPulsePeriod'
@@ -14,7 +15,8 @@ export const updateOrbitWave = (
   const phase = ((Date.now() - Date.parse(card.observedAt)) % period) / period
   wave.quaternion.copy(camera.quaternion)
   wave.scale.setScalar(1 + phase * 2)
-  const material = wave.material as MeshBasicMaterial
+  const material = wave.material
+  if (!(material instanceof MeshBasicMaterial)) return
   material.opacity = card.greyed
     ? 0
     : (1 - phase) ** 2 *

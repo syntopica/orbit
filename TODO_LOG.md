@@ -150,3 +150,9 @@ result and the evidence. Active work lives in `TODO.md`.
   leaving dynamic `import()` out. Evidence: a synthetic build gives entry,
   shared and side-effect chunks without the lazy one; live 139.8 KB of 150 KB;
   `pnpm gate` green.
+- 2026-10-04 [x] Web type coverage is 100 % and pinned there: the remaining
+  sites were typed (zod-parsed search params, `instanceof` instead of casts, a
+  typed uniform), the visx class component's `any` state is ignored with a
+  reason, `src/test/**` helpers join the excluded test category, and
+  `@syntopica/quality-config` 0.12.0 lets `--at-least 100` pin a repository
+  above the shared floor. Evidence: `pnpm type-coverage` 20820 / 20820.

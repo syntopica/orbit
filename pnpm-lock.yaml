@@ -418,8 +418,8 @@ importers:
         specifier: ^0.2.0
         version: 0.2.0(prettier-plugin-css-order@2.2.0(postcss@8.5.28)(prettier@3.9.9))(prettier-plugin-organize-imports@4.3.0(@typescript/typescript6@6.0.2)(prettier@3.9.9))(prettier-plugin-tailwindcss@0.8.1(prettier-plugin-css-order@2.2.0(postcss@8.5.28)(prettier@3.9.9))(prettier-plugin-organize-imports@4.3.0(@typescript/typescript6@6.0.2)(prettier@3.9.9))(prettier@3.9.9))(prettier@3.9.9)
       '@syntopica/quality-config':
-        specifier: ^0.11.1
-        version: 0.11.1(@commitlint/config-conventional@21.2.3)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.5.0)(knip@6.39.0)(oxlint@1.86.0)
+        specifier: ^0.12.0
+        version: 0.12.0(@commitlint/config-conventional@21.2.3)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.5.0)(knip@6.39.0)(oxlint@1.86.0)
       '@syntopica/tsconfig':
         specifier: ^0.3.0
         version: 0.3.0
@@ -1974,6 +1974,26 @@ packages:
 
   '@syntopica/quality-config@0.11.1':
     resolution: {integrity: sha512-8IzQZmj3lJMobC1pX95MHfl7YH77x9byb0yT/jm3ULF7rtKlHmS1Gpzv1rQdNRA7MqYmHs2WUGmO4cxQTJxw2g==}
+    engines: {node: '>=22'}
+    hasBin: true
+    peerDependencies:
+      '@commitlint/config-conventional': '>=21.0.0'
+      dependency-cruiser: '>=18.0.0'
+      knip: '>=6.0.0'
+      oxlint: '>=1.0.0'
+      typescript: '>=5.4.0'
+    peerDependenciesMeta:
+      '@commitlint/config-conventional':
+        optional: true
+      dependency-cruiser:
+        optional: true
+      knip:
+        optional: true
+      oxlint:
+        optional: true
+
+  '@syntopica/quality-config@0.12.0':
+    resolution: {integrity: sha512-C+MFbGRVwYe04S21JyWGAKFYkN31uScHTA2VXHxSrWqmo81jSAvULC1gNoFBbycoYe8PiEdnowO7UIKfCcKtEQ==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
@@ -6706,6 +6726,15 @@ snapshots:
       prettier-plugin-tailwindcss: 0.8.1(prettier-plugin-css-order@2.2.0(postcss@8.5.28)(prettier@3.9.9))(prettier-plugin-organize-imports@4.3.0(prettier@3.9.9)(typescript@7.0.2))(prettier@3.9.9)
 
   '@syntopica/quality-config@0.11.1(@commitlint/config-conventional@21.2.3)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.5.0)(knip@6.39.0)(oxlint@1.86.0)':
+    dependencies:
+      typescript: '@typescript/typescript6@6.0.2'
+    optionalDependencies:
+      '@commitlint/config-conventional': 21.2.3
+      dependency-cruiser: 18.5.0
+      knip: 6.39.0
+      oxlint: 1.86.0
+
+  '@syntopica/quality-config@0.12.0(@commitlint/config-conventional@21.2.3)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.5.0)(knip@6.39.0)(oxlint@1.86.0)':
     dependencies:
       typescript: '@typescript/typescript6@6.0.2'
     optionalDependencies:

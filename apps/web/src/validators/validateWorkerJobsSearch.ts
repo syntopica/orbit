@@ -1,16 +1,15 @@
 import { identifierSchema } from '@orbit/contract'
 
-export const validateWorkerJobsSearch = (search: Record<string, unknown>) => ({
-  ...(identifierSchema.safeParse(search['queue']).success
-    ? { queue: search['queue'] as string }
-    : {}),
-  ...(identifierSchema.safeParse(search['state']).success
-    ? { state: search['state'] as string }
-    : {}),
-  ...(identifierSchema.safeParse(search['producer']).success
-    ? { producer: search['producer'] as string }
-    : {}),
-  ...(typeof search['before'] === 'string' && search['before'].length <= 512
-    ? { before: search['before'] }
-    : {}),
-})
+export const validateWorkerJobsSearch = (search: Record<string, unknown>) => {
+  const queue = identifierSchema.safeParse(search['queue'])
+  const state = identifierSchema.safeParse(search['state'])
+  const producer = identifierSchema.safeParse(search['producer'])
+  return {
+    ...(queue.success ? { queue: queue.data } : {}),
+    ...(state.success ? { state: state.data } : {}),
+    ...(producer.success ? { producer: producer.data } : {}),
+    ...(typeof search['before'] === 'string' && search['before'].length <= 512
+      ? { before: search['before'] }
+      : {}),
+  }
+}

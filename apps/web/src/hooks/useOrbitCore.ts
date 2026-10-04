@@ -14,7 +14,8 @@ export const useOrbitCore = (color: string, light: boolean) => {
     [color, light],
   )
   useFrame(({ clock }) => {
-    const time = surface.current?.uniforms['uTime']
+    const time: { value: number } | undefined =
+      surface.current?.uniforms['uTime']
     if (time) time.value = clock.elapsedTime
     if (group.current)
       group.current.scale.setScalar(
