@@ -7,6 +7,20 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Detail pool bounded: TODO files and the clips aggregate are
+  read outside the pool (they start no process), and at most 8 live requests
+  wait for a slot; one more is refused `lagging` at once. Evidence:
+  `createSlotQueue.test.ts`, `runLocalSource.test.ts`, gate green.
+- 2026-10-04 [x] Poller health: `GET /api/poller` and the "Orbit polling" list
+  on System show each loop's state, last success, duration, failures in a row
+  and next tick; `orbit watch`, run every 300 s by its own LaunchAgent, restarts
+  an orbit that stops answering on loopback after 2 misses. Evidence:
+  `createPollerRegistry.test.ts`, `runWatch.test.ts`, `watchCommand.test.ts`,
+  live `/api/poller` answered 7 loops, first watcher pass exited 0.
+- 2026-10-04 [x] Tailnet identity: `orbit doctor` now says an empty
+  `allowedLogins` refuses every request carrying a Tailscale login, which is
+  what the guard does (spec 6.5); sessions remain the only authentication.
+
 - 2026-10-04 [x] Atrium doctor panel (spec 7.4): `GET /api/atrium` reads the
   optional `doctor.json` that atrium's refresh job publishes, answers codes,
   severities and staleness (2 x the refresh interval), and a `broken` check

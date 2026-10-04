@@ -25,16 +25,13 @@ This repository is public: entries describe engine behaviour only.
 
 ## Reliability plan (2026-10-04, in this order)
 
-- [~] 1. Engine read timeouts: time every engine command (total, outcome,
-  concurrent runs) without content, find the stalled phase, then fix it.
-- [ ] 4. Detail pool: bound queue wait and queued requests so non-settling work
-      cannot hold both slots forever; Pending fans out up to 50 sources into it.
-- [ ] 2. Poller health: per adapter last attempt, last success, duration,
-      consecutive failures and next attempt as metadata, plus an external check
-      that orbit's own LaunchAgent is alive.
-- [ ] 3. Tailnet identity: `orbit doctor` claims an empty `allowedLogins`
-      refuses every tailnet request; the guard only refuses a present, unlisted
-      login (spec 6.5). Make the message say exactly that.
+- [~] 1. Engine read timeouts: every engine command now logs
+  `engine-run <engine> <subcommand> <ms> <outcome> concurrent=<n> load=<1-min>`.
+  First sample: `clips status` and `brain lint` reach 8-10 s and time out at the
+  runner's 10 s default with `concurrent=1`, so the command itself is slow, not
+  orbit's queue; by hand `clips status` takes 0.6 s at load 15-23. Next: confirm
+  the slow runs coincide with high load, then decide between a lighter status
+  read in the engine and a measured per-engine budget.
 - [ ] 7. Tests under load: find what the 5 s vitest timeouts wait on and fix the
       cause (fake clocks or targeted limits).
 - [ ] 5. Per-item clips waiting in Pending, with a content-safe item list from
