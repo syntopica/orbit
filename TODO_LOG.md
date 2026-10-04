@@ -156,3 +156,11 @@ result and the evidence. Active work lives in `TODO.md`.
   reason, `src/test/**` helpers join the excluded test category, and
   `@syntopica/quality-config` 0.12.0 lets `--at-least 100` pin a repository
   above the shared floor. Evidence: `pnpm type-coverage` 20820 / 20820.
+- 2026-10-04 [x] UI redesign pass with codeality-ui: the brain graph takes the
+  full width with filters, legend and the selected page floating over it and the
+  side panels in columns below; engine actions inline; one page width; dense
+  pending groups with full titles; job, executor and failure lists on fixed grid
+  columns; doctor severities as badges; addresses linked; the job list says when
+  it was read; chart width read by a plain ResizeObserver so a first narrow
+  measurement never sticks. Evidence: `codeality-ui check` 0 findings over 10
+  routes x 2 viewports x 2 schemes, `pnpm gate` green.

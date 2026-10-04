@@ -22,3 +22,26 @@ This repository is public: entries describe engine behaviour only.
   upstream patches for the five `@lhci/cli` advisories; re-add it, or waive them
   explicitly, when they clear. Re-checked 2026-10-04: `@lhci/cli` 0.15.1 now
   resolves to 14 advisories (11 high), the same five among them.
+
+## Design review (external critique, 2026-10-04)
+
+- [ ] Separate service availability from backlog state on the home screen and
+      the orbit: a component can be up while its backlog needs attention.
+- [ ] Phone: pad content for the fixed navigation bar and the safe area so it
+      never covers the end of a section.
+- [ ] Worker: lead with queue health and failures; collapse secondary analysis;
+      executor rows as compact cards on phone.
+- [ ] Brain: label collisions in the graph centre; on phone, show labels on
+      selection and the selected page right under the graph.
+- [ ] Charts: current value and change over the range next to each chart;
+      shorter charts for flat series; legible time labels everywhere.
+- [ ] Pending: two-line titles on phone; groups with blocked work first, the
+      rest collapsed; search before the filter chips.
+- [ ] System: a legend and start/end times on the history strips; group
+      services; actions visually below status.
+- [ ] Clips: funnel bars read as conversion; label them as counts or drop the
+      funnel shape; flag the oldest waiting age against a threshold.
+- [ ] Job detail: attempts as a labelled timeline rather than progress bars; a
+      specific label for the content reveal; one primary recovery action.
+- [ ] Empty and success states: add scope or a timestamp ("All checks pass" as
+      of when).
