@@ -4,8 +4,6 @@ Active engine backlog. States: `[ ]` pending, `[~]` partial, `[!]` blocked,
 `[x]` verified complete, `[-]` obsolete. Closed items move to `TODO_LOG.md`.
 This repository is public: entries describe engine behaviour only.
 
-## Memory (sub-project 1)
-
 ## Reliability plan (2026-10-04, in this order)
 
 - [~] 1. Engine read timeouts (brain and clips reads time out together every few
@@ -21,5 +19,3 @@ This repository is public: entries describe engine behaviour only.
   `brain lint` p90 3.1 s, p99 10 s. Per-engine `timeoutMs` added (clips and
   brain set to 20 s in the instance), adapter budget 45 s for two reads. Next:
   confirm the timeouts stop in the next day of lines.
-- [ ] 5. Per-item clips waiting in Pending, with a content-safe item list from
-      the clips engine.

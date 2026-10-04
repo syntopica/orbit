@@ -7,6 +7,22 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Per-item clips in Pending and on the Clips screen. The clips
+  engine (syntopica/clips `88d7544`) prints `items` with `status --json --items`
+  from the same pass as the counts: a digest id (not the clip id), state, reason
+  code, failure stage and code, pipeline stage, capture and transition times,
+  attempts, the last synthesis run (duration, outcome, transport, worker job
+  ids, tokens from codex or agy) and the ledger's pages; it now records each
+  run. orbit runs it only when `orbit.json` lists
+  `["status", "--json", "--items"]`, so the poll stays one engine call; the
+  adapter keeps the read in memory (never the snapshot) and `/api/clips` and
+  `/api/pending` reuse it. Pending lists each waiting clip by state, code and
+  age; the Clips screen lists each clip with links to its worker jobs and result
+  pages, and its query is dropped on unmount. Evidence: `toClipsItem.test.ts`,
+  `readClipsPending.test.ts`, `buildClipsReader.test.ts`, `ClipsItems.test.tsx`,
+  e2e `pending` and `memoryScreens` specs; server, web and contract gates green;
+  on the live store `--items` took 0.96-1.23 s against 1.08-2.1 s for counts
+  alone (load 77).
 - 2026-10-04 [x] Lighthouse is back in `apps/web` as `pnpm perf:check`: plain
   `lighthouse` 13.5 (0 advisories) against `vite preview`, floors 0.9
   performance and best practices, 1.0 accessibility. `@lhci/cli` stays out: its

@@ -12,11 +12,13 @@ inboxes, curation proposals, lint". Every rule of the base spec holds; "base
 | TODO files | every open, partial or blocked item | files listed in `orbit.json` |
 | Brain lint | every lint issue | the brain checks already read by the Brain screen (base 7.5) |
 | Worker | production jobs `failed` and not acknowledged | `GET /v1/admin/jobs?state=failed` |
-| Clips | one aggregate row per waiting state, with count and oldest age | the clips snapshot (counts only) |
+| Clips | one row per waiting clip (state, reason code, age), or per waiting state when the engine lists no items | the clips adapter's last read, in memory |
 
 Curation proposals join when Atrium specifies a review API (base 2,
-sub-project 5). Clips joins item by item when `clips status --json` lists
-items; until then it is one row per state linking to `/clips`.
+sub-project 5). Clips is item by item when `orbit.json` lists
+`status --json --items`: the adapter's one engine call returns counts and
+items, the snapshot keeps the counts and the items stay in memory for detail
+routes. Without the flag it is one row per state linking to `/clips`.
 
 ## 2. TODO files
 
@@ -48,7 +50,7 @@ detail route below, never in snapshots, events or logs.
 - `items`: `{ id, source, kind, state, title, detail, section, ref, ageMs }`.
   `id` is stable across reads (source id plus line for TODO items, the issue
   or job id otherwise). `state` is `open | partial | blocked` for TODO items,
-  `issue` for lint, `failed` for jobs, `waiting` for clips aggregates. `title`
+  `issue` for lint, `failed` for jobs, `waiting` for clips. `title`
   is the item's first line (at most 300 characters) and `detail` the rest
   (at most 4000). `ref` is where it lives: `{ file, line }` for TODO items, a
   page id, a job id, or a route. `ageMs` is known for jobs and clips, `null`
