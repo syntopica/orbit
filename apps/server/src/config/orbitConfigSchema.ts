@@ -5,6 +5,7 @@ import { z } from 'zod'
 import { engineTableSchema } from '../engines/engineTableSchema'
 import { launchdLabelSchema } from './launchdLabelSchema'
 import { pendingConfigSchema } from './pendingConfigSchema'
+import { warningsConfigSchema } from './warningsConfigSchema'
 
 export const orbitConfigSchema = z
   .object({
@@ -43,6 +44,7 @@ export const orbitConfigSchema = z
       .optional(),
     engines: engineTableSchema.default({}),
     pending: pendingConfigSchema.optional(),
+    warnings: warningsConfigSchema.default({}),
     cadenceMs: z
       .partialRecord(z.enum(COMPONENT_IDS), z.number().int().min(1000))
       .default({}),

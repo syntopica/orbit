@@ -23,4 +23,18 @@ describe('createPendingAdapter', () => {
     expect(JSON.stringify(snapshot)).not.toContain('Private placeholder')
     expect(JSON.stringify(snapshot)).not.toContain(path)
   })
+  it('warns backlog once blocked items pass the configured limit', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'orbit-pending-'))
+    const path = join(dir, 'TODO.md')
+    await writeFile(path, '- [!] one\n- [!] two')
+    const read = async (limit?: number) =>
+      (
+        await createPendingAdapter([{ name: 'tasks', path }], 1000, limit).read(
+          new AbortController().signal,
+        )
+      ).health
+    expect(await read(1)).toEqual({ state: 'warn', reason: 'backlog' })
+    expect(await read(2)).toEqual({ state: 'ok', reason: null })
+    expect(await read()).toEqual({ state: 'ok', reason: null })
+  })
 })

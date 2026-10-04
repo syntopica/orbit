@@ -7,6 +7,11 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Backlog warnings: `orbit.json` `warnings.pendingBlocked` and
+  `warnings.clipsOldestDays` turn a healthy pending or clips card `warn` with
+  the new reason `backlog`; without them counts never warn. Replaces the blocked
+  design-review item on thresholds. Evidence: `backlogHealth.test.ts`,
+  `clipsOldestOver.test.ts`, adapter tests, gate green.
 - 2026-10-04 [x] Tests under load: the web tests that hit vitest's 5 s limit are
   CPU-bound jsdom route renders (slowest 1.2 s at load 28; the three that failed
   take 0.1-0.6 s) and wait on no real timer or process, so the web suite's

@@ -6,5 +6,11 @@ export const buildPendingAdapters = ({ config }: AdapterContext): Adapter[] => {
   const files = config.pending?.todoFiles ?? []
   return files.length === 0
     ? []
-    : [createPendingAdapter(files, config.cadenceMs.pending ?? 60_000)]
+    : [
+        createPendingAdapter(
+          files,
+          config.cadenceMs.pending ?? 60_000,
+          config.warnings.pendingBlocked,
+        ),
+      ]
 }

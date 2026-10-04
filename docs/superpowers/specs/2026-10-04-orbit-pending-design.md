@@ -66,6 +66,13 @@ The snapshot of a new `pending` component carries counts only
 (`open, partial, blocked` across TODO files) so the home Pending row shows
 them.
 
+**Backlog warnings.** `orbit.json` `warnings` sets two optional limits:
+`pendingBlocked` (the pending card turns `warn`, reason `backlog`, when blocked
+items exceed it) and `clipsOldestDays` (the clips card does the same when the
+oldest waiting clip in any group is older). Without them counts are shown and
+never warned on. A backlog only downgrades a healthy reading; a failed check
+keeps `check_failed`.
+
 ## 4. Screen
 
 `/pending` (lazy route, in the shell navigation after Worker):

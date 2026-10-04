@@ -34,8 +34,6 @@ This repository is public: entries describe engine behaviour only.
   read in the engine and a measured per-engine budget.
 - [ ] 5. Per-item clips waiting in Pending, with a content-safe item list from
       the clips engine.
-- [ ] 8. Backlog warnings: oldest waiting clip and blocked TODO count thresholds
-      from instance config.
 - [ ] 6. Action outcomes survive a restart: persist content-free run metadata
       and mark interrupted runs at startup.
 - [ ] Step-up: phone and remote sessions re-enter the admin token before launchd

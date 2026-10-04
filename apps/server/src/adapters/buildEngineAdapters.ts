@@ -21,6 +21,7 @@ export const buildEngineAdapters = (context: AdapterContext): Adapter[] => {
       createClipsAdapter({
         run: engines['clips'] ?? createFailedEngineRunner,
         cadenceMs: config.cadenceMs.clips ?? 60_000,
+        oldestDays: config.warnings.clipsOldestDays,
       }),
     )
   }

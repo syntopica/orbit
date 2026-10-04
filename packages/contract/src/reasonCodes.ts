@@ -11,4 +11,5 @@ export const REASON_CODES = [
   'lagging',
   'check_failed',
   'permission_denied',
+  'backlog',
 ] as const

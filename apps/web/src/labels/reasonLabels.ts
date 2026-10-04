@@ -13,4 +13,5 @@ export const REASON_LABELS: Record<ReasonCode, string> = {
   lagging: 'Reads are slow',
   check_failed: 'Health check failed',
   permission_denied: 'Permission denied',
+  backlog: 'Backlog past its limit',
 }
