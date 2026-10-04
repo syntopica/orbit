@@ -4,6 +4,7 @@ import type { WorkerJobReport } from '../types/WorkerJobReport'
 import { identifierOrNull } from './identifierOrNull'
 import { isIdentifier } from './isIdentifier'
 import { secondsToMs } from './secondsToMs'
+import { toJobMetricsView } from './toJobMetricsView'
 
 export const toJobView = (row: WorkerJobReport): WorkerJob | null => {
   if (
@@ -28,5 +29,6 @@ export const toJobView = (row: WorkerJobReport): WorkerJob | null => {
     acked: row.acked === null ? null : secondsToMs(row.acked),
     retryOf: identifierOrNull(row.retry_of),
     sampling: row.sampling,
+    ...toJobMetricsView(row),
   }
 }

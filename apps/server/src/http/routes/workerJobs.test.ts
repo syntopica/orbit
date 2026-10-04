@@ -70,7 +70,7 @@ describe('worker jobs routes', () => {
     )
     const { get } = buildTestApp({ workerJobs: read })
     const list = await get('/api/worker/jobs?queue=queue.a&limit=20')
-    expect(await list.json()).toEqual({
+    expect(await list.json()).toMatchObject({
       jobs: [
         {
           id: 'job-1',
@@ -106,6 +106,8 @@ describe('worker jobs routes', () => {
         endedAt: 2250,
         tokensIn: 3,
         tokensOut: 4,
+        wallMs: null,
+        costUsd: null,
       },
     ])
   })

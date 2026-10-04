@@ -1,4 +1,5 @@
 import { isIdentifier } from '../../workerView/isIdentifier'
+import { isStateList } from './isStateList'
 
 export const workerJobListPath = (
   query: Record<string, string>,
@@ -7,7 +8,8 @@ export const workerJobListPath = (
   for (const name of ['queue', 'state', 'producer'] as const) {
     const value = query[name]
     if (value === undefined) continue
-    if (!isIdentifier(value)) return { error: 'bad_request' }
+    const valid = name === 'state' ? isStateList(value) : isIdentifier(value)
+    if (!valid) return { error: 'bad_request' }
     params.set(name, value)
   }
   const before = query['before']

@@ -2,9 +2,11 @@ import type { z } from 'zod'
 
 import type { WorkerJobDetail } from '@orbit/contract'
 import type { workerAttemptReportSchema } from '../adapters/worker/workerAttemptReportSchema'
+import { amountOrNull } from './amountOrNull'
 import { identifierOrNull } from './identifierOrNull'
 import { isIdentifier } from './isIdentifier'
 import { secondsToMs } from './secondsToMs'
+import { secondsToMsOrNull } from './secondsToMsOrNull'
 
 export const toAttemptView = (
   row: z.infer<typeof workerAttemptReportSchema>,
@@ -25,5 +27,7 @@ export const toAttemptView = (
     endedAt: row.ended === null ? null : secondsToMs(row.ended),
     tokensIn: row.tokens_in,
     tokensOut: row.tokens_out,
+    wallMs: secondsToMsOrNull(row.wall_s),
+    costUsd: amountOrNull(row.cost_usd),
   }
 }
