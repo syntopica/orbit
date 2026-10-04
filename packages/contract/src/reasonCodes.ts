@@ -12,4 +12,6 @@ export const REASON_CODES = [
   'check_failed',
   'permission_denied',
   'backlog',
+  'pass_timeout',
+  'pass_failed',
 ] as const

@@ -8,6 +8,7 @@ export const EVENT_KINDS = [
   'worker.cooldown_started',
   'worker.revealed',
   'worker.action',
+  'atrium.revealed',
   'action.started',
   'action.succeeded',
   'action.failed',
