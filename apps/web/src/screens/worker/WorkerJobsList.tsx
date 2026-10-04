@@ -1,3 +1,4 @@
+import { formatClock } from '../../formatters/formatClock'
 import { formatJobCount } from '../../formatters/formatJobCount'
 import type { useWorkerJobsScreen } from '../../hooks/useWorkerJobsScreen'
 import { WorkerJobsRows } from './WorkerJobsRows'
@@ -15,7 +16,7 @@ export const WorkerJobsList = ({
       <p role="status" className="text-muted text-sm">
         {model.reading
           ? 'Reading jobs…'
-          : formatJobCount(data.jobs.length, data.next !== null)}
+          : `${formatJobCount(data.jobs.length, data.next !== null)} · read ${formatClock(new Date(model.jobs.dataUpdatedAt).toISOString())}`}
       </p>
       {data.jobs.length === 0 ? <p>No jobs found.</p> : null}
       {data.jobs.length > 0 && model.isPhone ? (

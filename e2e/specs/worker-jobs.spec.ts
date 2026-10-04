@@ -21,7 +21,7 @@ for (const colorScheme of ['dark', 'light'] as const) {
         ).toBeVisible()
         await page.getByRole('button', { name: 'Apply filters' }).click()
         await expect(list.getByRole('status')).toHaveText(
-          '3 jobs, newest first',
+          /^3 jobs, newest first · read \d{2}:\d{2}:\d{2}$/,
         )
         expect(
           await page.evaluate(() => document.documentElement.scrollWidth),
