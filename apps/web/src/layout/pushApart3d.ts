@@ -9,11 +9,13 @@ export const pushApart3d = (a: Vec3d, b: Vec3d, need: number): boolean => {
   const distance = Math.hypot(x, y, z)
   if (distance >= need) return false
   const push = (need - distance) / 2
-  const unit: Vec3d =
+  const [ux, uy, uz]: Vec3d =
     distance < 1e-9 ? [1, 0, 0] : [x / distance, y / distance, z / distance]
-  for (let axis = 0; axis < 3; axis += 1) {
-    a[axis] = (a[axis] ?? 0) - (unit[axis] ?? 0) * push
-    b[axis] = (b[axis] ?? 0) + (unit[axis] ?? 0) * push
-  }
+  a[0] -= ux * push
+  a[1] -= uy * push
+  a[2] -= uz * push
+  b[0] += ux * push
+  b[1] += uy * push
+  b[2] += uz * push
   return true
 }
