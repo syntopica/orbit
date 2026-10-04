@@ -16,6 +16,5 @@ vi.mock('../graph/hasWebGl', () => ({ hasWebGl: vi.fn(() => true) }))
 export const resetBrainGraphMocks = (): void => {
   fakeReactSigma.loaded.length = 0
   fakeReactSigma.goto.mockClear()
-  fakeReactSigma.gotoNode.mockClear()
   vi.mocked(hasWebGl).mockReturnValue(true)
 }

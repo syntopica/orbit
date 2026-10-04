@@ -16,12 +16,19 @@ vi.mock(
     (await import('../../test/fakeLayoutWorkerModule')).fakeLayoutWorkerModule,
 )
 vi.mock('../../graph/hasWebGl', () => ({ hasWebGl: () => true }))
+vi.mock('./GraphScene3d', () => ({
+  default: () => <p>3D scene stand-in</p>,
+}))
 
-type LoadedGraph = { getNodeAttribute: (id: string, name: string) => unknown }
+type LoadedGraph = {
+  hasNode: (id: string) => boolean
+  nodes: () => string[]
+}
 const lastGraph = () => fakeReactSigma.loaded.at(-1) as LoadedGraph
 
 beforeEach(() => {
   fakeReactSigma.loaded.length = 0
+  localStorage.clear()
   stubBrainFetch({ '/api/brain/graph': BRAIN_GRAPH })
 })
 
@@ -44,27 +51,98 @@ describe('graph controls', () => {
     await renderAt('/brain?page=notes%2Fb')
     fireEvent.click(await screen.findByRole('checkbox', { name: 'topic' }))
     await waitFor(() => {
-      expect(lastGraph().getNodeAttribute('notes/a', 'hidden')).toBe(true)
+      expect(lastGraph().hasNode('notes/a')).toBe(false)
     })
-    expect(lastGraph().getNodeAttribute('notes/b', 'hidden')).toBe(false)
+    expect(lastGraph().hasNode('notes/b')).toBe(true)
   })
-  it('offers local steps only with a selection, then limits the view', async () => {
+  it('opens one step around the most linked page and names the view', async () => {
+    await renderAt('/brain')
+    expect(
+      await screen.findByText('1 step around notes/b: 3 pages'),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '1 step' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    )
+  })
+  it('limits a local view to the steps around the found page', async () => {
     const { router } = await renderAt('/brain')
-    expect(await screen.findByRole('button', { name: '1 step' })).toBeDisabled()
-    fireEvent.change(screen.getByLabelText('Find a page'), {
+    fireEvent.change(await screen.findByLabelText('Find a page'), {
       target: { value: 'notes/a' },
     })
     await waitFor(() => {
       expect(router.state.location.search).toMatchObject({ page: 'notes/a' })
     })
-    fireEvent.click(screen.getByRole('button', { name: '1 step' }))
     await waitFor(() => {
-      expect(lastGraph().getNodeAttribute('notes/c', 'hidden')).toBe(true)
+      expect(lastGraph().hasNode('notes/c')).toBe(false)
     })
-    expect(lastGraph().getNodeAttribute('notes/b', 'hidden')).toBe(false)
-    expect(screen.getByRole('button', { name: '1 step' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    )
+    fireEvent.click(screen.getByRole('button', { name: '2 steps' }))
+    await waitFor(() => {
+      expect(lastGraph().hasNode('notes/c')).toBe(true)
+    })
+  })
+  it('leaves out orphans and hubs', async () => {
+    const { router } = await renderAt('/brain')
+    fireEvent.click(await screen.findByRole('checkbox', { name: 'Orphans' }))
+    await waitFor(() => {
+      expect(lastGraph().hasNode('notes/c')).toBe(false)
+    })
+    fireEvent.change(screen.getByLabelText('Pages with more links than'), {
+      target: { value: '1' },
+    })
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({ maxLinks: 1 })
+    })
+    fireEvent.change(screen.getByLabelText('Pages with more links than'), {
+      target: { value: '' },
+    })
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({ maxLinks: null })
+    })
+  })
+})
+
+describe('views and keys', () => {
+  it('steps through the overview, a group and back with keys', async () => {
+    const { router } = await renderAt('/brain')
+    await screen.findByText(/around notes\/b/)
+    fireEvent.keyDown(document, { key: '0' })
+    expect(await screen.findByText(/^Overview: 1 group/)).toBeInTheDocument()
+    const [cluster] = lastGraph().nodes()
+    expect(cluster).toMatch(/^cluster:/)
+    fakeReactSigma.handlers['clickNode']?.({ node: cluster ?? '' })
+    await waitFor(() => {
+      expect(lastGraph().hasNode('notes/a')).toBe(true)
+    })
+    fireEvent.keyDown(document, { key: 'Escape' })
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({ cluster: null })
+    })
+    fireEvent.keyDown(document, { key: '+' })
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({ depth: 1 })
+    })
+    fireEvent.keyDown(screen.getByLabelText('Find a page'), { key: '3' })
+    fireEvent.keyDown(document, { key: '2', ctrlKey: true })
+    expect(router.state.location.search).toMatchObject({ depth: 1 })
+  })
+  it('opens a page picked in the overview in its local view', async () => {
+    const { router } = await renderAt('/brain?depth=0')
+    await screen.findByText(/^Overview: /)
+    fakeReactSigma.handlers['clickNode']?.({ node: 'notes/a' })
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({
+        page: 'notes/a',
+        depth: 1,
+      })
+    })
+  })
+  it('draws the same scene in 3D when asked', async () => {
+    const { router } = await renderAt('/brain')
+    fireEvent.click(await screen.findByRole('button', { name: '3D' }))
+    await waitFor(() => {
+      expect(router.state.location.search).toMatchObject({ scene: '3d' })
+    })
+    expect(await screen.findByText('3D scene stand-in')).toBeInTheDocument()
   })
 })

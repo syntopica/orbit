@@ -2,7 +2,9 @@ import { pageIdSchema } from '@orbit/contract'
 import { z } from 'zod'
 
 import type { BrainSearch } from '../types/BrainSearch'
+import { readClusterKey } from './readClusterKey'
 import { readGraphDepth } from './readGraphDepth'
+import { readMaxLinks } from './readMaxLinks'
 
 // Invalid values fall back to defaults; a page id outside the pattern is
 // dropped, so it never reaches the page route.
@@ -20,6 +22,10 @@ export const validateBrainSearch = (
     hide: hide.success
       ? hide.data.filter((type): type is string => typeof type === 'string')
       : [],
+    hideOrphans: search['hideOrphans'] === true,
+    maxLinks: readMaxLinks(search['maxLinks']),
+    cluster: readClusterKey(search['cluster']),
+    scene: search['scene'] === '3d' ? '3d' : '2d',
     range: range === '7d' || range === '30d' ? range : '24h',
   }
 }

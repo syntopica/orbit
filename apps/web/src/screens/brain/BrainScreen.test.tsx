@@ -47,7 +47,7 @@ describe('BrainScreen', () => {
       expect(router.state.location.search).toMatchObject({ page: 'notes/b' })
     })
     await waitFor(() => {
-      expect(fakeReactSigma.gotoNode).toHaveBeenCalledWith('notes/b', {
+      expect(fakeReactSigma.goto).toHaveBeenCalledWith(expect.any(Object), {
         duration: 300,
       })
     })

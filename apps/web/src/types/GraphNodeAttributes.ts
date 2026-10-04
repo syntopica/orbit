@@ -4,5 +4,5 @@ export type GraphNodeAttributes = {
   readonly y: number
   readonly size: number
   readonly color: string
-  readonly hidden: boolean
+  readonly forceLabel: boolean
 }

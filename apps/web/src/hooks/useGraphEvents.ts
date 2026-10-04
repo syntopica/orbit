@@ -2,7 +2,10 @@ import { useRegisterEvents, useSigma } from '@react-sigma/core'
 import { useEffect } from 'react'
 import type { GraphEventsProps } from '../types/GraphEventsProps'
 
-export const useGraphEvents = ({ onSelect }: GraphEventsProps): void => {
+export const useGraphEvents = ({
+  onSelect,
+  onHover,
+}: GraphEventsProps): void => {
   const register = useRegisterEvents()
   const sigma = useSigma()
   useEffect(() => {
@@ -14,15 +17,17 @@ export const useGraphEvents = ({ onSelect }: GraphEventsProps): void => {
       clickStage: () => {
         onSelect(null)
       },
-      enterNode: () => {
+      enterNode: (event) => {
         container.classList.add('cursor-pointer')
+        onHover(event.node)
       },
       leaveNode: () => {
         container.classList.remove('cursor-pointer')
+        onHover(null)
       },
     })
     return () => {
       container.classList.remove('cursor-pointer')
     }
-  }, [register, onSelect, sigma])
+  }, [register, onSelect, onHover, sigma])
 }

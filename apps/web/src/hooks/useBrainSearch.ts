@@ -1,7 +1,7 @@
 import { useNavigate, useSearch } from '@tanstack/react-router'
 import { useCallback, useMemo } from 'react'
 
-import { withPage } from '../selectors/withPage'
+import { searchForNode } from '../selectors/searchForNode'
 import type { BrainSearch } from '../types/BrainSearch'
 import type { BrainSearchModel } from '../types/BrainSearchModel'
 import type { BrainSearchPatch } from '../types/BrainSearchPatch'
@@ -21,7 +21,7 @@ export const useBrainSearch = (): BrainSearchModel => {
   )
   const select = useCallback(
     (id: string | null) => {
-      go(withPage(search, id))
+      go(searchForNode(search, id))
     },
     [go, search],
   )

@@ -7,4 +7,6 @@ export type GraphLegendProps = {
   readonly communities: number
   readonly highlightOrphans: boolean
   readonly skipped: number
+  readonly caption: string
+  readonly overview: boolean
 }

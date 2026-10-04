@@ -6,10 +6,14 @@ import { validateBrainSearch } from './validateBrainSearch'
 describe('validateBrainSearch', () => {
   it('defaults every field', () => {
     expect(validateBrainSearch({})).toEqual({
-      depth: 0,
+      depth: 1,
       color: 'type',
       orphans: true,
       hide: [],
+      hideOrphans: false,
+      maxLinks: null,
+      cluster: null,
+      scene: '2d',
       range: '24h',
     })
   })
@@ -21,6 +25,10 @@ describe('validateBrainSearch', () => {
         color: 'community',
         orphans: false,
         hide: ['topic', 3],
+        hideOrphans: true,
+        maxLinks: 40,
+        cluster: -1,
+        scene: '3d',
         range: '7d',
       }),
     ).toEqual({
@@ -29,11 +37,21 @@ describe('validateBrainSearch', () => {
       color: 'community',
       orphans: false,
       hide: ['topic'],
+      hideOrphans: true,
+      maxLinks: 40,
+      cluster: -1,
+      scene: '3d',
       range: '7d',
     })
-    expect(validateBrainSearch({ page: '../x', depth: 9 })).toEqual(
-      validateBrainSearch({}),
-    )
+    expect(
+      validateBrainSearch({
+        page: '../x',
+        depth: 9,
+        maxLinks: 0.5,
+        cluster: -2,
+        scene: '4d',
+      }),
+    ).toEqual(validateBrainSearch({}))
   })
   it('sets and clears the page', () => {
     const search = validateBrainSearch({ page: 'notes/a' })

@@ -775,9 +775,22 @@ seeded generator, so a graph always lays out the same way. Size is
 `min(16, 2 + 1.5 * sqrt(degree))`. Colour is by type (types ranked by page
 count take series slots 1-5, the rest share slot 6) or by community (ranked by
 size the same way); orphans wear the warn colour labelled "Orphan" while
-highlighted, and the selected page the accent colour. Type filters hide
-pages; the local view shows 1-3 steps around the selected page over links in
-either direction and reuses the global positions. The canvas is an image with
+highlighted, and the selected page (the focus) the accent colour. The screen
+never draws the whole wiki as single pages. It opens on the local view: 1-3
+steps (default 1) around the focus, which is the selected page, else the last
+page viewed (kept in browser storage), else the most linked page, drawn on
+deterministic rings by step count. Depth 0 is the overview: each Louvain
+community is one node at the centre of its pages, sized by page count and
+named by its most linked page; communities of one page fold into one
+"Unlinked pages" node; links between communities fold into one weighted
+edge; noverlap keeps nodes apart; selecting a community opens it into its
+pages, and selecting a page opens its local view. Keys 0-3, + and -, and Esc
+(back to the overview, then close the community) change the view. Type
+filters, "leave out orphans" and a hub cap (pages with more links than N)
+remove pages before either view is built; the focus always stays. Hovering a
+node fades everything but its neighbours and hides other edges. An opt-in 3D
+drawing (`@react-three/fiber`, its own lazy chunk) draws the same scene with
+a static, seeded 3D layout, so nothing moves without the user. The canvas is an image with
 a summary name; "Find a page" and a "Show pages" table reach every page
 without a pointer, and both still work without WebGL.
 

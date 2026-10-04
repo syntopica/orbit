@@ -12,7 +12,6 @@ export const fakeReactSigma = {
     string,
     ((event: { node: string }) => void) | undefined
   >,
-  gotoNode: vi.fn(),
   goto: vi.fn(),
   container: document.createElement('div'),
   SigmaContainer: ({ children }: { readonly children?: ReactNode }) => (
@@ -27,12 +26,12 @@ export const fakeReactSigma = {
   useLoadGraph: () => fakeReactSigma.loadGraph,
   useRegisterEvents: () => fakeReactSigma.register,
   useCamera: () => ({
-    gotoNode: fakeReactSigma.gotoNode,
     goto: fakeReactSigma.goto,
   }),
   sigma: {
     getGraph: () => fakeReactSigma.loaded.at(-1),
     getContainer: () => fakeReactSigma.container,
+    setSetting: vi.fn(),
     getDimensions: () => ({ width: 800, height: 600 }),
     graphToViewport: (point: Coordinates) => ({
       x: point.x * 600 + 400,

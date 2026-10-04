@@ -70,14 +70,12 @@ describe('Brain view fallbacks and interaction', () => {
   })
   it('does not refetch the graph on selection or window focus', async () => {
     stubBrainFetch({ '/api/brain/graph': BRAIN_GRAPH })
-    await renderAt('/brain')
+    const { router } = await renderAt('/brain')
     await screen.findByRole('img', { name: /^Brain graph/ })
     fireEvent.click(screen.getByText('Show pages'))
     fireEvent.click(screen.getByRole('button', { name: 'notes/b' }))
     await waitFor(() => {
-      expect(fakeReactSigma.gotoNode).toHaveBeenCalledWith('notes/b', {
-        duration: 300,
-      })
+      expect(router.state.location.search).toMatchObject({ page: 'notes/b' })
     })
     await act(async () => {
       focusManager.setFocused(false)
@@ -101,6 +99,5 @@ describe('Brain view fallbacks and interaction', () => {
         name: 'Brain graph: 0 pages, 0 links, 0 orphans',
       }),
     ).toBeInTheDocument()
-    expect(fakeReactSigma.gotoNode).not.toHaveBeenCalled()
   })
 })

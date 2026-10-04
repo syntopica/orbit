@@ -3,8 +3,8 @@ import { describe, expect, it } from 'vitest'
 
 import { UNTYPED } from '../charts/untypedType'
 import { buildGraphModel } from './buildGraphModel'
-import { neighbourhood } from './neighbourhood'
-import { visibleNodes } from './visibleNodes'
+import { filterPages } from './filterPages'
+import { hopDistances } from './hopDistances'
 
 // a - b - c - d, and e alone; b links back to a.
 const graph: BrainGraph = {
@@ -43,23 +43,35 @@ describe('buildGraphModel', () => {
   })
 })
 
-describe('neighbourhood', () => {
-  it('walks up to depth steps in either direction', () => {
-    const { neighbours } = buildGraphModel(graph)
-    expect(
-      [...neighbourhood(neighbours, 0, 1)].toSorted((a, b) => a - b),
-    ).toEqual([0, 1])
-    expect(
-      [...neighbourhood(neighbours, 0, 3)].toSorted((a, b) => a - b),
-    ).toEqual([0, 1, 2, 3])
-    expect([...neighbourhood(neighbours, 4, 3)]).toEqual([4])
+describe('hopDistances', () => {
+  const model = buildGraphModel(graph)
+  const all = model.ids.map(() => true)
+  it('walks up to depth steps in either direction and records the step', () => {
+    expect([...hopDistances(model.neighbours, all, 0, 1)]).toEqual([
+      [0, 0],
+      [1, 1],
+    ])
+    expect([...hopDistances(model.neighbours, all, 0, 3)]).toEqual([
+      [0, 0],
+      [1, 1],
+      [2, 2],
+      [3, 3],
+    ])
+    expect([...hopDistances(model.neighbours, all, 4, 3)]).toEqual([[4, 0]])
+  })
+  it('does not walk through filtered pages', () => {
+    const allowed = [true, true, false, true, true]
+    expect([...hopDistances(model.neighbours, allowed, 0, 3).keys()]).toEqual([
+      0, 1,
+    ])
   })
 })
 
-describe('visibleNodes', () => {
+describe('filterPages', () => {
   const model = buildGraphModel(graph)
+  const none = { hide: [], hideOrphans: false, maxLinks: null }
   it('hides filtered types but never the focus', () => {
-    expect(visibleNodes(model, ['topic'], 0, 0)).toEqual([
+    expect(filterPages(model, { ...none, hide: ['topic'] }, 0)).toEqual([
       true,
       false,
       true,
@@ -67,17 +79,17 @@ describe('visibleNodes', () => {
       true,
     ])
   })
-  it('limits a local view to the neighbourhood of the focus', () => {
-    expect(visibleNodes(model, [], 1, 1)).toEqual([
+  it('hides orphans and hubs above the cap', () => {
+    expect(filterPages(model, { ...none, hideOrphans: true }, null)).toEqual([
       true,
       true,
       true,
-      false,
+      true,
       false,
     ])
-    expect(visibleNodes(model, [], null, 2)).toEqual([
+    expect(filterPages(model, { ...none, maxLinks: 1 }, 2)).toEqual([
       true,
-      true,
+      false,
       true,
       true,
       true,

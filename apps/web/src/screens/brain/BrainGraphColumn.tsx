@@ -1,9 +1,10 @@
+import { useGraphKeys } from '../../hooks/useGraphKeys'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { BRAIN_LABELS } from '../../labels/brainLabels'
 import type { BrainBodyProps } from '../../types/BrainBodyProps'
 import { FloatingPagePanel } from './FloatingPagePanel'
 import { GraphControls } from './GraphControls'
-import { GraphLegend } from './GraphLegend'
+import { GraphLegendDock } from './GraphLegendDock'
 import { GraphStage } from './GraphStage'
 
 // Always mounted, so a selected page keeps its panel while the graph loads.
@@ -12,6 +13,7 @@ import { GraphStage } from './GraphStage'
 // page first so it sits right below the node that was tapped.
 export const BrainGraphColumn = ({ view, brain }: BrainBodyProps) => {
   const animate = !useMediaQuery('(prefers-reduced-motion: reduce)')
+  useGraphKeys(brain)
   const { search, select } = brain
   return (
     <div
@@ -25,10 +27,9 @@ export const BrainGraphColumn = ({ view, brain }: BrainBodyProps) => {
         >
           <GraphStage
             view={view}
-            selectedId={view.selected === null ? null : (search.page ?? null)}
             select={select}
+            scene={search.scene}
             animate={animate}
-            depth={search.depth}
           />
         </section>
       )}
@@ -37,17 +38,7 @@ export const BrainGraphColumn = ({ view, brain }: BrainBodyProps) => {
           <GraphControls model={view.model} brain={brain} />
         </div>
       ) : null}
-      {view.model !== null ? (
-        <div className="order-3 lg:absolute lg:bottom-3 lg:left-3 lg:max-w-[calc(100%-29rem)]">
-          <GraphLegend
-            model={view.model}
-            colorBy={search.color}
-            communities={view.communities}
-            highlightOrphans={search.orphans}
-            skipped={view.data?.skipped ?? 0}
-          />
-        </div>
-      ) : null}
+      <GraphLegendDock view={view} brain={brain} />
       {search.page === undefined ? null : (
         <FloatingPagePanel
           key={search.page}

@@ -52,6 +52,10 @@ export default [
       'src/screens/home/OrbitGlow.tsx',
       'src/screens/home/OrbitTrail.tsx',
       'src/screens/home/OrbitPulseRing.tsx',
+      'src/screens/brain/GraphScene3d.tsx',
+      'src/screens/brain/SceneEdges3d.tsx',
+      'src/screens/brain/SceneLabel3d.tsx',
+      'src/screens/brain/SceneNodes3d.tsx',
     ],
     rules: {
       'react/no-unknown-property': [
@@ -75,6 +79,8 @@ export default [
             'uniforms',
             'vertexShader',
             'fragmentShader',
+            'position',
+            'geometry',
           ],
         },
       ],
