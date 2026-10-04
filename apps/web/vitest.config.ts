@@ -12,6 +12,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
+    // jsdom route renders are CPU-bound: the slowest test takes about 1.2 s at
+    // load 28, and three that take 0.1-0.6 s passed 5 s at load 40-75 while
+    // other sessions shared the machine. None waits on a real timer or process.
+    testTimeout: 15_000,
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
     setupFiles: ['./src/test/setup.ts'],
     coverage: {
