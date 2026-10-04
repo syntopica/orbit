@@ -6,10 +6,10 @@ import type {
 } from '@orbit/contract'
 
 import type { Hub } from '../types/Hub'
+import { createEventPublisher } from './createEventPublisher'
 import { createRing } from './createRing'
+import { createSnapshotPublisher } from './createSnapshotPublisher'
 import { deliverToListeners } from './deliverToListeners'
-import { snapshotHash } from './snapshotHash'
-import { withoutEvents } from './withoutEvents'
 
 export const createHub = (options: {
   ringSize: number
@@ -18,7 +18,6 @@ export const createHub = (options: {
 }): Hub => {
   if (!Number.isInteger(options.ringSize) || options.ringSize < 1)
     throw new Error('ringSize must be a positive integer')
-  const resendMs = 30_000
   let nextId = options.firstId
   const ring = createRing(options.ringSize)
   const current = new Map<ComponentId, Snapshot>()
@@ -29,25 +28,24 @@ export const createHub = (options: {
     ring.push(message)
     deliverToListeners(listeners, message)
   }
-  const publishSnapshot = (snapshot: Snapshot): void => {
-    const stored = withoutEvents(snapshot)
-    current.set(snapshot.component, stored)
-    const hash = snapshotHash(stored)
-    const prior = sent.get(snapshot.component)
-    if (prior?.hash === hash && Date.now() - prior.at < resendMs) return
-    sent.set(snapshot.component, { hash, at: Date.now() })
-    send({ type: 'snapshot', id: nextId++, snapshot: stored })
-  }
+  const publishEvent = createEventPublisher({
+    events,
+    recentEvents: options.recentEvents,
+    send,
+    nextId: () => nextId++,
+  })
+  const publishSnapshot = createSnapshotPublisher({
+    current,
+    sent,
+    send,
+    nextId: () => nextId++,
+  })
   return {
     ringSize: options.ringSize,
+    publishEvent,
     publish: (snapshot) => {
       publishSnapshot(snapshot)
-      for (const event of snapshot.events) {
-        const message: EventMessage = { type: 'event', id: nextId++, event }
-        events.push(message)
-        events.splice(0, Math.max(0, events.length - options.recentEvents))
-        send(message)
-      }
+      for (const event of snapshot.events) publishEvent(event)
     },
     snapshots: () => [...current.values()],
     recentEvents: () => [...events],

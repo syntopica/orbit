@@ -4,7 +4,8 @@ import { pruneAudit } from './pruneAudit'
 
 export const recordAudit = (
   db: DatabaseSync,
-  action: 'session.create' | 'session.pair' | 'session.logout',
+  action:
+    'session.create' | 'session.pair' | 'session.logout' | 'session.step_up',
   outcome: 'ok' | 'denied' | 'error',
   now: number,
 ): void => {

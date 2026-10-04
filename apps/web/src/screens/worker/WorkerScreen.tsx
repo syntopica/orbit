@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router'
 import { ConnectionIndicator } from '../../components/shell/ConnectionIndicator'
 import { useWorkerActivity } from '../../hooks/useWorkerActivity'
 import { useWorkerModel } from '../../hooks/useWorkerModel'
@@ -13,6 +14,9 @@ export const WorkerScreen = () => {
         <h1 className="text-2xl font-semibold tracking-tight">
           {WORKER_LABELS.title}
         </h1>
+        <Link to="/worker/jobs" className="text-accent underline">
+          Jobs
+        </Link>
         {model.isPhone ? <ConnectionIndicator /> : null}
       </header>
       {model.failed ? <p role="alert">{WORKER_LABELS.unavailable}</p> : null}

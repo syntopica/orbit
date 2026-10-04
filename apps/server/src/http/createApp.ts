@@ -17,14 +17,13 @@ import { getMemoryFlow } from './routes/getMemoryFlow'
 import { getMetricHistory } from './routes/getMetricHistory'
 import { getSnapshots } from './routes/getSnapshots'
 import { getStream } from './routes/getStream'
-import { getWorker } from './routes/getWorker'
-import { getWorkerActivity } from './routes/getWorkerActivity'
-import { getWorkerCosts } from './routes/getWorkerCosts'
-import { getWorkerQuality } from './routes/getWorkerQuality'
 import { postLogout } from './routes/postLogout'
 import { postPair } from './routes/postPair'
 import { postSession } from './routes/postSession'
+import { postStepUp } from './routes/postStepUp'
 import { registerBrainRoutes } from './routes/registerBrainRoutes'
+import { registerWorkerDetailRoutes } from './routes/registerWorkerDetailRoutes'
+import { registerWorkerJobRoutes } from './routes/registerWorkerJobRoutes'
 import { securityHeaders } from './securityHeaders'
 import { serveWeb } from './serveWeb'
 import { tailnetLogin } from './tailnetLogin'
@@ -51,6 +50,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   const api = new Hono<OrbitEnv>()
   api.use('*', requireSession(deps.authDb, deps.now))
   api.post('/logout', postLogout(auth))
+  api.post('/session/step-up', authBodyLimit(), postStepUp(auth))
   api.get('/snapshots', getSnapshots(deps.hub))
   api.get('/stream', refuseHead(), getStream(deps.hub, deps.authDb, deps.now))
   api.get('/launchd', getLaunchdRows(deps.catalog, pool))
@@ -62,19 +62,8 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   api.get('/clips', getClips(deps.clips, deps.hub, memoryPool, deps.now))
   api.get('/memory/flow', getMemoryFlow(deps, memoryPool))
   api.get('/atrium', getAtrium(deps.atrium, memoryPool, deps.now))
-  api.get('/worker', getWorker(deps.worker, workerPool, deps.now))
-  api.get(
-    '/worker/activity',
-    getWorkerActivity(deps.workerActivity, workerPool, deps.now),
-  )
-  api.get(
-    '/worker/costs',
-    getWorkerCosts(deps.workerCosts, workerPool, deps.now),
-  )
-  api.get(
-    '/worker/quality',
-    getWorkerQuality(deps.workerQuality, workerPool, deps.now),
-  )
+  registerWorkerDetailRoutes(api, deps, workerPool)
+  registerWorkerJobRoutes(api, deps, workerPool)
   registerBrainRoutes(api, deps.brain, memoryPool, deps.now)
   api.all('*', (c) => c.json({ error: 'not_found' }, 404))
   app.route('/api', api)

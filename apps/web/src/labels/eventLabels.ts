@@ -8,5 +8,7 @@ export const EVENT_LABELS: Record<OrbitEvent['kind'], string> = {
   'launchd.stopped': 'job stopped',
   'worker.job_failed': 'job failed',
   'worker.cooldown_started': 'executor cooling down',
+  'worker.revealed': 'job content revealed',
+  'worker.action': 'job action completed',
   'synthetic.tick': 'probe tick',
 }

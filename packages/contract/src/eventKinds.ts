@@ -6,5 +6,7 @@ export const EVENT_KINDS = [
   'launchd.stopped',
   'worker.job_failed',
   'worker.cooldown_started',
+  'worker.revealed',
+  'worker.action',
   'synthetic.tick',
 ] as const

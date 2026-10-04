@@ -10,6 +10,7 @@ import { buildClipsReader } from './buildClipsReader'
 import { buildStageLabels } from './buildStageLabels'
 import { buildWorkerActivityReader } from './buildWorkerActivityReader'
 import { buildWorkerCostsReader } from './buildWorkerCostsReader'
+import { buildWorkerJobClient } from './buildWorkerJobClient'
 import { buildWorkerQualityReader } from './buildWorkerQualityReader'
 import { buildWorkerReader } from './buildWorkerReader'
 
@@ -53,6 +54,7 @@ export const buildHandler = (
     workerActivity: buildWorkerActivityReader(config.worker, fetch),
     workerCosts: buildWorkerCostsReader(config.worker, fetch),
     workerQuality: buildWorkerQualityReader(config.worker, fetch),
+    workerJobs: buildWorkerJobClient(config.worker, fetch),
     guard: {
       port,
       allowedHosts: config.allowedHosts,

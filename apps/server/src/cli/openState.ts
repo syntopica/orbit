@@ -6,6 +6,7 @@ import { resolveDataDir } from '../config/resolveDataDir'
 import { HISTORY_SCHEMA_SQL } from '../history/historySchemaSql'
 import { AUTH_SCHEMA_SQL } from '../state/authSchemaSql'
 import { ensureStateDir } from '../state/ensureStateDir'
+import { migrateAuthStepUp } from '../state/migrateAuthStepUp'
 import { openDatabase } from '../state/openDatabase'
 import type { OrbitState } from '../types/OrbitState'
 
@@ -19,6 +20,7 @@ export const openState = async (
   const stateDir = await ensureStateDir(dataDir)
   const config = await loadOrbitConfig(dataDir)
   const authDb = openDatabase(join(stateDir, 'auth.sqlite3'), AUTH_SCHEMA_SQL)
+  migrateAuthStepUp(authDb)
   const historyDb = openDatabase(
     join(stateDir, 'history.sqlite3'),
     HISTORY_SCHEMA_SQL,

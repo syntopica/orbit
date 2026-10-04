@@ -8,6 +8,8 @@ import { pairRoute } from './pairRoute'
 import { rootRoute } from './rootRoute'
 import { shellRoute } from './shellRoute'
 import { systemRoute } from './systemRoute'
+import { workerJobRoute } from './workerJobRoute'
+import { workerJobsRoute } from './workerJobsRoute'
 import { workerRoute } from './workerRoute'
 
 export const routeTree = rootRoute.addChildren([
@@ -18,6 +20,8 @@ export const routeTree = rootRoute.addChildren([
     brainRoute,
     clipsRoute,
     workerRoute,
+    workerJobsRoute,
+    workerJobRoute,
     systemRoute,
   ]),
   loginRoute,

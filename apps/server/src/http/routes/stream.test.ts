@@ -59,6 +59,7 @@ const setup = () => {
     workerActivity: null,
     workerCosts: null,
     workerQuality: null,
+    workerJobs: null,
     guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
     webRoot: '/nonexistent',
     now: () => Date.now(),

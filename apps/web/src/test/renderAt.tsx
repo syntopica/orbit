@@ -22,5 +22,5 @@ export const renderAt = async (path: string) => {
     </QueryClientProvider>,
   )
   await router.load()
-  return { ...view, router }
+  return { ...view, router, client }
 }

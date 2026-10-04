@@ -6,6 +6,7 @@ import { join } from 'node:path'
 import { fakeActivity } from './fakeActivity'
 import { fakeCosts } from './fakeCosts'
 import { fakeQuality } from './fakeQuality'
+import { fakeJob } from './fakeJob'
 import { E2E } from './paths'
 
 // A stand-in coordinator: admin aggregate reads with the right
@@ -14,17 +15,101 @@ export const startFakeWorker = async (
   token: string,
 ): Promise<{ url: string; stop: () => Promise<void> }> => {
   const body = await readFile(join(E2E.fixtures, 'worker-status.json'))
+  let cancelled = false
   const server = createServer((request, response) => {
     const allowed = request.headers.authorization === `Bearer ${token}`
     const url = new URL(request.url ?? '/', 'http://127.0.0.1')
-    const known = [
-      '/v1/status',
-      '/v1/activity',
-      '/v1/costs',
-      '/v1/quality',
-    ].includes(url.pathname)
+    const known =
+      ['/v1/status', '/v1/activity', '/v1/costs', '/v1/quality'].includes(
+        url.pathname,
+      ) || url.pathname.startsWith('/v1/admin/jobs')
     if (!known || !allowed) {
       response.writeHead(allowed ? 404 : 401).end()
+      return
+    }
+    if (url.pathname.startsWith('/v1/admin/jobs')) {
+      const parts = url.pathname.split('/')
+      const id = parts[4]
+      const action = parts[5]
+      const ids = ['job-internal', 'job-secret', 'job-cancel']
+      if (id && !ids.includes(id)) {
+        response
+          .writeHead(404, { 'Content-Type': 'application/json' })
+          .end('{"error":"not_found"}')
+        return
+      }
+      if (
+        id === 'job-cancel' &&
+        action === 'cancel' &&
+        request.method === 'POST'
+      )
+        cancelled = true
+      const row = fakeJob(
+        id ?? 'job-internal',
+        id === 'job-cancel' ? (cancelled ? 'cancelled' : 'queued') : 'failed',
+      )
+      const jobs = ids
+        .map((item) =>
+          fakeJob(
+            item,
+            item === 'job-cancel'
+              ? cancelled
+                ? 'cancelled'
+                : 'queued'
+              : 'failed',
+          ),
+        )
+        .filter(
+          (item) =>
+            (!url.searchParams.has('queue') ||
+              item.queue === url.searchParams.get('queue')) &&
+            (!url.searchParams.has('state') ||
+              item.state === url.searchParams.get('state')) &&
+            (!url.searchParams.has('producer') ||
+              item.producer === url.searchParams.get('producer')),
+        )
+      const result = !id
+        ? { jobs, next: null }
+        : action === 'content'
+          ? {
+              input: { prompt: 'Example input' },
+              output: { answer: 'Example output' },
+            }
+          : action === 'retry'
+            ? { id: 'job-retry', state: 'queued', retry_of: id }
+            : action
+              ? { id, state: row.state }
+              : {
+                  ...row,
+                  attempt_details: [
+                    {
+                      node: 'node-demo',
+                      provider: 'agy',
+                      model: 'model-demo',
+                      outcome: 'failed',
+                      error: 'timeout',
+                      started: 1_790_000_001,
+                      ended: 1_790_000_002,
+                      tokens_in: 2,
+                      tokens_out: 3,
+                    },
+                  ],
+                  has_input: true,
+                  has_output: true,
+                }
+      if (
+        action === 'content' &&
+        id === 'job-secret' &&
+        request.headers['x-worker-reveal'] !== 'secret'
+      ) {
+        response
+          .writeHead(403, { 'Content-Type': 'application/json' })
+          .end('{"error":"reveal_required"}')
+        return
+      }
+      response
+        .writeHead(200, { 'Content-Type': 'application/json' })
+        .end(JSON.stringify(result))
       return
     }
     response

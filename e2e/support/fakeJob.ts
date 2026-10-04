@@ -1,0 +1,15 @@
+export const fakeJob = (id: string, state = 'failed') => ({
+  id,
+  queue: 'queue.demo',
+  producer: 'demo',
+  state,
+  privacy: id === 'job-secret' ? 'secret' : 'internal',
+  tier: 'fast',
+  created: 1_790_000_000,
+  updated: 1_790_000_100,
+  attempts: 1,
+  last_error: 'timeout',
+  acked: null,
+  retry_of: null,
+  sampling: false,
+})

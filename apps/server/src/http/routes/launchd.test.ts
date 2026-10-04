@@ -29,6 +29,7 @@ describe('launchd routes', () => {
       workerActivity: null,
       workerCosts: null,
       workerQuality: null,
+      workerJobs: null,
       stageLabels: new Map(),
       catalog: {
         rows: vi.fn<LaunchdCatalog['rows']>().mockResolvedValue([

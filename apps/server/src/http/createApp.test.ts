@@ -38,6 +38,7 @@ describe('createApp static files', () => {
       workerActivity: null,
       workerCosts: null,
       workerQuality: null,
+      workerJobs: null,
       guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
       webRoot,
       now: () => Date.now(),
