@@ -5,3 +5,5 @@ allowBuilds:
   lefthook: true
   unrs-resolver: true
   esbuild: true
+minimumReleaseAgeExclude:
+  - '@syntopica/quality-config@0.12.0'
