@@ -14,7 +14,7 @@ export const checkTailnet: DoctorCheck = (state) => {
       name: 'tailnet',
       level: 'fail',
       detail:
-        'allowedHosts set but allowedLogins empty: every tailnet request is refused',
+        'allowedHosts set but allowedLogins empty: every request carrying a Tailscale login is refused (sessions remain the only authentication)',
     }
   }
   return {
