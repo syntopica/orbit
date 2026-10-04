@@ -7,6 +7,14 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Lighthouse is back in `apps/web` as `pnpm perf:check`: plain
+  `lighthouse` 13.5 (0 advisories) against `vite preview`, floors 0.9
+  performance and best practices, 1.0 accessibility. `@lhci/cli` stays out: its
+  last release (0.15.1, June 2025) still pulls 14 advisories. Evidence: first
+  run 0.92 / 1.00 / 0.96 at host load ~50; `audit:check` clean.
+- 2026-10-04 [x] Root format check no longer walks agent worktrees:
+  `.claude/worktrees/` is ignored. The pre-push gate failed on files that
+  belonged to other branches.
 - 2026-10-04 [x] Step-up exemption for the machine itself: `orbit.json`
   `remotePort` makes orbit listen on a second loopback port for Tailscale Serve;
   requests whose socket arrived on `port` skip the action step-up, requests on

@@ -6,11 +6,6 @@ This repository is public: entries describe engine behaviour only.
 
 ## Memory (sub-project 1)
 
-- [!] Lighthouse CI is out of `apps/web` (see `apps/web/README.md`). Blocked on
-  upstream patches for the five `@lhci/cli` advisories; re-add it, or waive them
-  explicitly, when they clear. Re-checked 2026-10-04: `@lhci/cli` 0.15.1 now
-  resolves to 14 advisories (11 high), the same five among them.
-
 ## Reliability plan (2026-10-04, in this order)
 
 - [~] 1. Engine read timeouts (brain and clips reads time out together every few
