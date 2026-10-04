@@ -17,13 +17,21 @@ export const DoctorList = ({ doctor, note }: DoctorListProps) => {
       ) : (
         <ul className="space-y-1 font-mono text-sm">
           {failing.map((check) => (
-            <li key={check.name} className="wrap-anywhere">
-              {check.name}
+            <li
+              key={check.name}
+              className="flex flex-wrap items-center gap-x-2 wrap-anywhere"
+            >
               {check.severity === undefined ? null : (
-                <span> [{check.severity}]</span>
-              )}
+                <span
+                  data-severity={check.severity}
+                  className="border-line data-[severity=broken]:text-down data-[severity=warn]:text-warn rounded border px-1.5 font-sans text-xs uppercase"
+                >
+                  {check.severity === 'broken' ? 'fail' : check.severity}
+                </span>
+              )}{' '}
+              <span>{check.name}</span>{' '}
               {check.code === null ? null : (
-                <span className="text-muted"> {check.code}</span>
+                <span className="text-muted">{check.code}</span>
               )}
             </li>
           ))}

@@ -89,7 +89,7 @@ describe('AtriumScreen', () => {
       }),
     ).toBeInTheDocument()
     const doctor = screen.getByRole('region', { name: 'Doctor' })
-    expect(doctor).toHaveTextContent('synthesis [warn] orphans')
+    expect(doctor).toHaveTextContent('warn synthesis orphans')
     expect(doctor).not.toHaveTextContent('archive')
     expect(doctor).toHaveTextContent('Published 2m ago.')
     expect(

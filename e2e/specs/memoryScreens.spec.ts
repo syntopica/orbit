@@ -52,7 +52,7 @@ test('atrium shows doctor codes and inspects a context query', async ({
   await page.goto('/atrium')
   const doctor = page.getByRole('region', { name: 'Doctor' })
   await expect(doctor).toContainText(
-    'synthesis [warn] synthesis_orphan_conversations',
+    'warn synthesis synthesis_orphan_conversations',
   )
   await expect(doctor).toContainText('Published 2m ago.')
   const inspector = page.getByRole('region', { name: 'Context inspector' })
