@@ -9,6 +9,8 @@ import { buildBrainReaders } from './buildBrainReaders'
 import { buildClipsReader } from './buildClipsReader'
 import { buildStageLabels } from './buildStageLabels'
 import { buildWorkerActivityReader } from './buildWorkerActivityReader'
+import { buildWorkerCostsReader } from './buildWorkerCostsReader'
+import { buildWorkerQualityReader } from './buildWorkerQualityReader'
 import { buildWorkerReader } from './buildWorkerReader'
 
 // The HTTP application over the state, for the port the server really got.
@@ -49,6 +51,8 @@ export const buildHandler = (
     atrium: buildAtriumReader(config.atrium, config.cadenceMs.atrium ?? 60_000),
     worker: buildWorkerReader(config.worker, fetch),
     workerActivity: buildWorkerActivityReader(config.worker, fetch),
+    workerCosts: buildWorkerCostsReader(config.worker, fetch),
+    workerQuality: buildWorkerQualityReader(config.worker, fetch),
     guard: {
       port,
       allowedHosts: config.allowedHosts,

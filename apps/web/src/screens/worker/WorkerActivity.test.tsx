@@ -138,7 +138,12 @@ describe('worker activity', () => {
     const fetcher = serve()
     const { router } = await renderAt(WORKER)
     await chart()
-    fireEvent.click(screen.getByRole('button', { name: '7 days' }))
+    fireEvent.click(
+      within(screen.getByRole('region', { name: 'Activity' })).getByRole(
+        'button',
+        { name: '7 days' },
+      ),
+    )
     await waitFor(() => {
       expect(router.state.location.search).toEqual({ range: '7d' })
     })

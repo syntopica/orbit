@@ -4,9 +4,11 @@ import type { AddressInfo } from 'node:net'
 import { join } from 'node:path'
 
 import { fakeActivity } from './fakeActivity'
+import { fakeCosts } from './fakeCosts'
+import { fakeQuality } from './fakeQuality'
 import { E2E } from './paths'
 
-// A stand-in coordinator: GET /v1/status and /v1/activity with the right
+// A stand-in coordinator: admin aggregate reads with the right
 // bearer token only.
 export const startFakeWorker = async (
   token: string,
@@ -15,7 +17,12 @@ export const startFakeWorker = async (
   const server = createServer((request, response) => {
     const allowed = request.headers.authorization === `Bearer ${token}`
     const url = new URL(request.url ?? '/', 'http://127.0.0.1')
-    const known = ['/v1/status', '/v1/activity'].includes(url.pathname)
+    const known = [
+      '/v1/status',
+      '/v1/activity',
+      '/v1/costs',
+      '/v1/quality',
+    ].includes(url.pathname)
     if (!known || !allowed) {
       response.writeHead(allowed ? 404 : 401).end()
       return
@@ -25,7 +32,11 @@ export const startFakeWorker = async (
       .end(
         url.pathname === '/v1/status'
           ? body
-          : fakeActivity(Number(url.searchParams.get('hours'))),
+          : url.pathname === '/v1/activity'
+            ? fakeActivity(Number(url.searchParams.get('hours')))
+            : url.pathname === '/v1/costs'
+              ? fakeCosts()
+              : fakeQuality(),
       )
   })
   await new Promise<void>((resolve) => {

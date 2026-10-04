@@ -23,6 +23,17 @@ export default [
       },
     },
   },
+  // A labelled region that scrolls horizontally must take keyboard focus
+  // (axe scrollable-region-focusable), so regions may carry tabIndex.
+  {
+    files: ['**/*.tsx'],
+    rules: {
+      'jsx-a11y/no-noninteractive-tabindex': [
+        'error',
+        { tags: [], roles: ['tabpanel', 'region'] },
+      ],
+    },
+  },
   // Entry-point bootstrap files are allowed multiple top-level statements
   {
     files: ['src/main.tsx', 'src/main.ts'],

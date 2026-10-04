@@ -61,7 +61,7 @@ test('charts worker activity with a tooltip, a queue detail and a range', async 
   await expect(
     page.getByRole('group', { name: 'OpenRouter attempts today (UTC)' }),
   ).toBeVisible()
-  await page.getByRole('button', { name: '7 days' }).click()
+  await activity.getByRole('button', { name: '7 days' }).click()
   await expect(page).toHaveURL(/\/worker\?range=7d$/)
   await expect(chart).toBeVisible()
   expect(errors).toEqual([])

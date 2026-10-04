@@ -22,6 +22,8 @@ export const buildTestApp = (overrides: Partial<AppDeps> = {}) => {
     brain: null,
     worker: null,
     workerActivity: null,
+    workerCosts: null,
+    workerQuality: null,
     guard: { port: 8790, allowedHosts: [], allowedLogins: [] },
     webRoot: '/nonexistent',
     ...overrides,

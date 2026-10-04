@@ -37,7 +37,7 @@ export const layoutChart = (
   })
   const yTicks = y
     .ticks(3)
-    .filter((value) => Number.isInteger(value))
+    .filter((value) => Number.isInteger(value) || max < 1)
     .map((value) => ({ at: y(value), label: value.toLocaleString('en-GB') }))
   const starts = columns.map((c) => c.start)
   const centers = laid.map((c) => c.center)

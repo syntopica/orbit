@@ -1,7 +1,9 @@
 import type { WorkerBodyProps } from '../../types/WorkerBodyProps'
 import { ActivitySection } from './ActivitySection'
 import { CooldownSection } from './CooldownSection'
+import { CostsSection } from './CostsSection'
 import { DiagnosisCard } from './DiagnosisCard'
+import { ExecutorsSection } from './ExecutorsSection'
 import { FailureSection } from './FailureSection'
 import { NodeSection } from './NodeSection'
 import { QueueSection } from './QueueSection'
@@ -19,5 +21,7 @@ export const WorkerBody = ({ body, isPhone, activity }: WorkerBodyProps) => (
     <CooldownSection cooldowns={body.view.cooldowns} now={body.view.now} />
     <NodeSection nodes={body.view.nodes} />
     <FailureSection groups={body.failures} activity={activity} />
+    <CostsSection />
+    <ExecutorsSection cooldowns={body.view.cooldowns} now={body.view.now} />
   </>
 )

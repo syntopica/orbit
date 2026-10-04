@@ -38,6 +38,9 @@ routes `GET /api/brain/graph|related|page|checks`, the page id pattern, the
 graph's colour, size, layout and local view, the page view's content, and the
 fetch policy (open, cache, never poll).
 
+**Revision 10 (worker costs and executors).** 7.3: the read-only Costs and
+Executors panels follow section 2 of `2026-10-04-orbit-worker-design.md`.
+
 **Revision 8 (memory screens).** 7.4 (new): the detail routes
 `GET /api/history/metrics`, `GET /api/atrium`, `GET /api/clips` and
 `GET /api/memory/flow`; flow stages and edges as data with freshness sources;

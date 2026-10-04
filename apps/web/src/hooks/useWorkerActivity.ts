@@ -9,7 +9,7 @@ import type { WorkerActivityState } from '../types/WorkerActivityState'
 import { validateWorkerSearch } from '../validators/validateWorkerSearch'
 
 export const useWorkerActivity = (): WorkerActivityState => {
-  const { range } = validateWorkerSearch(useSearch({ strict: false }))
+  const { range, costs } = validateWorkerSearch(useSearch({ strict: false }))
   const navigate = useNavigate()
   const query = useQuery({
     queryKey: ['worker-activity', range],
@@ -28,6 +28,9 @@ export const useWorkerActivity = (): WorkerActivityState => {
     failed: query.isError && model === null,
     range,
     setRange: (next) =>
-      void navigate({ to: '/worker', search: { range: next } }),
+      void navigate({
+        to: '/worker',
+        search: { range: next, ...(costs === undefined ? {} : { costs }) },
+      }),
   }
 }

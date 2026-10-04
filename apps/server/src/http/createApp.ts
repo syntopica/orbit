@@ -19,6 +19,8 @@ import { getSnapshots } from './routes/getSnapshots'
 import { getStream } from './routes/getStream'
 import { getWorker } from './routes/getWorker'
 import { getWorkerActivity } from './routes/getWorkerActivity'
+import { getWorkerCosts } from './routes/getWorkerCosts'
+import { getWorkerQuality } from './routes/getWorkerQuality'
 import { postLogout } from './routes/postLogout'
 import { postPair } from './routes/postPair'
 import { postSession } from './routes/postSession'
@@ -64,6 +66,14 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   api.get(
     '/worker/activity',
     getWorkerActivity(deps.workerActivity, workerPool, deps.now),
+  )
+  api.get(
+    '/worker/costs',
+    getWorkerCosts(deps.workerCosts, workerPool, deps.now),
+  )
+  api.get(
+    '/worker/quality',
+    getWorkerQuality(deps.workerQuality, workerPool, deps.now),
   )
   registerBrainRoutes(api, deps.brain, memoryPool, deps.now)
   api.all('*', (c) => c.json({ error: 'not_found' }, 404))

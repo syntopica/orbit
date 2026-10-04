@@ -9,6 +9,8 @@ import type { GuardConfig } from './GuardConfig'
 import type { Hub } from './Hub'
 import type { LaunchdCatalog } from './LaunchdCatalog'
 import type { WorkerActivityReader } from './WorkerActivityReader'
+import type { WorkerCostsReader } from './WorkerCostsReader'
+import type { WorkerQualityReader } from './WorkerQualityReader'
 import type { WorkerReader } from './WorkerReader'
 
 export type AppDeps = {
@@ -22,6 +24,8 @@ export type AppDeps = {
   readonly catalog: LaunchdCatalog | null
   readonly worker: WorkerReader | null
   readonly workerActivity: WorkerActivityReader | null
+  readonly workerCosts: WorkerCostsReader | null
+  readonly workerQuality: WorkerQualityReader | null
   readonly guard: GuardConfig
   readonly webRoot: string
   readonly now: () => number
