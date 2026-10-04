@@ -12,3 +12,6 @@ coverage/
 e2e/.tmp/
 test-results/
 playwright-report/
+
+# Agent worktrees created under the checkout
+.claude/worktrees/
