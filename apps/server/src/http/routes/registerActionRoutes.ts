@@ -6,7 +6,7 @@ import type { OrbitEnv } from '../../types/OrbitEnv'
 import { postEngineAction } from './postEngineAction'
 import { postLaunchdAction } from './postLaunchdAction'
 import { requireActionRate } from './requireActionRate'
-import { requireRemoteStepUp } from './requireRemoteStepUp'
+import { requireStepUp } from './requireStepUp'
 
 export const registerActionRoutes = (
   api: Hono<OrbitEnv>,
@@ -21,7 +21,7 @@ export const registerActionRoutes = (
     { once: true },
   )
   const rate = requireActionRate(deps)
-  const stepUp = requireRemoteStepUp(deps)
+  const stepUp = requireStepUp(deps)
   api.get('/actions', (c) => c.json({ runs: store.list() }))
   api.get('/engines/:engine/actions', (c) => {
     const name = c.req.param('engine')

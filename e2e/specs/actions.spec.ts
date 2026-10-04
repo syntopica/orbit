@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 
+import { confirmWithStepUp } from '../support/confirmWithStepUp'
 import { signIn } from '../support/signIn'
 
 test('scheduled run needs confirmation and reaches the ticker', async ({
@@ -16,7 +17,7 @@ test('scheduled run needs confirmation and reaches the ticker', async ({
   await dialog.getByRole('button', { name: 'Cancel' }).click()
   await expect(dialog).toHaveCount(0)
   await row.getByRole('button', { name: 'Run now' }).click()
-  await dialog.getByRole('button', { name: 'Confirm run' }).click()
+  await confirmWithStepUp(dialog, 'Confirm run')
   await expect(row.getByRole('link', { name: 'View run' })).toBeVisible()
   await page.goto('/')
   await expect(
@@ -34,7 +35,8 @@ test('engine action needs confirmation and reports failure', async ({
   await page.getByRole('button', { name: 'Fail graph action' }).click()
   const dialog = page.getByRole('dialog', { name: 'Confirm fail' })
   await expect(dialog).toContainText('brain')
-  await dialog.getByRole('button', { name: 'Confirm fail' }).click()
+  await confirmWithStepUp(dialog, 'Confirm fail')
+  await expect(dialog).toHaveCount(0)
   await page.goto('/')
   await expect(
     page

@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 import { E2E } from '../support/paths'
+import { confirmWithStepUp } from '../support/confirmWithStepUp'
 import { signIn } from '../support/signIn'
 
 for (const colorScheme of ['dark', 'light'] as const) {
@@ -81,6 +82,6 @@ test('cancel waits for confirmation and refreshes job', async ({ page }) => {
   await page.keyboard.press('Escape')
   await expect(dialog).toHaveCount(0)
   await page.getByRole('button', { name: 'Cancel job' }).click()
-  await dialog.getByRole('button', { name: 'Confirm cancel' }).click()
+  await confirmWithStepUp(dialog, 'Confirm cancel')
   await expect(page.getByText('cancelled', { exact: true })).toBeVisible()
 })

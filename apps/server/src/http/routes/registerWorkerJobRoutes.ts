@@ -7,7 +7,7 @@ import { getWorkerJob } from './getWorkerJob'
 import { getWorkerJobContent } from './getWorkerJobContent'
 import { getWorkerJobs } from './getWorkerJobs'
 import { postWorkerJobAction } from './postWorkerJobAction'
-import { requireRemoteStepUp } from './requireRemoteStepUp'
+import { requireStepUp } from './requireStepUp'
 
 export const registerWorkerJobRoutes = (
   api: Hono<OrbitEnv>,
@@ -17,7 +17,7 @@ export const registerWorkerJobRoutes = (
   api.get('/worker/jobs', getWorkerJobs(deps.workerJobs, pool))
   api.get('/worker/jobs/:id', getWorkerJob(deps.workerJobs, pool))
   api.get('/worker/jobs/:id/content', getWorkerJobContent(deps, pool))
-  const stepUp = requireRemoteStepUp(deps)
+  const stepUp = requireStepUp(deps)
   for (const action of ['cancel', 'retry', 'ack'] as const)
     api.post(
       `/worker/jobs/:id/${action}`,

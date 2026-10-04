@@ -1,5 +1,5 @@
 import { orbitConfigSchema } from '../../config/orbitConfigSchema'
-import { buildTestApp } from '../../test/buildTestApp'
+import { buildSteppedApp } from '../../test/buildSteppedApp'
 import type { RunRequest } from '../../types/RunRequest'
 import type { RunResult } from '../../types/RunResult'
 
@@ -53,7 +53,7 @@ describe('action routes', () => {
           finish = resolve
         }),
     )
-    const app = buildTestApp({
+    const app = buildSteppedApp({
       actions: {
         launchd: config.launchd,
         engines: config.engines,
@@ -101,7 +101,7 @@ describe('action routes', () => {
     expect(JSON.stringify(events)).not.toContain('PRIVATE')
   })
   it('refuses unknown, mismatched and self actions', async () => {
-    const app = buildTestApp({
+    const app = buildSteppedApp({
       actions: {
         launchd: config.launchd,
         engines: config.engines,
@@ -141,7 +141,7 @@ describe('action routes', () => {
     ).toBe(404)
   })
   it('limits requests per session and requires CSRF', async () => {
-    const app = buildTestApp({
+    const app = buildSteppedApp({
       actions: {
         launchd: config.launchd,
         engines: config.engines,
@@ -173,7 +173,7 @@ describe('action routes', () => {
     const runner = vi.fn(
       async () => await Promise.resolve({ code: 0, stdout: 'SECRET' }),
     )
-    const app = buildTestApp({
+    const app = buildSteppedApp({
       actions: {
         launchd: config.launchd,
         engines: config.engines,

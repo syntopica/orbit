@@ -1,6 +1,7 @@
 import type { DatabaseSync } from 'node:sqlite'
 
 import { createSession } from '../auth/createSession'
+import { markStepUp } from '../auth/markStepUp'
 import { createApp } from '../http/createApp'
 import { createHub } from '../hub/createHub'
 import type { AppDeps } from '../types/AppDeps'
@@ -8,7 +9,10 @@ import { openAuthDb } from './openAuthDb'
 import { openHistoryDb } from './openHistoryDb'
 
 // An app on a fixed clock with a live session cookie and loopback headers.
-export const buildTestApp = (overrides: Partial<AppDeps> = {}) => {
+export const buildTestApp = (
+  overrides: Partial<AppDeps> = {},
+  options: { stepUp?: boolean } = {},
+) => {
   const now = overrides.now ?? (() => 1_790_000_000_000)
   const authDb: DatabaseSync = overrides.authDb ?? openAuthDb()
   const deps: AppDeps = {
@@ -32,7 +36,9 @@ export const buildTestApp = (overrides: Partial<AppDeps> = {}) => {
     now,
   }
   const app = createApp(deps)
-  const cookie = `__Host-orbit_session=${createSession(authDb, now())}`
+  const session = createSession(authDb, now())
+  if (options.stepUp === true) markStepUp(authDb, session, now())
+  const cookie = `__Host-orbit_session=${session}`
   const get = async (path: string, headers: Record<string, string> = {}) =>
     app.request(`http://127.0.0.1:8790${path}`, {
       headers: {

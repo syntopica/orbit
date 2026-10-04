@@ -5,7 +5,7 @@ import { join } from 'node:path'
 import { orbitConfigSchema } from '../../config/orbitConfigSchema'
 import { createEngineRunner } from '../../engines/createEngineRunner'
 import { runProcess } from '../../process/runProcess'
-import { buildTestApp } from '../../test/buildTestApp'
+import { buildSteppedApp } from '../../test/buildSteppedApp'
 
 describe('engine action timeout', () => {
   it('kills the action process group and reports no output', async () => {
@@ -36,7 +36,7 @@ setInterval(() => {}, 1000)
         { file: command, subcommands: [['action']], env: { MARKER: marker } },
         runProcess,
       )
-      const app = buildTestApp({
+      const app = buildSteppedApp({
         actions: {
           launchd: undefined,
           engines: config.engines,

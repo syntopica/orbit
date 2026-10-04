@@ -167,7 +167,10 @@ describe('worker jobs routes', () => {
         body: JSON.stringify({ error: 'not_found', private: 'PRIVATE' }),
       })
     })
-    const { get, post, deps, app, cookie } = buildTestApp({ workerJobs: read })
+    const { get, post, deps, app, cookie } = buildTestApp(
+      { workerJobs: read },
+      { stepUp: true },
+    )
     const missing = await get('/api/worker/jobs/job-1')
     expect(await missing.text()).toBe('{"error":"not_found"}')
     const refused = await post('/api/worker/jobs/job-1/retry', '', {

@@ -1,5 +1,5 @@
 import { orbitConfigSchema } from '../../config/orbitConfigSchema'
-import { buildTestApp } from '../../test/buildTestApp'
+import { buildSteppedApp } from '../../test/buildSteppedApp'
 import type { RunRequest } from '../../types/RunRequest'
 import { getConfiguredEngineAction } from './getConfiguredEngineAction'
 
@@ -32,7 +32,7 @@ describe('configured actions', () => {
     },
   })
   it('offers only configured engine actions and refuses missing runners', async () => {
-    const app = buildTestApp({
+    const app = buildSteppedApp({
       actions: {
         launchd: config.launchd,
         engines: config.engines,
@@ -68,7 +68,7 @@ describe('configured actions', () => {
       async (_request: RunRequest) =>
         await Promise.resolve({ code: 0, stdout: 'PRIVATE' }),
     )
-    const app = buildTestApp({
+    const app = buildSteppedApp({
       actions: {
         launchd: config.launchd,
         engines: config.engines,
@@ -128,7 +128,7 @@ describe('configured actions', () => {
           })
         },
       )
-    const app = buildTestApp({
+    const app = buildSteppedApp({
       actionSignal: controller.signal,
       actions: {
         launchd: config.launchd,
