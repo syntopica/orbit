@@ -1,13 +1,12 @@
-import { createLaunchdCatalog } from '../adapters/launchd/createLaunchdCatalog'
 import { configuredTodoFiles } from '../config/configuredTodoFiles'
-import { recordLaunchdObservation } from '../history/recordLaunchdObservation'
 import { createApp } from '../http/createApp'
-import { runProcess } from '../process/runProcess'
 import type { BuildHandlerArgs } from '../types/BuildHandlerArgs'
 import type { RequestHandler } from '../types/RequestHandler'
+import { buildActionDeps } from './buildActionDeps'
 import { buildAtriumReader } from './buildAtriumReader'
 import { buildBrainReaders } from './buildBrainReaders'
 import { buildClipsReader } from './buildClipsReader'
+import { buildLaunchdCatalog } from './buildLaunchdCatalog'
 import { buildStageLabels } from './buildStageLabels'
 import { buildWorkerActivityReader } from './buildWorkerActivityReader'
 import { buildWorkerCostsReader } from './buildWorkerCostsReader'
@@ -17,22 +16,10 @@ import { buildWorkerReader } from './buildWorkerReader'
 
 // The HTTP application over the state, for the port the server really got.
 export const buildHandler = (
-  ...[state, hub, webRoot, port, engines]: BuildHandlerArgs
+  ...[state, hub, webRoot, port, engines, actionSignal]: BuildHandlerArgs
 ): RequestHandler => {
   const { config, historyDb } = state
-  const launchd = config.launchd
-  const catalog =
-    launchd === undefined
-      ? null
-      : createLaunchdCatalog({
-          ...launchd,
-          uid: process.getuid?.() ?? 0,
-          cadenceMs: config.cadenceMs.launchd ?? 10_000,
-          run: runProcess,
-          record: (observation) => {
-            recordLaunchdObservation(historyDb, observation)
-          },
-        })
+  const catalog = buildLaunchdCatalog(state)
   const app = createApp({
     authDb: state.authDb,
     historyDb,
@@ -63,6 +50,8 @@ export const buildHandler = (
     },
     webRoot,
     now: Date.now,
+    actions: buildActionDeps(state, engines),
+    actionSignal,
   })
   return async (request, env) => app.fetch(request, env)
 }

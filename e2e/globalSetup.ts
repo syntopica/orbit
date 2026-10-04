@@ -23,8 +23,14 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
   await assertPortFree()
   await rm(E2E.root, { recursive: true, force: true })
   await mkdir(E2E.stateDir, { recursive: true, mode: 0o700 })
-  const launchctl = join(E2E.fixtures, 'bin', 'launchctl.mjs')
+  const launchctl = join(import.meta.dirname, 'support', 'fakeLaunchctl.mjs')
+  const brainAction = join(
+    import.meta.dirname,
+    'support',
+    'fakeEngineAction.mjs',
+  )
   await chmod(launchctl, 0o755)
+  await chmod(brainAction, 0o755)
   const engineRoot = (name: string): string => join(E2E.root, 'engines', name)
   for (const name of ['brain', 'clips']) {
     await mkdir(join(engineRoot(name), 'bin'), { recursive: true })
@@ -116,7 +122,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       atrium: { statusDir: atriumStatusDir },
       engines: {
         brain: {
-          command: 'bin/brain',
+          command: brainAction,
           subcommands: [
             ['lint', '--json'],
             ['doctor', '--json', '--skip', 'credentials'],
@@ -124,6 +130,10 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
             ['graph', '--json', '--related', '--limit', '50'],
             ['page', '--json', '--id', '{pageId}'],
           ],
+          actions: {
+            refresh: { args: ['action', 'success'], label: 'Refresh graph' },
+            fail: { args: ['action', 'failure'], label: 'Fail graph action' },
+          },
         },
         clips: {
           command: 'bin/clips',
@@ -140,6 +150,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
             component: 'worker',
             label: 'com.example.worker.serve',
             role: 'keepalive',
+            actions: ['restart'],
             plist: plist('com.example.worker.serve'),
           },
           {
@@ -147,6 +158,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
             label: 'com.example.nightly',
             stage: 'curation',
             role: 'scheduled',
+            actions: ['run'],
             plist: plist('com.example.nightly'),
           },
         ],

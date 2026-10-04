@@ -9,6 +9,7 @@ const scheduled: LaunchdRow = {
   component: 'worker',
   label: 'com.example.job',
   role: 'scheduled',
+  actions: [],
   schedule: { intervalS: 3_600, calendar: false, keepAlive: false },
 }
 

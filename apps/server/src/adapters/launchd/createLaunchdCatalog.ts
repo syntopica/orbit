@@ -28,6 +28,7 @@ export const createLaunchdCatalog = (
           component: entry.component,
           label: entry.label,
           role: entry.role,
+          actions: entry.actions ?? [],
           schedule: await scheduleOf(entry.plist, signal),
         })
       }

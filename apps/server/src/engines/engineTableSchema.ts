@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { engineActionSchema } from './engineActionSchema'
 import { PAGE_ID_PLACEHOLDER } from './pageIdPlaceholder'
 
 // Per engine: the command (relative to the engine's checkout from the
@@ -27,6 +28,9 @@ export const engineTableSchema = z.partialRecord(
         .min(1),
       env: z
         .record(z.string().regex(/^[A-Z][A-Z0-9_]*$/), z.string())
+        .default({}),
+      actions: z
+        .record(z.string().regex(/^[\w.-]{1,64}$/), engineActionSchema)
         .default({}),
     })
     .strict(),

@@ -6,6 +6,7 @@ const row = {
   component: 'worker' as const,
   label: 'com.example.job',
   role: 'scheduled' as const,
+  actions: [],
 }
 
 describe('system formatters', () => {

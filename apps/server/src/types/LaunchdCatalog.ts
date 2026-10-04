@@ -8,6 +8,7 @@ export type LaunchdCatalog = {
       readonly component: ComponentId
       readonly label: string
       readonly role: 'scheduled' | 'keepalive'
+      readonly actions?: readonly ('run' | 'restart')[]
       readonly schedule: LaunchdSchedule | null
     }[]
   >

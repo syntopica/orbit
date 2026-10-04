@@ -2,6 +2,7 @@ import type { FlowStageId } from '@orbit/contract'
 
 import type { DatabaseSync } from 'node:sqlite'
 
+import type { ActionDeps } from './ActionDeps'
 import type { AtriumDeps } from './AtriumDeps'
 import type { BrainReaders } from './BrainReaders'
 import type { ClipsReader } from './ClipsReader'
@@ -33,4 +34,6 @@ export type AppDeps = {
   readonly guard: GuardConfig
   readonly webRoot: string
   readonly now: () => number
+  readonly actions?: ActionDeps
+  readonly actionSignal?: AbortSignal | undefined
 }

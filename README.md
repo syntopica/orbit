@@ -60,6 +60,13 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
   "engines": {
     "brain": {
       "command": "bin/brain",
+      "actions": {
+        "example": {
+          "args": ["example-action"],
+          "label": "Example action",
+          "timeoutS": 600
+        }
+      },
       "subcommands": [
         ["lint", "--json"],
         ["doctor", "--json"]
@@ -79,6 +86,7 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
         "component": "worker",
         "label": "com.example.worker.serve",
         "role": "keepalive",
+        "actions": ["restart"],
         "plist": "/Users/you/Library/LaunchAgents/com.example.worker.serve.plist"
       }
     ]
@@ -90,6 +98,11 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
 requests are built as `/api/...` against the origin. `pending.todoFiles` is
 optional. Each entry has an identifier name and an absolute path; when absent,
 the Pending board has no TODO sources.
+
+`launchd.labels[].actions` allows `run` for scheduled jobs and `restart` for
+keepalive services. Omit it to offer no action. `engines.<name>.actions` maps a
+fixed action identifier to its argument list, button label and optional
+`timeoutS` (default 600, maximum 1800). Actions need confirmation in orbit.
 
 ## Update
 

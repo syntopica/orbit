@@ -87,4 +87,23 @@ describe('loadOrbitConfig', () => {
       loadOrbitConfig(await withOrbitJson(withStage('nowhere'))),
     ).rejects.toThrow()
   })
+  it('pairs launchd actions with roles', async () => {
+    const label = {
+      component: 'worker',
+      label: 'com.example.job',
+      role: 'scheduled',
+      plist: '/x',
+      actions: ['run'],
+    }
+    const config = await loadOrbitConfig(
+      await withOrbitJson({ launchd: { labels: [label] } }),
+    )
+    expect(config.launchd?.labels[0]?.actions).toEqual(['run'])
+    for (const actions of [['restart'], ['run', 'run']])
+      await expect(
+        loadOrbitConfig(
+          await withOrbitJson({ launchd: { labels: [{ ...label, actions }] } }),
+        ),
+      ).rejects.toThrow()
+  })
 })

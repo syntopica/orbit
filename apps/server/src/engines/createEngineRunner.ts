@@ -13,14 +13,14 @@ export const createEngineRunner =
     engine: ResolvedEngine,
     run: (request: RunRequest) => Promise<RunResult>,
   ): EngineRunner =>
-  async (requested, signal) => {
+  async (requested, signal, timeoutMs = 10_000) => {
     const args = resolveListedArgs(engine.subcommands, requested)
     if (args === null) throw new ProcessError('check_failed')
     return await run({
       file: engine.file,
       args,
       env: buildChildEnv(process.env, engine.env),
-      timeoutMs: 10_000,
+      timeoutMs,
       maxBytes: 8 * 1024 * 1024,
       signal,
     })

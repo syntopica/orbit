@@ -6,6 +6,9 @@ implementation of sub-project 0). Scope: sub-project 0 (Base) and sub-project 1
 
 ### Change log
 
+**Revision 14 (actions).** Sub-project 5 writes are specified by
+`2026-10-04-orbit-actions-design.md`; worker actions remain in sub-project 2.
+
 **Revision 13 (remote phone shell).** Five phone slots, the More sheet,
 installable static assets, safe-area layout and phone tests follow
 `2026-10-04-orbit-remote-design.md`.
@@ -71,8 +74,9 @@ information from agent sessions back into agent sessions.
 orbit is an engine: a public repository with no instance data. Everything it
 shows is discovered at runtime from the instance under `SYNTOPICA_DATA`.
 
-Sub-projects 0 and 1 are **read-only**. orbit writes only its own state
-(section 5.6). Actions on other components belong to sub-project 5.
+Sub-projects 0 and 1 are **read-only**. orbit writes its own state (section
+5.6); writes to other components exist only as specified by sub-projects 2
+and 5.
 
 ### Success criteria
 

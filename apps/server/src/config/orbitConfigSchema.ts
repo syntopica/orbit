@@ -1,8 +1,9 @@
-import { COMPONENT_IDS, FLOW_STAGE_IDS } from '@orbit/contract'
+import { COMPONENT_IDS } from '@orbit/contract'
 import { isAbsolute } from 'node:path'
 import { z } from 'zod'
 
 import { engineTableSchema } from '../engines/engineTableSchema'
+import { launchdLabelSchema } from './launchdLabelSchema'
 import { pendingConfigSchema } from './pendingConfigSchema'
 
 export const orbitConfigSchema = z
@@ -15,19 +16,7 @@ export const orbitConfigSchema = z
       .object({
         launchctl: z.string().refine(isAbsolute).default('/bin/launchctl'),
         plutil: z.string().refine(isAbsolute).default('/usr/bin/plutil'),
-        labels: z
-          .array(
-            z
-              .object({
-                component: z.enum(COMPONENT_IDS),
-                label: z.string().regex(/^[\w.-]{1,64}$/),
-                role: z.enum(['scheduled', 'keepalive']),
-                plist: z.string().min(1),
-                stage: z.enum(FLOW_STAGE_IDS).optional(),
-              })
-              .strict(),
-          )
-          .default([]),
+        labels: z.array(launchdLabelSchema).default([]),
       })
       .strict()
       .optional(),

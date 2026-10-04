@@ -7,6 +7,13 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Sub-project 5 (Actions), spec
+  `2026-10-04-orbit-actions-design.md`: run a scheduled LaunchAgent now or
+  restart a resident one from System, engine actions listed in
+  `engines.<name>.actions`, confirmation dialogs, single flight, 10 per minute
+  per session, `action.*` events with exit code and duration only, orbit's own
+  restart refused; run history kept in memory (last 50). Evidence: `pnpm gate`
+  green (56 e2e).
 - 2026-10-04 [x] Sub-project 4 (Remote), spec
   `2026-10-04-orbit-remote-design.md`: phone bar with Orbit, Memory, Worker,
   Pending and a More sheet (focus trapped, Escape closes), icons and untruncated

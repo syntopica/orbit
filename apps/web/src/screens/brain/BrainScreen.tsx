@@ -3,6 +3,7 @@ import { useBrainSearch } from '../../hooks/useBrainSearch'
 import { useBrainView } from '../../hooks/useBrainView'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { BRAIN_LABELS } from '../../labels/brainLabels'
+import { EngineActions } from '../actions/EngineActions'
 import { BrainBody } from './BrainBody'
 
 export const BrainScreen = () => {
@@ -17,6 +18,7 @@ export const BrainScreen = () => {
         </h1>
         {isPhone ? <ConnectionIndicator /> : null}
       </header>
+      <EngineActions engine="brain" />
       {view.failed ? <p role="alert">{BRAIN_LABELS.unavailable}</p> : null}
       {view.data === null && !view.failed ? (
         <p className="text-muted">{BRAIN_LABELS.loading}</p>

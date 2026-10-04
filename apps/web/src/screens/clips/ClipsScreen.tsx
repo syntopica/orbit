@@ -2,6 +2,7 @@ import { ConnectionIndicator } from '../../components/shell/ConnectionIndicator'
 import { formatDuration } from '../../formatters/formatDuration'
 import { useClipsModel } from '../../hooks/useClipsModel'
 import { CLIPS_LABELS } from '../../labels/clipsLabels'
+import { EngineActions } from '../actions/EngineActions'
 import { ClipsBody } from './ClipsBody'
 
 export const ClipsScreen = () => {
@@ -14,6 +15,7 @@ export const ClipsScreen = () => {
         </h1>
         {model.isPhone ? <ConnectionIndicator /> : null}
       </header>
+      <EngineActions engine="clips" />
       {model.failed ? (
         <p role="alert">
           {CLIPS_LABELS.unavailable}{' '}

@@ -2,6 +2,7 @@ import { formatSchedule } from '../../formatters/formatSchedule'
 import { useLaunchdRowModel } from '../../hooks/useLaunchdRowModel'
 import { COMPONENT_LABELS } from '../../labels/componentLabels'
 import type { LaunchdRowViewProps } from '../../types/LaunchdRowViewProps'
+import { LaunchdActions } from '../actions/LaunchdActions'
 import { HeartbeatStrip } from './HeartbeatStrip'
 
 export const LaunchdRowView = ({ row, range }: LaunchdRowViewProps) => {
@@ -18,6 +19,7 @@ export const LaunchdRowView = ({ row, range }: LaunchdRowViewProps) => {
       {model.buckets !== null && (
         <HeartbeatStrip buckets={model.buckets} summary={model.summary} />
       )}
+      <LaunchdActions row={row} />
     </li>
   )
 }

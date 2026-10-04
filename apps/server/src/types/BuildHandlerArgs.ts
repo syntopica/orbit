@@ -8,4 +8,5 @@ export type BuildHandlerArgs = [
   webRoot: string,
   port: number,
   engines: Readonly<Record<string, EngineRunner>>,
+  actionSignal?: AbortSignal,
 ]

@@ -22,6 +22,7 @@ import { postLogout } from './routes/postLogout'
 import { postPair } from './routes/postPair'
 import { postSession } from './routes/postSession'
 import { postStepUp } from './routes/postStepUp'
+import { registerActionRoutes } from './routes/registerActionRoutes'
 import { registerBrainRoutes } from './routes/registerBrainRoutes'
 import { registerWorkerDetailRoutes } from './routes/registerWorkerDetailRoutes'
 import { registerWorkerJobRoutes } from './routes/registerWorkerJobRoutes'
@@ -66,6 +67,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
   api.get('/pending', getPending(deps, memoryPool))
   registerWorkerDetailRoutes(api, deps, workerPool)
   registerWorkerJobRoutes(api, deps, workerPool)
+  registerActionRoutes(api, deps)
   registerBrainRoutes(api, deps.brain, memoryPool, deps.now)
   api.all('*', (c) => c.json({ error: 'not_found' }, 404))
   app.route('/api', api)

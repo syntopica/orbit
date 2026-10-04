@@ -6,4 +6,5 @@ export type LabelEntry = {
   readonly role: 'scheduled' | 'keepalive'
   readonly stage?: FlowStageId | undefined
   readonly plist: string
+  readonly actions?: readonly ('run' | 'restart')[]
 }
