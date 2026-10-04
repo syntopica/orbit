@@ -10,13 +10,13 @@ export const FreshnessCard = ({ view }: FreshnessCardProps) => (
     className="border-line bg-panel space-y-3 rounded-xl border p-4"
   >
     <h2 className="text-lg font-semibold">{ATRIUM_LABELS.freshness}</h2>
-    <dl className="divide-line divide-y text-sm">
+    <dl className="divide-line grid grid-cols-[minmax(0,8rem)_auto_minmax(0,1fr)_auto] divide-y text-sm">
       {selectFreshnessRows(view).map((row) => (
         <div
           key={row.name}
-          className="flex flex-wrap items-center gap-x-3 py-2"
+          className="col-span-full grid grid-cols-subgrid items-center gap-x-3 py-2"
         >
-          <dt className="min-w-32">{row.name}</dt>
+          <dt className="truncate">{row.name}</dt>
           <dd className="tabular-nums">
             {row.at === null
               ? ATRIUM_LABELS.never
@@ -25,7 +25,7 @@ export const FreshnessCard = ({ view }: FreshnessCardProps) => (
           <dd className="text-muted text-xs">
             {ATRIUM_LABELS.within} {formatDuration(row.policyMs)}
           </dd>
-          <dd className="ml-auto">
+          <dd className="justify-self-end">
             <StateBadge state={row.state} />
           </dd>
         </div>

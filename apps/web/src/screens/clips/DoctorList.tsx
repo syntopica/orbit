@@ -15,16 +15,18 @@ export const DoctorList = ({ doctor, note }: DoctorListProps) => {
           {doctor.ok ? CLIPS_LABELS.allPass : CLIPS_LABELS.doctorFailure}
         </p>
       ) : (
-        <ul className="space-y-1 font-mono text-sm">
+        <ul className="grid grid-cols-[3rem_auto_minmax(0,1fr)] gap-x-2 gap-y-1 font-mono text-sm">
           {failing.map((check) => (
             <li
               key={check.name}
-              className="flex flex-wrap items-center gap-x-2 wrap-anywhere"
+              className="col-span-full grid grid-cols-subgrid items-center wrap-anywhere"
             >
-              {check.severity === undefined ? null : (
+              {check.severity === undefined ? (
+                <span />
+              ) : (
                 <span
                   data-severity={check.severity}
-                  className="border-line data-[severity=broken]:text-down data-[severity=warn]:text-warn rounded border px-1.5 font-sans text-xs uppercase"
+                  className="border-line data-[severity=broken]:text-down data-[severity=warn]:text-warn w-12 shrink-0 rounded border text-center font-sans text-xs uppercase"
                 >
                   {check.severity === 'broken' ? 'fail' : check.severity}
                 </span>
