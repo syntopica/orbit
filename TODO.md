@@ -23,8 +23,25 @@ This repository is public: entries describe engine behaviour only.
   explicitly, when they clear. Re-checked 2026-10-04: `@lhci/cli` 0.15.1 now
   resolves to 14 advisories (11 high), the same five among them.
 
-## Design review (external critique, 2026-10-04)
+## Reliability plan (2026-10-04, in this order)
 
-- [!] Backlog severity on the home cards and a warning for the oldest waiting
-  clip need thresholds the spec does not define. Blocked on the owner naming
-  them (count or age per component); the ok state already reads "Up".
+- [~] 1. Engine read timeouts: time every engine command (total, outcome,
+  concurrent runs) without content, find the stalled phase, then fix it.
+- [ ] 4. Detail pool: bound queue wait and queued requests so non-settling work
+      cannot hold both slots forever; Pending fans out up to 50 sources into it.
+- [ ] 2. Poller health: per adapter last attempt, last success, duration,
+      consecutive failures and next attempt as metadata, plus an external check
+      that orbit's own LaunchAgent is alive.
+- [ ] 3. Tailnet identity: `orbit doctor` claims an empty `allowedLogins`
+      refuses every tailnet request; the guard only refuses a present, unlisted
+      login (spec 6.5). Make the message say exactly that.
+- [ ] 7. Tests under load: find what the 5 s vitest timeouts wait on and fix the
+      cause (fake clocks or targeted limits).
+- [ ] 5. Per-item clips waiting in Pending, with a content-safe item list from
+      the clips engine.
+- [ ] 8. Backlog warnings: oldest waiting clip and blocked TODO count thresholds
+      from instance config.
+- [ ] 6. Action outcomes survive a restart: persist content-free run metadata
+      and mark interrupted runs at startup.
+- [ ] Step-up: phone and remote sessions re-enter the admin token before launchd
+      restart/run, worker cancel/retry/ack and brain index rebuild.
