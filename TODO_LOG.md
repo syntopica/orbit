@@ -7,6 +7,20 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-04 [x] Atrium doctor panel (spec 7.4): `GET /api/atrium` reads the
+  optional `doctor.json` that atrium's refresh job publishes, answers codes,
+  severities and staleness (2 x the refresh interval), and a `broken` check
+  turns the atrium component `warn` (`check_failed`); the Atrium screen reuses
+  the doctor list and says when nothing is published yet. Evidence: route,
+  schema and screen tests; `pnpm gate` green.
+- 2026-10-04 [x] Atrium context inspector (spec 7 item 4, 7.4): `{query}`
+  placeholder for one bounded free argument (1 to 500 characters after trim, no
+  control characters, one argv element after `--`), `atrium` engine table entry
+  `context --json --lane words -- {query}`, `POST /api/atrium/context` (session,
+  CSRF, 10 per minute per session, 5 s under the memory pool, fixed error codes,
+  query never logged or echoed), and a query form with labelled blocks, trust
+  badges, sizes and warnings. Evidence: route tests with a fake atrium binary,
+  component tests, e2e; `pnpm gate` green.
 - 2026-10-04 [x] Sub-project 5 (Actions), spec
   `2026-10-04-orbit-actions-design.md`: run a scheduled LaunchAgent now or
   restart a resident one from System, engine actions listed in

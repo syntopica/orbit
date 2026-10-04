@@ -6,6 +6,12 @@ implementation of sub-project 0). Scope: sub-project 0 (Base) and sub-project 1
 
 ### Change log
 
+**Revision 15 (atrium doctor and context inspector).** 4: atrium publishes
+`doctor.json` at the end of its hourly refresh, and `atrium context --json`
+is versioned and measured on the words lane. 5.3: a second placeholder,
+`{query}`, for the one bounded free argument. 7.4: the Atrium doctor panel,
+`POST /api/atrium/context` and the context inspector as built.
+
 **Revision 14 (actions).** Sub-project 5 writes are specified by
 `2026-10-04-orbit-actions-design.md`; worker actions remain in sub-project 2.
 
@@ -202,8 +208,8 @@ a file at the end of work it already does, and orbit reads the file.
 | --- | --- | --- | --- |
 | atrium | `atrium/status/refresh.json`, written only by the refresh job at its end | records per source; archive, refresh and content ages; per-population registry/intended/indexed; `writtenAt` | written by a job that already runs; orbit reads a file |
 | atrium | `atrium/status/synthesis.json`, written only by the synthesis job at its end | last pass: synthesized, deferred, started, finished; `writtenAt` | same |
-| atrium | doctor result status file, written at the end of work atrium already does | checks `name`, `ok`, `code`; `schemaVersion` | deferred until atrium publishes the status file; orbit reads a file |
-| atrium | `atrium context --json` | versioned contract with `schemaVersion` | deferred until benchmarked against the budget and the versioned contract is published |
+| atrium | `atrium/status/doctor.json`, written by `atrium doctor --publish` at the end of the refresh job | checks `name`, `ok`, `severity`, `code`; `ok`; `writtenAt`; `schemaVersion` | `atrium doctor --json` takes minutes, so the refresh job publishes it; orbit reads a file |
+| atrium | `atrium context --json --lane words -- <query>` | versioned contract with `schemaVersion`; evidence `text`, `trust`, `role`, `provider`, `conversation_id`, `note_path`, `authored_at`, `truncated`; `freshness.status`, `warnings`, `limit`, `max_chars`, `text_chars` | on-demand detail call; the words lane measured at most 1.8 s and 42 MB on the full instance, while the default lane needs 1.6 GB, so orbit always passes `--lane words` |
 | brain | `brain lint --json` | issues `page`, `code`; `indexStale` | benchmarked |
 | brain | `brain doctor --json` | checks `name`, `ok`, `code` | benchmarked |
 | brain | `brain graph --json --no-html` | read-only: nodes (`id`, `type`, `degree`), edges, orphans, dangling; never writes `graph.html` | benchmarked; related-unlinked pairs excluded |
@@ -304,9 +310,11 @@ An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, 
   whole entry, so the appended tail, such as `--skip credentials`, comes from
   `orbit.json` and never from the caller. The command is resolved once at start to an absolute path; a missing or
   non-executable file is `not_found`.
-- An argument in the table may be exactly `{pageId}`, the only placeholder.
-  The runner accepts a requested argument in that position only when it
-  matches the page id pattern (section 7.5); any other `{...}` argument is a
+- An argument in the table may be exactly `{pageId}` or `{query}`, the only
+  placeholders. The runner accepts a requested argument in a `{pageId}`
+  position only when it matches the page id pattern (section 7.5), and in a
+  `{query}` position only when it is already trimmed, 1 to 500 characters
+  long and free of control characters; any other `{...}` argument is a
   configuration error. `orbit doctor` skips entries that hold a placeholder.
 - `spawn` with `shell: false`, a fixed argument list, `detached: true` so the
   child leads its own process group; on timeout or abort the whole group gets
@@ -655,9 +663,41 @@ synthesis pass. Sources, models and the producer are identifiers. The screen
 shows records per source, a freshness card (archive and refresh against 2 x
 the refresh interval, newest content against 3 days), the last pass with a
 synthesized and deferred trend from history, and the populations with records
-not in the index. The doctor panel waits for atrium to publish its doctor
-result to a status file (its command exceeds the budget), and the context
-inspector waits for a versioned, benchmarked `atrium context --json`.
+not in the index.
+
+The same route reads `doctor.json` when it exists and answers `doctor: null`
+until atrium publishes one. A present doctor answers `writtenAt`, `ok`,
+`stale` (written more than 2 x the refresh interval ago) and every check's
+`name`, `ok`, `severity` (`ok`, `warn`, `broken`) and `code`; a name that is
+not an identifier drops the check and a code that is not one is `null`. A
+`broken` check turns the atrium component `warn` with `check_failed` unless
+it is already `stale`; a `warn` check does not. The screen's Doctor panel
+reuses the Clips list: failing checks with their severity and code, and when
+the result was published; until then it says atrium has not published one.
+
+**Context inspector.** `POST /api/atrium/context` with body `{ "query": q }`
+is session-guarded, needs the CSRF header, takes at most 4 KiB, and shares the
+action limit's form: 10 per minute per session, then 429 `rate_limited`. The
+query is trimmed and must be 1 to 500 characters without control characters,
+otherwise 400 `bad_request` before anything runs. It runs the engine table's
+`atrium` entry `context --json --lane words -- {query}` under the memory
+detail pool (5 s, stdout capped like every engine run), with no `--project`,
+so a query searches across projects; results are not cached. Another schema
+major answers 503 `engine_schema_unsupported`, any other failure 503
+`unavailable`. It answers `{ now, blocks, textChars, limit, maxChars,
+warnings, freshnessStatus }`, each block `{ rank, trust, role, provider,
+notePath, conversationId, authoredAt, chars, text, truncated }`: `trust` is
+`curated` or `history`, `role` and `provider` are identifiers or `null`,
+`conversationId` is shortened to 12 characters, `chars` counts code points,
+and warnings are codes. The query is never echoed, and neither it nor any
+block text reaches logs, errors, events or history (section 6.6). The screen
+shows a labelled query field with a 500-character limit and counter, an
+Inspect button, and the result as ranked blocks with a trust badge, their
+source, size and truncation, a summary of characters used against the limit,
+the index freshness and a warnings row; while it runs it says so, a failure
+shows a fixed message per code, and an empty result says no evidence was
+found. The result lives in component state only and is gone when the screen
+unmounts.
 
 **Clips.** `GET /api/clips` runs `clips status --json` and
 `clips doctor --json` through the engine table under the detail pool (10 s,

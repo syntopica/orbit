@@ -58,6 +58,10 @@ name to `allowedHosts` and your tailnet login to `allowedLogins` in
     "todoFiles": [{ "name": "project", "path": "/path/to/project/TODO.md" }]
   },
   "engines": {
+    "atrium": {
+      "command": "bin/atrium",
+      "subcommands": [["context", "--json", "--lane", "words", "--", "{query}"]]
+    },
     "brain": {
       "command": "bin/brain",
       "actions": {
@@ -103,6 +107,16 @@ the Pending board has no TODO sources.
 keepalive services. Omit it to offer no action. `engines.<name>.actions` maps a
 fixed action identifier to its argument list, button label and optional
 `timeoutS` (default 600, maximum 1800). Actions need confirmation in orbit.
+
+Each `engines.<name>.command` resolves against that engine's checkout,
+`engines.<name>.path` in the instance's `syntopica.config.json`. The Atrium
+context inspector runs exactly the `atrium` entry above: `--lane words` keeps a
+query within the polling budget, `--` keeps a query that starts with `-` a
+positional argument, and `{query}` is filled with the trimmed query (1 to 500
+characters, no control characters) as one argument. orbit passes no `--project`,
+so a query searches across projects. The Atrium doctor panel needs no engine
+entry: it reads `doctor.json`, which `atrium doctor --publish` writes into
+`atrium.statusDir`.
 
 ## Update
 
