@@ -287,7 +287,9 @@ An adapter is `{ id, cadenceMs, timeoutMs, configured(instance), read(instance, 
   at one subprocess per adapter by single flight, so polling needs no shared
   pool: the total is bounded by the number of adapters, and one adapter's hang
   can only skip its own ticks. Detail calls have their own pool of 2 slots,
-  FIFO, timeout counted from enqueue, and never touch polling.
+  FIFO, timeout counted from enqueue, and never touch polling. At most 8 live
+  requests wait for a slot; one more is refused with `lagging` at once, so work
+  that never settles cannot grow the queue.
 - **Isolation test.** With any number of other adapters hung, every healthy
   adapter's tick starts within 100 ms of schedule. A hung adapter's skipped
   ticks mark it `lagging`, and its data turns `stale` once past its freshness

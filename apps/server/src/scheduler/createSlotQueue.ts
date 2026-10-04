@@ -3,7 +3,9 @@ import type { SlotQueue } from '../types/SlotQueue'
 
 // FIFO slots: a waiter whose signal aborts is refused with `timeout` at once
 // and skipped when a slot frees; one that starts drops its abort listener.
-export const createSlotQueue = (slots: number): SlotQueue => {
+// At most `maxWaiting` live waiters queue; past that a request is refused with
+// `lagging` at once, so work that never settles cannot grow the queue.
+export const createSlotQueue = (slots: number, maxWaiting = 8): SlotQueue => {
   let running = 0
   const waiting: {
     readonly signal: AbortSignal
@@ -15,6 +17,8 @@ export const createSlotQueue = (slots: number): SlotQueue => {
         running += 1
         return
       }
+      const live = waiting.filter((item) => !item.signal.aborted).length
+      if (live >= maxWaiting) throw new ProcessError('lagging')
       await new Promise<void>((resolve, reject) => {
         const onAbort = (): void => {
           reject(new ProcessError('timeout'))
