@@ -13,10 +13,12 @@ import { OrbitTrack } from './OrbitTrack'
 export const OrbitCanvas = ({
   cards,
   labels,
+  leaders,
   visible,
 }: {
   readonly cards: readonly CardModel[]
   readonly labels: readonly RefObject<HTMLAnchorElement | null>[]
+  readonly leaders: readonly RefObject<SVGPathElement | null>[]
   readonly visible: boolean
 }) => {
   const styles = getComputedStyle(document.documentElement)
@@ -33,7 +35,7 @@ export const OrbitCanvas = ({
     >
       <ambientLight intensity={1.2} />
       <OrbitCamera />
-      <OrbitLabelLayout labels={labels} />
+      <OrbitLabelLayout labels={labels} leaders={leaders} />
       <OrbitDust color={accent} light={light} />
       <OrbitCore color={accent} light={light} texture={texture} />
       <OrbitTrack radius={2.35} color={accent} />

@@ -7,6 +7,16 @@ import { orbitPosition3d } from './orbitPosition3d'
 import { resolveOrbitLabels } from './resolveOrbitLabels'
 
 describe('resolveOrbitLabels', () => {
+  it('prefers the side away from a neighboring sphere', () => {
+    const left = { x: 220, y: 200, radius: 20, width: 142, height: 48 }
+    const right = { ...left, x: 390 }
+    const [box] = resolveOrbitLabels([left, right], {
+      width: 700,
+      height: 400,
+    })
+    expect(box?.x).toBeLessThan(left.x - left.radius)
+  })
+
   it.each([920, 764])('keeps seven radial labels clear at %i px', (width) => {
     const points: OrbitLabelInput[] = [
       [0.35, 0.28],

@@ -14,13 +14,13 @@ export const OrbitCore = ({
   readonly light: boolean
   readonly texture: Texture
 }) => {
-  const { group, surface, uniforms } = useOrbitCore(color)
+  const { group, surface, uniforms } = useOrbitCore(color, light)
   return (
     <group ref={group}>
       <OrbitGlow
         color={color}
         light={light}
-        opacity={0.67}
+        opacity={light ? 1 : 0.67}
         scale={3.3}
         texture={texture}
       />

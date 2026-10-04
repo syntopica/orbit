@@ -4,18 +4,15 @@ import type { OrbitLabelInput } from '../types/OrbitLabelInput'
 export const orbitLabelCandidate = (
   point: OrbitLabelInput,
   viewport: { readonly width: number; readonly height: number },
-  radialStep: number,
-  tangentStep: number,
+  direction: { readonly x: number; readonly y: number },
+  offset: { readonly radial: number; readonly tangent: number },
 ): OrbitLabelBox => {
-  const dx = point.x - viewport.width / 2
-  const dy = point.y - viewport.height / 2
-  const length = Math.hypot(dx, dy) || 1
-  const ux = dx / length
-  const uy = dy / length
+  const ux = direction.x
+  const uy = direction.y
   const extent = (Math.abs(ux) * point.width + Math.abs(uy) * point.height) / 2
-  const distance = point.radius + 12 + extent + radialStep
-  const centerX = point.x + ux * distance - uy * tangentStep
-  const centerY = point.y + uy * distance + ux * tangentStep
+  const distance = point.radius + 12 + extent + offset.radial
+  const centerX = point.x + ux * distance - uy * offset.tangent
+  const centerY = point.y + uy * distance + ux * offset.tangent
   return {
     x: Math.max(
       12,

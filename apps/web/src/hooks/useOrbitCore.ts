@@ -2,12 +2,16 @@ import { useFrame } from '@react-three/fiber'
 import { useMemo, useRef } from 'react'
 import { Color, type Group, type ShaderMaterial } from 'three'
 
-export const useOrbitCore = (color: string) => {
+export const useOrbitCore = (color: string, light: boolean) => {
   const group = useRef<Group>(null)
   const surface = useRef<ShaderMaterial>(null)
   const uniforms = useMemo(
-    () => ({ uColor: { value: new Color(color) }, uTime: { value: 0 } }),
-    [color],
+    () => ({
+      uColor: { value: new Color(color) },
+      uLight: { value: light ? 1 : 0 },
+      uTime: { value: 0 },
+    }),
+    [color, light],
   )
   useFrame(({ clock }) => {
     const time = surface.current?.uniforms['uTime']

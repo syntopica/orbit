@@ -18,6 +18,9 @@ for (const colorScheme of ['dark', 'light'] as const) {
       await expect(orbit.getByRole('img', { name: /^Worker:/ })).toBeVisible()
       const collisions = await orbit.evaluate((stage) => {
         const labels = [...stage.querySelectorAll<HTMLElement>('.orbit-label')]
+        const leaders = [
+          ...stage.querySelectorAll<SVGPathElement>('.orbit-leaders path'),
+        ]
         const boxes = labels.map((label) => label.getBoundingClientRect())
         const overlap = boxes.some((box, index) =>
           boxes
@@ -41,11 +44,21 @@ for (const colorScheme of ['dark', 'light'] as const) {
             return Math.hypot(x - nearestX, y - nearestY) < radius + 4
           }),
         )
-        return { overlap, sphereOverlap, count: labels.length }
+        return {
+          overlap,
+          sphereOverlap,
+          count: labels.length,
+          connected: leaders.filter(
+            (leader) =>
+              leader.getAttribute('d')?.startsWith('M ') === true &&
+              leader.getAttribute('marker-end') === 'url(#orbit-leader-dot)',
+          ).length,
+        }
       })
       expect(collisions.overlap).toBe(false)
       expect(collisions.sphereOverlap).toBe(false)
       expect(collisions.count).toBeGreaterThanOrEqual(6)
+      expect(collisions.connected).toBe(collisions.count)
       await page.screenshot({
         path: `test-results/screens/${width}-${colorScheme}-orbit3d.png`,
         fullPage: true,
