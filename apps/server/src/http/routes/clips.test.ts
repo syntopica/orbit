@@ -93,6 +93,37 @@ describe('GET /api/clips', () => {
       oldestAt: Date.parse('2026-10-02T08:00:00.000Z'),
     })
   })
+  it('answers null items for an engine not asked to list them, else the checked items', async () => {
+    const view = clipsViewSchema.parse(
+      await (await appWith(null).get(route)).json(),
+    )
+    expect(view.items).toBeNull()
+    const item = {
+      id: '0123456789abcdef',
+      state: 'pending',
+      reason: 'no_ledger',
+      failure: null,
+      stage: 'synthesis',
+      capturedAt: '2026-10-01T06:00:00.000Z',
+      lastTransitionAt: null,
+      attempts: 0,
+      lastRun: null,
+      pages: [],
+    }
+    const listed = buildTestApp({
+      clips: async () =>
+        await Promise.resolve({
+          ...docs,
+          status: { ...docs.status, items: [item, { ...item, id: 'clip-id' }] },
+        }),
+    })
+    const items = clipsViewSchema.parse(
+      await (await listed.get(route)).json(),
+    ).items
+    expect(items).toEqual([
+      { ...item, capturedAt: Date.parse(item.capturedAt) },
+    ])
+  })
   it('leaves the capture lane out when capture is absent or down', async () => {
     for (const snapshot of [
       null,

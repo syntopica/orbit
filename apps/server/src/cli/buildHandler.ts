@@ -31,7 +31,10 @@ export const buildHandler = (
       engines['clips'],
       config.engines.clips !== undefined,
       config.cadenceMs.clips ?? 60_000,
+      state.clipsLatest,
     ),
+    clipsLatest: () =>
+      state.clipsLatest.get((config.cadenceMs.clips ?? 60_000) * 2),
     brain: buildBrainReaders(
       engines['brain'],
       config.engines.brain !== undefined,

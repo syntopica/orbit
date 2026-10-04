@@ -4,6 +4,7 @@ import { selectFunnel } from '../../selectors/selectFunnel'
 import type { ClipsBodyProps } from '../../types/ClipsBodyProps'
 import { TrendSection } from '../memory/TrendSection'
 import { ClipsFunnel } from './ClipsFunnel'
+import { ClipsItemsSection } from './ClipsItemsSection'
 import { DoctorList } from './DoctorList'
 import { IntakeSection } from './IntakeSection'
 import { OldestList } from './OldestList'
@@ -16,6 +17,7 @@ export const ClipsBody = ({ view, model }: ClipsBodyProps) => {
         <ClipsFunnel rows={rows} capture={view.capture} now={view.now} />
         <OldestList states={view.states} now={view.now} />
       </div>
+      <ClipsItemsSection items={view.items} now={view.now} />
       <IntakeSection intake={view.intake} />
       <TrendSection
         title={CLIPS_LABELS.backlog}

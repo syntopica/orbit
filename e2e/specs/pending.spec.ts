@@ -16,6 +16,10 @@ for (const colorScheme of ['dark', 'light'] as const) {
           page.getByRole('heading', { name: 'Pending', exact: true }),
         ).toBeVisible()
         await expect(page.getByText('Resolve placeholder item')).toBeVisible()
+        await expect(
+          page.getByText('Clip needs-claude: MODEL_ESCALATED'),
+        ).toBeVisible()
+        await expect(page.getByText('Clip pending: no_ledger')).toBeVisible()
         await page.getByRole('button', { name: 'Collapse all' }).click()
         await expect(page.getByText('Resolve placeholder item')).toBeHidden()
         await page.getByRole('button', { name: 'Expand all' }).click()

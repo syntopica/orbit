@@ -4,6 +4,7 @@ import type { ClipsDocuments } from '../types/ClipsDocuments'
 import { isIntakeDay } from './isIntakeDay'
 import { toCaptureLane } from './toCaptureLane'
 import { toCheckRows } from './toCheckRows'
+import { toClipsItems } from './toClipsItems'
 import { toStateRows } from './toStateRows'
 
 export const toClipsView = (
@@ -20,4 +21,5 @@ export const toClipsView = (
   },
   doctor: { ok: doctor.ok, checks: toCheckRows(doctor) },
   capture: toCaptureLane(capture),
+  items: toClipsItems(status),
 })

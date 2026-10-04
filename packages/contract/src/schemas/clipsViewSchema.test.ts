@@ -7,6 +7,7 @@ const view = {
   intake: { days: [{ day: '2026-10-02', count: 2 }], undated: 0 },
   doctor: { ok: true, checks: [{ name: 'paths', ok: true, code: 'ok' }] },
   capture: null,
+  items: null,
 }
 
 describe('clipsViewSchema', () => {

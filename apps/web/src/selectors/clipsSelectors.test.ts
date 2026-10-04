@@ -19,6 +19,7 @@ const view: ClipsView = {
   intake: { days: [{ day: '2026-10-02', count: 2 }], undated: 0 },
   doctor: { ok: true, checks: [] },
   capture: null,
+  items: null,
 }
 
 describe('selectFunnel', () => {

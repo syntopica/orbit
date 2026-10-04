@@ -162,7 +162,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
         clips: {
           command: 'bin/clips',
           subcommands: [
-            ['status', '--json'],
+            ['status', '--json', '--items'],
             ['doctor', '--json'],
           ],
         },

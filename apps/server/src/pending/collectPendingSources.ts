@@ -44,6 +44,7 @@ export const collectPendingSources = async (
         () =>
           readClipsPending(
             deps.hub.snapshots().find((row) => row.component === 'clips'),
+            deps.clipsLatest?.() ?? null,
             now,
           ),
         { id: 'clips', kind: 'clips', name: 'Clips waiting' },

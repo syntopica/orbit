@@ -11,4 +11,7 @@ export const clipsStatusSchema = z.object({
     ),
     undated: z.number().int().nonnegative(),
   }),
+  // Present when orbit.json lists `status --json --items`; each entry is
+  // checked on its own by toClipsItem.
+  items: z.array(z.unknown()).optional(),
 })

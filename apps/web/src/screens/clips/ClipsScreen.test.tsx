@@ -27,6 +27,7 @@ const view: ClipsView = {
     checks: [{ name: 'archive', ok: false, code: 'archive_public_remote' }],
   },
   capture: { count: 2, oldestAt: NOW - 3_600_000 },
+  items: null,
 }
 const history: MetricHistory = {
   now: NOW,

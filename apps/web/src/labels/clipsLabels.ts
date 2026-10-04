@@ -33,4 +33,12 @@ export const CLIPS_LABELS = {
   doctorFailure: 'Doctor reports a failure; check details are unavailable.',
   backlog: 'Backlog',
   backlogChart: 'Pending and needing review per bucket',
+  items: 'Clips one by one',
+  itemList: 'Clips',
+  itemsUnlisted:
+    'The engine lists no items: add ["status", "--json", "--items"] to engines.clips.subcommands in orbit.json.',
+  stage: 'stage',
+  attempts: 'attempts',
+  lastRun: 'last run',
+  workerJob: 'Worker job',
 } as const

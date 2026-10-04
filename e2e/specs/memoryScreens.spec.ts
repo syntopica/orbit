@@ -90,3 +90,22 @@ test('clips shows the funnel, intake, oldest waiting and doctor, no content', as
   )
   await expect(page.getByText('notes/a')).toHaveCount(0)
 })
+
+test('clips lists each clip with its run, worker job and result page', async ({
+  page,
+}) => {
+  await signIn(page)
+  await page.goto('/clips')
+  const list = page.getByRole('list', { name: 'Clips', exact: true })
+  await expect(list.getByRole('listitem')).toHaveCount(3)
+  const routed = list.getByRole('listitem').first()
+  await expect(routed).toContainText('MODEL_ESCALATED @ synthesis')
+  await expect(routed).toContainText('escalated · 1m 33s')
+  await expect(
+    routed.getByRole('link', { name: 'Worker job job-example-1' }),
+  ).toHaveAttribute('href', '/worker/jobs/job-example-1')
+  const done = list.getByRole('listitem').nth(2)
+  await expect(done).toContainText('26728 in · 43 out')
+  await done.getByRole('link', { name: 'notes/c' }).click()
+  await expect(page).toHaveURL(/\/brain\?.*page=notes%2Fc/)
+})

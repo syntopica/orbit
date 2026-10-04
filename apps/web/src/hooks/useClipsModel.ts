@@ -1,6 +1,7 @@
 import { clipsViewSchema } from '@orbit/contract'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate, useSearch } from '@tanstack/react-router'
+import { useEffect } from 'react'
 
 import { apiJson } from '../api/apiJson'
 import { CLIPS_TREND_SPECS } from '../charts/clipsTrendSpecs'
@@ -13,11 +14,21 @@ export const useClipsModel = (): ClipsModel => {
   const { range } = validateSystemSearch(useSearch({ strict: false }))
   const navigate = useNavigate()
   const isPhone = useMediaQuery('(max-width: 767px)')
+  const client = useQueryClient()
   const query = useQuery({
     queryKey: ['clips'],
     queryFn: async () => apiJson('/api/clips', clipsViewSchema),
     refetchInterval: 60_000,
+    gcTime: 0,
   })
+  // The view carries brain page ids (content, spec 6.6): never kept past the
+  // screen.
+  useEffect(
+    () => () => {
+      client.removeQueries({ queryKey: ['clips'], exact: true })
+    },
+    [client],
+  )
   const view = query.data ?? null
   return {
     view,

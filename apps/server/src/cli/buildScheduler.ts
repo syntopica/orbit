@@ -25,6 +25,7 @@ export const buildScheduler = (
       run: runProcess,
       fetch,
       engines,
+      clipsLatest: state.clipsLatest,
     }),
     hub,
     poller,

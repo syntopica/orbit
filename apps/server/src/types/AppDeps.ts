@@ -6,6 +6,7 @@ import type { ActionDeps } from './ActionDeps'
 import type { AtriumContextReader } from './AtriumContextReader'
 import type { AtriumDeps } from './AtriumDeps'
 import type { BrainReaders } from './BrainReaders'
+import type { ClipsDocuments } from './ClipsDocuments'
 import type { ClipsReader } from './ClipsReader'
 import type { GuardConfig } from './GuardConfig'
 import type { Hub } from './Hub'
@@ -25,6 +26,9 @@ export type AppDeps = {
   readonly stageLabels: ReadonlyMap<FlowStageId, string>
   readonly brain: BrainReaders | null
   readonly clips: ClipsReader | null
+  // The adapter's last read while fresh, for sources that must not run the
+  // engine themselves (the pending board).
+  readonly clipsLatest?: (() => ClipsDocuments | null) | undefined
   readonly atrium: AtriumDeps | null
   readonly atriumContext: AtriumContextReader | null
   readonly catalog: LaunchdCatalog | null

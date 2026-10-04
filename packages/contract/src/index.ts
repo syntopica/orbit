@@ -67,8 +67,10 @@ export type { WorkerQueue } from './types/WorkerQueue'
 export type { WorkerResult } from './types/WorkerResult'
 export type { WorkerView } from './types/WorkerView'
 
+export { clipsItemSchema } from './schemas/clipsItemSchema'
 export { clipsViewSchema } from './schemas/clipsViewSchema'
 export { contextQuerySchema } from './schemas/contextQuerySchema'
+export type { ClipsItem } from './types/ClipsItem'
 export type { ClipsView } from './types/ClipsView'
 
 export { FLOW_STAGE_IDS } from './flowStageIds'

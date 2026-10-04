@@ -1,4 +1,5 @@
 import type { EngineRunner } from './EngineRunner'
+import type { LatestClipsDocuments } from './LatestClipsDocuments'
 import type { LaunchdObservation } from './LaunchdObservation'
 import type { OrbitConfig } from './OrbitConfig'
 import type { RunRequest } from './RunRequest'
@@ -12,4 +13,5 @@ export type AdapterContext = {
   readonly run: (request: RunRequest) => Promise<RunResult>
   readonly fetch: typeof fetch
   readonly engines: Readonly<Record<string, EngineRunner>>
+  readonly clipsLatest?: LatestClipsDocuments | undefined
 }

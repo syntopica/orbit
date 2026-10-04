@@ -1,5 +1,6 @@
 import { join } from 'node:path'
 
+import { createLatestClipsDocuments } from '../adapters/clips/createLatestClipsDocuments'
 import { loadInstanceConfig } from '../config/loadInstanceConfig'
 import { loadOrbitConfig } from '../config/loadOrbitConfig'
 import { resolveDataDir } from '../config/resolveDataDir'
@@ -33,6 +34,7 @@ export const openState = async (
     env,
     authDb,
     historyDb,
+    clipsLatest: createLatestClipsDocuments(Date.now),
     // Idempotent: a failed start and its caller may both close.
     close: () => {
       if (authDb.isOpen) authDb.close()
