@@ -12,8 +12,12 @@ export const GraphLegend = ({
   colorBy,
   communities,
   highlightOrphans,
+  skipped,
 }: GraphLegendProps) => (
-  <section aria-label={BRAIN_LABELS.legend} className="text-sm">
+  <section
+    aria-label={BRAIN_LABELS.legend}
+    className="lg:border-line lg:bg-panel/90 space-y-1 text-sm lg:rounded-lg lg:border lg:px-3 lg:py-2 lg:shadow-lg lg:backdrop-blur"
+  >
     <ul className="flex flex-wrap gap-x-4 gap-y-1">
       {colorBy === 'type' ? (
         selectTypeLegend(model.types).map((entry) => (
@@ -45,5 +49,10 @@ export const GraphLegend = ({
         {BRAIN_LABELS.selected}
       </li>
     </ul>
+    {skipped > 0 ? (
+      <p className="text-muted">
+        {skipped} {BRAIN_LABELS.skipped}
+      </p>
+    ) : null}
   </section>
 )

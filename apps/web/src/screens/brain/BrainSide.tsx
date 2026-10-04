@@ -1,22 +1,15 @@
 import type { BrainSideProps } from '../../types/BrainSideProps'
 import { ChecksSection } from './ChecksSection'
-import { PagePanel } from './PagePanel'
+import { PageList } from './PageList'
 import { RelatedPanel } from './RelatedPanel'
 
-export const BrainSide = ({ brain }: BrainSideProps) => {
+export const BrainSide = ({ brain, model }: BrainSideProps) => {
   const { search, select } = brain
   return (
-    <div className="min-w-0 space-y-4">
-      {search.page === undefined ? null : (
-        <PagePanel
-          key={search.page}
-          id={search.page}
-          search={search}
-          select={select}
-        />
-      )}
+    <div className="gap-4 *:mb-4 *:break-inside-avoid lg:columns-2 2xl:columns-3">
       <RelatedPanel selectedId={search.page ?? null} search={search} />
       <ChecksSection brain={brain} />
+      {model === null ? null : <PageList model={model} select={select} />}
     </div>
   )
 }

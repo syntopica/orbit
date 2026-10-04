@@ -9,7 +9,7 @@ export const PagePanel = ({ id, search, select }: PagePanelProps) => {
   return (
     <section
       aria-label={BRAIN_LABELS.pageRegion}
-      className="border-line bg-panel min-w-0 space-y-4 rounded-xl border p-4"
+      className="border-line bg-panel min-w-0 space-y-4 rounded-xl border p-4 lg:shadow-xl"
     >
       <div className="flex items-start justify-between gap-2">
         <h2 className="text-lg font-semibold wrap-break-word">

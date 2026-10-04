@@ -25,6 +25,7 @@ export const BRAIN_LABELS = {
   yes: 'yes',
   no: 'no',
   controls: 'Graph controls',
+  filters: 'Filters',
   colorBy: 'Colour by',
   byType: 'Type',
   byCommunity: 'Community',

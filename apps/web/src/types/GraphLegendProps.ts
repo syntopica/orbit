@@ -6,4 +6,5 @@ export type GraphLegendProps = {
   readonly colorBy: ColorMode
   readonly communities: number
   readonly highlightOrphans: boolean
+  readonly skipped: number
 }
