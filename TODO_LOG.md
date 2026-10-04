@@ -164,3 +164,9 @@ result and the evidence. Active work lives in `TODO.md`.
   it was read; chart width read by a plain ResizeObserver so a first narrow
   measurement never sticks. Evidence: `codeality-ui check` 0 findings over 10
   routes x 2 viewports x 2 schemes, `pnpm gate` green.
+- 2026-10-04 [x] Design review: brain graph labels on a sparse grid
+  (`labelDensity` 0.5, `labelGridCellSize` 160, threshold 10) so the centre no
+  longer collides. Evidence: brain screenshot, `pnpm gate` green.
+- 2026-10-04 [-] Design review "phone navigation covers content": not a defect;
+  the page already pads `6rem` plus the safe area below the fixed tab bar, and
+  the bar only appears mid-page in full-page screenshots.
