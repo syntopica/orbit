@@ -16,7 +16,13 @@ export const CONTEXT_LABELS = {
   warnings: 'Warnings',
   chars: 'chars',
   truncated: 'truncated',
-  trust: { curated: 'Curated', history: 'History' },
+  trust: {
+    curated: 'Curated',
+    history: 'History',
+    synthesized: 'Synthesized',
+    untrusted: 'Untrusted source',
+    unknown: 'Unknown',
+  },
   errors: {
     bad_request: 'Enter 1 to 500 characters without control characters.',
     rate_limited: 'Too many queries; wait a minute.',

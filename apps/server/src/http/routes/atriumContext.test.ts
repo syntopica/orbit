@@ -38,6 +38,16 @@ const document = (schemaVersion: number) =>
         authored_at: '2026-10-01T10:00:00+00:00',
         truncated: true,
       },
+      {
+        text: 'an episode',
+        trust: 'synthesized',
+        role: 'episode',
+        provider: 'synthesis',
+        conversation_id: 'abcdef0123456789abcd',
+        note_path: null,
+        authored_at: null,
+        truncated: false,
+      },
     ],
     freshness: { status: 'fresh', last_refresh: '2026-10-04T00:00:00Z' },
     warnings: ['lexical_budget_exhausted', 'not a code'],
@@ -94,6 +104,11 @@ describe('POST /api/atrium/context', () => {
         authoredAt: Date.parse('2026-10-01T10:00:00Z'),
         chars: 16,
         truncated: true,
+      }),
+      expect.objectContaining({
+        rank: 3,
+        trust: 'synthesized',
+        role: 'episode',
       }),
     ])
     expect(view).toMatchObject({

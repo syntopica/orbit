@@ -26,6 +26,20 @@ describe('atriumContextSchema', () => {
   it('accepts labelled blocks with their sizes', () => {
     expect(atriumContextSchema.parse(context)).toEqual(context)
   })
+  it('accepts every trust atrium assigns', () => {
+    for (const trust of [
+      'curated',
+      'history',
+      'synthesized',
+      'untrusted',
+      'unknown',
+    ]) {
+      const blocks = [{ ...block, trust }]
+      expect(
+        atriumContextSchema.parse({ ...context, blocks }).blocks[0]?.trust,
+      ).toBe(trust)
+    }
+  })
   it('rejects an unknown trust and a warning that is free text', () => {
     const blocks = [{ ...block, trust: 'other' }]
     expect(() => atriumContextSchema.parse({ ...context, blocks })).toThrow()

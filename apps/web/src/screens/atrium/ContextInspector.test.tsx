@@ -53,6 +53,19 @@ const ask = (value: string) => {
 }
 
 describe('ContextInspector', () => {
+  it('labels synthesized blocks and marks untrusted sources', async () => {
+    const trusts = ['synthesized', 'untrusted'] as const
+    const blocks = context.blocks.map((block, index) => ({
+      ...block,
+      trust: trusts[index] ?? 'unknown',
+    }))
+    answer({ ...context, blocks })
+    render(<ContextInspector />)
+    ask('anything')
+    const list = await screen.findByRole('list', { name: 'Blocks' })
+    expect(within(list).getByText('Synthesized')).not.toHaveClass('bg-warn')
+    expect(within(list).getByText('Untrusted source')).toHaveClass('bg-warn')
+  })
   it('starts idle with a disabled button and a 500-character counter', () => {
     render(<ContextInspector />)
     expect(screen.getByRole('button', { name: 'Inspect' })).toBeDisabled()

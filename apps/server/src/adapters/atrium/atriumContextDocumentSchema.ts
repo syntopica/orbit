@@ -1,3 +1,4 @@
+import { atriumTrustSchema } from '@orbit/contract'
 import { z } from 'zod'
 
 import { nonNegativeCount } from '../nonNegativeCount'
@@ -9,7 +10,7 @@ export const atriumContextDocumentSchema = z.object({
   evidence: z.array(
     z.object({
       text: z.string(),
-      trust: z.enum(['history', 'curated']),
+      trust: atriumTrustSchema,
       role: z.string().nullish(),
       provider: z.string().nullish(),
       conversation_id: z.string().nullish(),

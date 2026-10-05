@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { atriumTrustSchema } from './atriumTrustSchema'
 import { countSchema } from './countSchema'
 import { identifierSchema } from './identifierSchema'
 
@@ -10,7 +11,7 @@ export const atriumContextSchema = z.object({
   blocks: z.array(
     z.object({
       rank: z.number().int().positive(),
-      trust: z.enum(['history', 'curated']),
+      trust: atriumTrustSchema,
       role: identifierSchema.nullable(),
       provider: identifierSchema.nullable(),
       notePath: z.string().max(512).nullable(),

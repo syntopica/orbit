@@ -1,3 +1,4 @@
+import { TRUST_BADGES } from '../../charts/trustBadges'
 import { formatBlockSource } from '../../formatters/formatBlockSource'
 import { formatCount } from '../../formatters/formatCount'
 import { CONTEXT_LABELS } from '../../labels/contextLabels'
@@ -8,11 +9,7 @@ export const ContextBlockCard = ({ block }: ContextBlockCardProps) => (
   <li className="border-line space-y-2 rounded-lg border p-3">
     <div className="flex flex-wrap items-center gap-2 text-xs">
       <span
-        className={`rounded-full px-2 py-0.5 font-semibold ${
-          block.trust === 'curated'
-            ? 'bg-accent text-space'
-            : 'border-line text-ink border'
-        }`}
+        className={`rounded-full px-2 py-0.5 font-semibold ${TRUST_BADGES[block.trust]}`}
       >
         {CONTEXT_LABELS.trust[block.trust]}
       </span>
