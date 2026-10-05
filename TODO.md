@@ -26,4 +26,5 @@ This repository is public: entries describe engine behaviour only.
       (2026-10-04, host load ~50) on axe `color-contrast` for `text-muted` stat
       labels (#828997 on #fcfcfe, 3.43); it passed 12 of 12 alone. Likely axe
       sampling mid theme transition. Next: wait for the computed colour to
-      settle (or disable transitions) before axe in that spec.
+      settle (or disable transitions) before axe in that spec. Recurred
+      2026-10-05 on a pre-push (#868d9b, 3.25); the retry passed.
