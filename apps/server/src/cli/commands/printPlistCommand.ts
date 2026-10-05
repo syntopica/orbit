@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { buildLaunchdPath } from '../../launchd/buildLaunchdPath'
 import { readPlistTemplate } from '../../launchd/readPlistTemplate'
 import { renderPlistTemplate } from '../../launchd/renderPlistTemplate'
+import { stableNodePath } from '../../launchd/stableNodePath'
 import type { CliIo } from '../../types/CliIo'
 
 // Prints a LaunchAgent plist for this node, this bundle and this instance.
@@ -14,12 +15,13 @@ export const printPlistCommand = (io: CliIo, template?: string): number => {
     return 1
   }
   const bundle = fileURLToPath(import.meta.url)
+  const node = stableNodePath(process.execPath, io.env['PATH'])
   io.out(
     renderPlistTemplate(readPlistTemplate(dirname(bundle), template), {
-      node: process.execPath,
+      node,
       orbit: bundle,
       data,
-      path: buildLaunchdPath(process.execPath, io.env['PATH']),
+      path: buildLaunchdPath(node, io.env['PATH']),
     }).trimEnd(),
   )
   return 0
