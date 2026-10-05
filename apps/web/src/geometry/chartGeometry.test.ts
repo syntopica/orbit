@@ -59,6 +59,21 @@ describe('layoutChart', () => {
   })
 })
 
+describe('layoutChart tick labels', () => {
+  it('writes large counts compactly so they fit the left margin', () => {
+    const columns = [0, 1].map((i) => ({
+      start: i * HOUR,
+      end: (i + 1) * HOUR,
+      segments: [{ key: 'a', count: 28_000_000 * i }],
+      total: 28_000_000 * i,
+    }))
+    const layout = layoutChart(columns, 430, 160, HOUR)
+    const labels = layout.yTicks.map((t) => t.label)
+    expect(labels).toContain('10M')
+    expect(labels.every((label) => label.length <= 4)).toBe(true)
+  })
+})
+
 describe('xAxisTicks', () => {
   it('labels where a local period begins, never the first bucket', () => {
     const starts = Array.from({ length: 25 }, (_, i) => i * HOUR)

@@ -7,6 +7,8 @@ export const CONTEXT_LABELS = {
   characters: 'characters',
   loading: 'Running atrium context',
   empty: 'No evidence for this query.',
+  outOfTime:
+    'The search ran out of time before it found anything; the machine is busy. Try again.',
   blocks: 'Blocks',
   of: 'of',
   limit: 'limit',

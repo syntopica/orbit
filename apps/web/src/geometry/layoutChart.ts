@@ -1,6 +1,7 @@
 import { scaleLinear } from '@visx/scale'
 
 import { CHART_MARGIN } from '../charts/chartMargin'
+import { formatTickCount } from '../formatters/formatTickCount'
 import type { ChartLayout } from '../types/ChartLayout'
 import type { StackColumn } from '../types/StackColumn'
 import { barWidth } from './barWidth'
@@ -38,7 +39,7 @@ export const layoutChart = (
   const yTicks = y
     .ticks(3)
     .filter((value) => Number.isInteger(value) || max < 1)
-    .map((value) => ({ at: y(value), label: value.toLocaleString('en-GB') }))
+    .map((value) => ({ at: y(value), label: formatTickCount(value) }))
   const starts = columns.map((c) => c.start)
   const centers = laid.map((c) => c.center)
   return {

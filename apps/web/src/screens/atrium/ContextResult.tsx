@@ -1,5 +1,6 @@
 import { formatCount } from '../../formatters/formatCount'
 import { CONTEXT_LABELS } from '../../labels/contextLabels'
+import { emptyContextMessage } from '../../selectors/emptyContextMessage'
 import type { ContextResultProps } from '../../types/ContextResultProps'
 import { ContextBlockCard } from './ContextBlockCard'
 
@@ -20,7 +21,9 @@ export const ContextResult = ({ result }: ContextResultProps) => (
       </p>
     )}
     {result.blocks.length === 0 ? (
-      <p className="text-muted text-sm">{CONTEXT_LABELS.empty}</p>
+      <p className="text-muted text-sm">
+        {emptyContextMessage(result.warnings)}
+      </p>
     ) : (
       <ol aria-label={CONTEXT_LABELS.blocks} className="space-y-3">
         {result.blocks.map((block) => (

@@ -99,6 +99,19 @@ describe('ContextInspector', () => {
       await screen.findByText('No evidence for this query.'),
     ).toBeInTheDocument()
   })
+  it('says the search ran out of time rather than that nothing matched', async () => {
+    answer({ ...context, blocks: [], textChars: 0 })
+    render(<ContextInspector />)
+    ask('nubenode')
+    expect(
+      await screen.findByText(
+        'The search ran out of time before it found anything; the machine is busy. Try again.',
+      ),
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('No evidence for this query.'),
+    ).not.toBeInTheDocument()
+  })
   it('shows a fixed message per error code and never the raw body', async () => {
     answer({ error: 'engine_schema_unsupported' }, 503)
     render(<ContextInspector />)
