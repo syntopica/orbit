@@ -6,7 +6,14 @@ import { signIn } from '../support/signIn'
 for (const colorScheme of ['dark', 'light'] as const) {
   for (const width of [1280, 375]) {
     test.describe(`${colorScheme} ${String(width)}px`, () => {
-      test.use({ colorScheme, viewport: { width, height: 900 } })
+      // Without reduced motion, axe can sample the costs panel mid-way
+      // through its stale-to-fresh opacity fade and report muted labels at a
+      // contrast they never settle on.
+      test.use({
+        colorScheme,
+        reducedMotion: 'reduce',
+        viewport: { width, height: 900 },
+      })
 
       test('costs and executors render without overflow or axe violations', async ({
         page,
@@ -28,6 +35,7 @@ for (const colorScheme of ['dark', 'light'] as const) {
         ).toContainText('$0.00')
         await costs.getByRole('button', { name: '30 days' }).click()
         await expect(page).toHaveURL(/costs=30d/)
+        await expect(costs.locator('[data-stale="true"]')).toHaveCount(0)
         await expect(
           costs.getByRole('slider', { name: 'Cost per day by provider' }),
         ).toBeVisible()

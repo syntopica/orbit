@@ -7,6 +7,13 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-06 [x] `worker-costs.spec.ts` axe contrast flake at light 1280px. The
+  cause was the costs panel's stale-to-fresh opacity fade after the 30-day
+  switch (`data-[stale=true]:opacity-50` with `transition-opacity`), not a theme
+  transition. The spec now runs with `reducedMotion: 'reduce'` and waits for no
+  `[data-stale="true"]` before axe. Evidence: prettier clean; the spec passed 12
+  of 12 with `--repeat-each 3` and 8 of 8 with `--repeat-each 2`.
+
 - 2026-10-04 [x] Jobs table no longer cuts names to two letters. The table sizes
   its columns to their content (no `table-fixed`), names and result wrap only at
   their own width, numbers never wrap, tokens read `2525 → 267` under "Tokens in

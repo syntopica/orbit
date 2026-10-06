@@ -7,24 +7,16 @@ This repository is public: entries describe engine behaviour only.
 ## Reliability plan (2026-10-04, in this order)
 
 - [~] 1. Engine read timeouts (brain and clips reads time out together every few
-  minutes; the Clips screen can stay on loading): every engine command now logs
+  minutes; the Clips screen can stay on loading): every engine command logs
   `engine-run <engine> <subcommand> <ms> <outcome> concurrent=<n> load=<1-min>`.
-  First sample: `clips status` and `brain lint` reach 8-10 s and time out at the
-  runner's 10 s default with `concurrent=1`, so the command itself is slow, not
-  orbit's queue; by hand `clips status` takes 0.6 s at load 15-23. Load alone
-  does not explain it: at load 102.8 the same commands took 0.5-1.1 s, while
-  every 8-10 s run so far fell inside a local gate run (build and git I/O on the
-  same disk). 668 lines by 2026-10-04 18:56: all 25 timeouts fell at load 20-125
-  (median load of successful runs 12); `clips status` p50 1.1 s, p90 8.7 s;
-  `brain lint` p90 3.1 s, p99 10 s. Per-engine `timeoutMs` added (clips and
-  brain set to 20 s in the instance), adapter budget 45 s for two reads. Next:
-  confirm the timeouts stop in the next day of lines.
-
-## Test reliability
-
-- [ ] `worker-costs.spec.ts` light 1280px failed once in the full gate
-      (2026-10-04, host load ~50) on axe `color-contrast` for `text-muted` stat
-      labels (#828997 on #fcfcfe, 3.43); it passed 12 of 12 alone. Likely axe
-      sampling mid theme transition. Next: wait for the computed colour to
-      settle (or disable transitions) before axe in that spec. Recurred
-      2026-10-05 on a pre-push (#868d9b, 3.25); the retry passed.
+  Recheck 2026-10-06 over ~16k lines (~52 h) after the per-engine `timeoutMs`
+  deploy (8ff6d0d): timeouts did NOT stop, 203 in total (clips status 73, atrium
+  synthesis 78, brain lint 27, brain doctor 10, brain graph 8, clips doctor 5,
+  atrium context 2). Clips and brain now time out at the new 20 s ceiling;
+  `clips status` p50 1.1 s, p90 4.7 s, p99 20 s. Atrium synthesis has its own ~3
+  s budget the change never touched. Timeouts track host load: median load 62 at
+  a timeout against 8.5 for successful runs, only 4 of 203 below load 20. Nearly
+  gone for ~10k lines after the deploy, then rising again. A bigger budget does
+  not fix it. Next: keep the screen's last good result when a read times out
+  instead of spinning, decide whether atrium synthesis's 3 s budget is intended,
+  and find what drives load 60-370 at those moments.
