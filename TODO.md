@@ -28,4 +28,15 @@ This repository is public: entries describe engine behaviour only.
   `at=` stamps to match the bursts against what else ran (a 2026-10-11 snapshot
   at load 23-57 showed dozens of `node` processes at 65-80% CPU plus OrbStack,
   i.e. other sessions' work, not orbit); only the host's scheduling can fix
-  that, not an orbit budget.
+  that, not an orbit budget. Decided 2026-10-11 (owner via Codex adjudication):
+  restart orbit on this build after checking no action is in flight. Done
+  2026-10-11 20:04Z: no action run was in flight; after the restart
+  `orbit doctor` is all `ok` bar the expected `port 8790 in use`, `/api/clips`
+  answered 200 with fresh data (no `lastGoodAt`, since no read timed out), and
+  new `engine-run` lines carry `at=`. Remaining: the live fallback is seen only
+  when a clips read next times out, and the burst match against `at=` needs a
+  few days of lines. Decided 2026-10-11 (owner via Codex adjudication): cap
+  concurrent resource-heavy session work on the host and stop unused container
+  workloads while diagnosing; reassess orbit only once host load falls. Needs
+  owner: which other sessions and container workloads may pause, then compare
+  timeout counts before and after.

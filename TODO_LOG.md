@@ -7,6 +7,14 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-11 [~] Orbit restarted on the read-timeout build (d4f3aea; item stays
+  open in `TODO.md`). Decided 2026-10-11 (owner via Codex adjudication). The
+  `action_runs` table held no `started` run, then the LaunchAgent was restarted
+  with `launchctl kickstart -k`. Evidence: `orbit doctor` all `ok` except
+  `warn port 8790 in use` (orbit itself); `/api/clips` 200 in 0.06 s with fresh
+  data; five `engine-run` lines after the restart, each ending `at=<ISO>`. The
+  `lastGoodAt` fallback was not exercised live because no clips read timed out.
+
 - 2026-10-11 [~] Engine read timeouts, orbit-side slice (item stays open in
   `TODO.md`). `engine-run` lines carry `at=<ISO>` and say `aborted` for a run
   its caller abandoned (`failureOutcome.ts`, `RunClock`); `/api/clips` falls
