@@ -7,6 +7,8 @@ import { identifierSchema } from './identifierSchema'
 // GET /api/clips: states, days and codes only; no clip id, title or url.
 // `items` is null when the engine was not asked to list them
 // (`status --json --items` in orbit.json); at most 2000, waiting first.
+// `lastGoodAt` is present only when the engine read failed and the view is
+// the last good one, read at that epoch millisecond.
 export const clipsViewSchema = z.object({
   now: z.number(),
   total: countSchema,
@@ -35,4 +37,5 @@ export const clipsViewSchema = z.object({
     .object({ count: countSchema, oldestAt: z.number().nullable() })
     .nullable(),
   items: z.array(clipsItemSchema).max(2000).nullable(),
+  lastGoodAt: z.number().optional(),
 })

@@ -7,6 +7,19 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-11 [~] Engine read timeouts, orbit-side slice (item stays open in
+  `TODO.md`). `engine-run` lines carry `at=<ISO>` and say `aborted` for a run
+  its caller abandoned (`failureOutcome.ts`, `RunClock`); `/api/clips` falls
+  back to the adapter's last good read with `lastGoodAt` (contract field,
+  optional) and a 45 s budget (`CLIPS_READ_MS`), and the Clips screen greys it
+  with "Last good data is N old" (`clipsStaleAgeMs.ts`). Atrium synthesis's 3 s
+  budget judged intended. Log analysis of 31k lines: timeouts track host load
+  (median 186 vs 9.9), not engine concurrency. Evidence: `pnpm gate:pkg` green
+  in packages/contract, apps/server (680 tests) and apps/web (512 tests); root
+  `format:check` and `secrets:check` clean; `pnpm e2e` 60 passed and 2 failed at
+  load 57 (a11y memory flow, atrium context inspector), both passed on the one
+  retry (9 of 9).
+
 - 2026-10-06 [x] `worker-costs.spec.ts` axe contrast flake at light 1280px. The
   cause was the costs panel's stale-to-fresh opacity fade after the 30-day
   switch (`data-[stale=true]:opacity-50` with `transition-opacity`), not a theme

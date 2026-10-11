@@ -12,4 +12,5 @@ export const formatRunLine = (request: RunRequest, line: RunLine): string =>
     line.outcome,
     `concurrent=${String(line.concurrent)}`,
     `load=${line.load.toFixed(1)}`,
+    `at=${line.at}`,
   ].join(' ')

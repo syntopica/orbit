@@ -144,4 +144,24 @@ describe('GET /api/clips', () => {
     expect(res.status).toBe(503)
     expect(await res.json()).toEqual({ error: 'unavailable' })
   })
+  it('falls back to the last good read, marked with when it was taken', async () => {
+    const failing = buildTestApp({
+      clips: async () => Promise.reject(new ProcessError('timeout')),
+      clipsLastGood: () => ({ documents: docs, at: 1_789_999_000_000 }),
+    })
+    const res = await failing.get(route)
+    expect(res.status).toBe(200)
+    const view = clipsViewSchema.parse(await res.json())
+    expect(view.lastGoodAt).toBe(1_789_999_000_000)
+    expect(view.total).toBe(10)
+    const fresh = clipsViewSchema.parse(
+      await (
+        await buildTestApp({
+          clips: async () => Promise.resolve(docs),
+          clipsLastGood: () => ({ documents: docs, at: 0 }),
+        }).get(route)
+      ).json(),
+    )
+    expect(fresh.lastGoodAt).toBeUndefined()
+  })
 })

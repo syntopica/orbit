@@ -34,6 +34,7 @@ export const buildHandler = (
     ),
     clipsLatest: () =>
       state.clipsLatest.get((config.cadenceMs.clips ?? 60_000) * 2),
+    clipsLastGood: state.clipsLatest.last,
     brain: buildBrainReaders(
       engines['brain'],
       config.engines.brain !== undefined,

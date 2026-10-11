@@ -127,6 +127,16 @@ describe('ClipsScreen', () => {
     )
     focusManager.setFocused(undefined)
   })
+  it('greys a server fallback to the last good read with its age', async () => {
+    serve({ ...view, lastGoodAt: NOW - 300_000 })
+    await renderAt('/clips')
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'Last good data is 5m old.',
+    )
+    expect(screen.getByRole('region', { name: 'Clips data' })).toHaveClass(
+      'grayscale',
+    )
+  })
   it('shows unknown waiting ages and excludes terminal states', async () => {
     serve({
       ...view,

@@ -10,6 +10,7 @@ import type { BrainReaders } from './BrainReaders'
 import type { ClipsDocuments } from './ClipsDocuments'
 import type { ClipsReader } from './ClipsReader'
 import type { GuardConfig } from './GuardConfig'
+import type { HeldClipsDocuments } from './HeldClipsDocuments'
 import type { Hub } from './Hub'
 import type { LaunchdCatalog } from './LaunchdCatalog'
 import type { PollerRegistry } from './PollerRegistry'
@@ -30,6 +31,9 @@ export type AppDeps = {
   // The adapter's last read while fresh, for sources that must not run the
   // engine themselves (the pending board).
   readonly clipsLatest?: (() => ClipsDocuments | null) | undefined
+  // The adapter's last good read at any age, for the Clips screen to fall back
+  // on when its own read fails.
+  readonly clipsLastGood?: (() => HeldClipsDocuments | null) | undefined
   readonly atrium: AtriumDeps | null
   readonly atriumContext: AtriumContextReader | null
   readonly atriumSyntheses: AtriumSynthesisReaders | null

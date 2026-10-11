@@ -63,7 +63,7 @@ export const createApp = (deps: AppDeps): Hono<OrbitEnv> => {
     getLaunchdHistory(deps.historyDb, deps.catalog, pool, deps.now),
   )
   api.get('/history/metrics', getMetricHistory(deps.historyDb, deps.now))
-  api.get('/clips', getClips(deps.clips, deps.hub, memoryPool, deps.now))
+  api.get('/clips', getClips(deps, memoryPool))
   api.get('/memory/flow', getMemoryFlow(deps, memoryPool))
   registerAtriumRoutes(api, deps, memoryPool)
   api.get('/pending', getPending(deps, memoryPool))

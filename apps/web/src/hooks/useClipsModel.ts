@@ -5,6 +5,7 @@ import { useEffect } from 'react'
 
 import { apiJson } from '../api/apiJson'
 import { CLIPS_TREND_SPECS } from '../charts/clipsTrendSpecs'
+import { clipsStaleAgeMs } from '../selectors/clipsStaleAgeMs'
 import type { ClipsModel } from '../types/ClipsModel'
 import { validateSystemSearch } from '../validators/validateSystemSearch'
 import { useMediaQuery } from './useMediaQuery'
@@ -32,11 +33,8 @@ export const useClipsModel = (): ClipsModel => {
   const view = query.data ?? null
   return {
     view,
-    failed: query.isError,
-    staleAgeMs:
-      query.isError && view !== null
-        ? query.errorUpdatedAt - query.dataUpdatedAt
-        : null,
+    failed: query.isError || view?.lastGoodAt !== undefined,
+    staleAgeMs: clipsStaleAgeMs(view, query),
     isPhone,
     trend: useTrend('clips', range, CLIPS_TREND_SPECS),
     range,

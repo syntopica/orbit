@@ -3,4 +3,5 @@ export type RunLine = {
   readonly outcome: string
   readonly concurrent: number
   readonly load: number
+  readonly at: string
 }
