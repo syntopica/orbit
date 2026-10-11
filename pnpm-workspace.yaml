@@ -8,3 +8,7 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - '@syntopica/quality-config@0.12.0'
   - '@syntopica/prettier-config@0.3.0'
+overrides:
+  # eslint-plugin-boundaries pins handlebars to 4.7.9, which carries three
+  # advisories (GHSA-xw65-4hp5-5hc7, GHSA-8r5x-fm3f-whwj, GHSA-p8wg-vrv2-v86f).
+  'handlebars@<4.7.10': ^4.7.10 # via eslint-plugin-boundaries>@boundaries/elements
