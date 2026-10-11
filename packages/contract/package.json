@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@syntopica/eslint-config": "^0.8.0",
-    "@syntopica/prettier-config": "^0.2.0",
+    "@syntopica/prettier-config": "^0.3.0",
     "@syntopica/quality-config": "^0.11.1",
     "@syntopica/tsconfig": "^0.3.0",
     "@eslint/js": "^10.0.1",
