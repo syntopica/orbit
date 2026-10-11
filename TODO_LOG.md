@@ -7,6 +7,15 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-11 [~] The root `gate` and `e2e` scripts queue behind a host admission
+  wrapper (item 1 stays open in `TODO.md`). Decided 2026-10-11 (owner via Codex
+  adjudication): one heavy suite per host, two test workers each. When
+  `heavy-suite` is on the PATH the scripts run through it, otherwise they run
+  `gate:run` / `e2e:run` directly. Evidence: `pnpm gate` exit 0 in 6 min 15 s
+  through the wrapper (it delayed the start 90 s at load 29 on 16 threads, then
+  started anyway as bounded); the nested `e2e` passed straight through, 62/62
+  Playwright specs passed.
+
 - 2026-10-11 [~] Orbit restarted on the read-timeout build (d4f3aea; item stays
   open in `TODO.md`). Decided 2026-10-11 (owner via Codex adjudication). The
   `action_runs` table held no `started` run, then the LaunchAgent was restarted

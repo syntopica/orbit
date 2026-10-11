@@ -39,4 +39,10 @@ This repository is public: entries describe engine behaviour only.
   concurrent resource-heavy session work on the host and stop unused container
   workloads while diagnosing; reassess orbit only once host load falls. Needs
   owner: which other sessions and container workloads may pause, then compare
-  timeout counts before and after.
+  timeout counts before and after. Decided 2026-10-11 (owner via Codex
+  adjudication): a host admission gate for heavy test commands, one suite per
+  host with two test workers each. Done 2026-10-11: the root `gate` and `e2e`
+  scripts run through a `heavy-suite` admission wrapper when the host provides
+  one (the original commands are `gate:run` and `e2e:run`; CI and hosts without
+  the wrapper run them directly). Remaining: compare the `timeout` rate before
+  and after over a few days of `at=` stamps.
