@@ -3,6 +3,8 @@
 Closed work, newest first, grouped by year and month. Each entry names the
 result and the evidence. Active work lives in `TODO.md`.
 
+<!-- tadu:log v1 since 2026-10-12 -->
+
 ## 2026
 
 ### October
