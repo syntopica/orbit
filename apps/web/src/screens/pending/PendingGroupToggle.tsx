@@ -1,10 +1,6 @@
-import type { usePendingBoard } from '../../hooks/usePendingBoard'
+import type { PendingGroupToggleProps } from '../../types/PendingGroupToggleProps'
 
-export const PendingGroupToggle = ({
-  model,
-}: {
-  model: ReturnType<typeof usePendingBoard>
-}) => (
+export const PendingGroupToggle = ({ model }: PendingGroupToggleProps) => (
   <div className="flex items-center justify-between gap-3">
     <p className="text-muted text-sm">{model.items.length} items</p>
     <button

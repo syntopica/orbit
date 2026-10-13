@@ -4,6 +4,7 @@ import forceAtlas2 from 'graphology-layout-forceatlas2'
 
 import type { LayoutRequest } from '../types/LayoutRequest'
 import type { LayoutResult } from '../types/LayoutResult'
+import type { Point } from '../types/Point'
 import { seededRandom } from './seededRandom'
 
 // Runs inside the layout worker (D9). Nodes start on a circle in index order
@@ -12,7 +13,7 @@ import { seededRandom } from './seededRandom'
 export const computeLayout = (request: LayoutRequest): LayoutResult => {
   const { order } = request
   if (order === 0) return { x: [], y: [], community: [] }
-  const graph = new Graph<{ x: number; y: number }>({ type: 'undirected' })
+  const graph = new Graph<Point>({ type: 'undirected' })
   for (let index = 0; index < order; index += 1) {
     const angle = (2 * Math.PI * index) / order
     graph.addNode(String(index), {

@@ -1,12 +1,7 @@
 import { useOrbitDust } from '../../hooks/useOrbitDust'
+import type { OrbitDustProps } from '../../types/OrbitDustProps'
 
-export const OrbitDust = ({
-  color,
-  light,
-}: {
-  readonly color: string
-  readonly light: boolean
-}) => {
+export const OrbitDust = ({ color, light }: OrbitDustProps) => {
   const { group, positions } = useOrbitDust()
   return (
     <group ref={group}>

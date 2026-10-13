@@ -1,11 +1,7 @@
-import type { useJobContentPanel } from '../../hooks/useJobContentPanel'
+import type { RevealedJobContentProps } from '../../types/RevealedJobContentProps'
 import { JobContentPane } from './JobContentPane'
 
-export const RevealedJobContent = ({
-  model,
-}: {
-  model: ReturnType<typeof useJobContentPanel>
-}) => (
+export const RevealedJobContent = ({ model }: RevealedJobContentProps) => (
   <>
     <button
       type="button"

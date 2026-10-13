@@ -1,14 +1,10 @@
-import type { usePendingBoard } from '../../hooks/usePendingBoard'
 import { sortSourcesByBlocked } from '../../selectors/sortSourcesByBlocked'
+import type { PendingSourcesProps } from '../../types/PendingSourcesProps'
 import { PendingGroupToggle } from './PendingGroupToggle'
 import { PendingSourceIssues } from './PendingSourceIssues'
 import { PendingSourceSection } from './PendingSourceSection'
 
-export const PendingSources = ({
-  model,
-}: {
-  model: ReturnType<typeof usePendingBoard>
-}) => {
+export const PendingSources = ({ model }: PendingSourcesProps) => {
   const data = model.query.data
   if (data === undefined) return null
   return (

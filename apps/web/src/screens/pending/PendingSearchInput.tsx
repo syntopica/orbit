@@ -1,10 +1,6 @@
-import type { usePendingBoard } from '../../hooks/usePendingBoard'
+import type { PendingSearchInputProps } from '../../types/PendingSearchInputProps'
 
-export const PendingSearchInput = ({
-  model,
-}: {
-  model: ReturnType<typeof usePendingBoard>
-}) => (
+export const PendingSearchInput = ({ model }: PendingSearchInputProps) => (
   <label className="block space-y-1 text-sm">
     <span>Search title and detail</span>
     <input

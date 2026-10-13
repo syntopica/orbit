@@ -1,9 +1,10 @@
 import { Fragment } from 'react'
 
 import { splitUrls } from '../../selectors/splitUrls'
+import type { PendingPlainTextProps } from '../../types/PendingPlainTextProps'
 
 // Addresses in a row's detail open in a new tab.
-export const PendingPlainText = ({ text }: { text: string }) => (
+export const PendingPlainText = ({ text }: PendingPlainTextProps) => (
   <>
     {splitUrls(text).map((segment) =>
       segment.url ? (

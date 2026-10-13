@@ -1,6 +1,7 @@
+import type { NavIconProps } from '../../types/NavIconProps'
 import type { NavItem } from '../../types/NavItem'
 
-export const NavIcon = ({ name }: { name: NavItem['to'] | 'more' }) => {
+export const NavIcon = ({ name }: NavIconProps) => {
   const paths: Record<NavItem['to'] | 'more', string> = {
     '/': 'M12 2 3 7v10l9 5 9-5V7l-9-5Zm0 3 6 3.3v7.4L12 19l-6-3.3V8.3L12 5Z',
     '/memory':

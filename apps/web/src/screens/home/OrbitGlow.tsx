@@ -1,5 +1,5 @@
-import type { Ref } from 'react'
-import { AdditiveBlending, type Sprite, type Texture } from 'three'
+import { AdditiveBlending } from 'three'
+import type { OrbitGlowProps } from '../../types/OrbitGlowProps'
 
 export const OrbitGlow = ({
   color,
@@ -8,14 +8,7 @@ export const OrbitGlow = ({
   ref,
   scale,
   texture,
-}: {
-  readonly color: string
-  readonly light: boolean
-  readonly opacity: number
-  readonly ref?: Ref<Sprite> | null
-  readonly scale: number
-  readonly texture: Texture
-}) => (
+}: OrbitGlowProps) => (
   <sprite ref={ref ?? null} scale={[scale, scale, 1]}>
     <spriteMaterial
       map={texture}

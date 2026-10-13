@@ -3,12 +3,9 @@ import { useQuery } from '@tanstack/react-query'
 
 import { apiJson } from '../api/apiJson'
 import { describePollerRows } from '../selectors/describePollerRows'
-import type { PollerLine } from '../types/PollerLine'
+import type { PollerState } from '../types/PollerState'
 
-export const usePoller = (): {
-  lines: PollerLine[] | null
-  failed: boolean
-} => {
+export const usePoller = (): PollerState => {
   const query = useQuery({
     queryKey: ['poller'],
     queryFn: async () => apiJson('/api/poller', pollerViewSchema),

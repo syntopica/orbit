@@ -1,22 +1,11 @@
 import { Link } from '@tanstack/react-router'
-import type { Ref } from 'react'
 
 import { formatReadingAge } from '../../formatters/formatReadingAge'
 import { HEALTH_LABELS } from '../../labels/healthLabels'
-import type { CardModel } from '../../types/CardModel'
+import type { OrbitLabelProps } from '../../types/OrbitLabelProps'
 import { orbitDestination } from './orbitDestination'
 
-export const OrbitLabel = ({
-  card,
-  index,
-  now,
-  ref,
-}: {
-  readonly card: CardModel
-  readonly index: number
-  readonly now: number
-  readonly ref: Ref<HTMLAnchorElement>
-}) => (
+export const OrbitLabel = ({ card, index, now, ref }: OrbitLabelProps) => (
   <Link
     ref={ref}
     to={orbitDestination(card.component)}

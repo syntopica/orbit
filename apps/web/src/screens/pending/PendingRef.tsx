@@ -1,15 +1,11 @@
-import type { PendingView } from '@orbit/contract'
 import { Link } from '@tanstack/react-router'
 
 import { pendingItemReference } from '../../selectors/pendingItemReference'
+import type { PendingRefProps } from '../../types/PendingRefProps'
 import { validateBrainSearch } from '../../validators/validateBrainSearch'
 import { PendingFileRef } from './PendingFileRef'
 
-export const PendingRef = ({
-  item,
-}: {
-  item: PendingView['items'][number]
-}) => {
+export const PendingRef = ({ item }: PendingRefProps) => {
   const reference = pendingItemReference(item)
   if (typeof reference !== 'string')
     return <PendingFileRef reference={reference} />

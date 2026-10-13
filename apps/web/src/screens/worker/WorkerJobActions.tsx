@@ -1,16 +1,9 @@
-import type { WorkerJobDetail } from '@orbit/contract'
-
 import { useWorkerJobActions } from '../../hooks/useWorkerJobActions'
+import type { WorkerJobActionsProps } from '../../types/WorkerJobActionsProps'
 import { ConfirmJobAction } from './ConfirmJobAction'
 import { JobActionButtons } from './JobActionButtons'
 
-export const WorkerJobActions = ({
-  job,
-  onAction,
-}: {
-  job: WorkerJobDetail
-  onAction: () => void
-}) => {
+export const WorkerJobActions = ({ job, onAction }: WorkerJobActionsProps) => {
   const model = useWorkerJobActions(job, onAction)
   return (
     <section aria-label="Job actions" className="space-y-3">

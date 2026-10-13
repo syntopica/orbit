@@ -1,10 +1,11 @@
 import type { OrbitLabelBox } from '../types/OrbitLabelBox'
 import type { OrbitLabelInput } from '../types/OrbitLabelInput'
+import type { OrbitLeaderLine } from '../types/OrbitLeaderLine'
 
 export const orbitLeaderGeometry = (
   point: OrbitLabelInput,
   box: OrbitLabelBox,
-): { x1: number; y1: number; x2: number; y2: number } => {
+): OrbitLeaderLine => {
   const x1 = Math.max(box.x, Math.min(point.x, box.x + box.width))
   const y1 = Math.max(box.y, Math.min(point.y, box.y + box.height))
   const dx = x1 - point.x

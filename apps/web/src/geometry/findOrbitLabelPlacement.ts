@@ -1,5 +1,6 @@
 import type { OrbitLabelBox } from '../types/OrbitLabelBox'
 import type { OrbitLabelInput } from '../types/OrbitLabelInput'
+import type { ViewportSize } from '../types/ViewportSize'
 import { orbitLabelCandidate } from './orbitLabelCandidate'
 import { orbitLabelDirection } from './orbitLabelDirection'
 import { orbitLabelIsClear } from './orbitLabelIsClear'
@@ -8,7 +9,7 @@ export const findOrbitLabelPlacement = (
   point: OrbitLabelInput,
   points: readonly OrbitLabelInput[],
   placed: readonly OrbitLabelBox[],
-  viewport: { readonly width: number; readonly height: number },
+  viewport: ViewportSize,
 ): OrbitLabelBox => {
   const preferred = orbitLabelDirection(point, points, viewport)
   const radial = orbitLabelDirection(point, [point], viewport)

@@ -2,11 +2,11 @@ import { formatDuration } from '../../formatters/formatDuration'
 import { RANGE_SPECS } from '../../heartbeat/rangeSpecs'
 import { BUCKET_LABELS } from '../../labels/bucketLabels'
 import { BUCKET_LEGEND_ORDER } from '../../labels/bucketLegendOrder'
-import type { HistoryRange } from '../../types/HistoryRange'
+import type { HeartbeatLegendProps } from '../../types/HeartbeatLegendProps'
 
 // One key for every strip: the colours, what one bar covers, and which end is
 // now, so a strip reads without hovering.
-export const HeartbeatLegend = ({ range }: { range: HistoryRange }) => {
+export const HeartbeatLegend = ({ range }: HeartbeatLegendProps) => {
   const spec = RANGE_SPECS[range]
   return (
     <div className="text-muted flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">

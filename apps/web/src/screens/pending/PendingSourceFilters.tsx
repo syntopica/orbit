@@ -1,10 +1,6 @@
-import type { usePendingBoard } from '../../hooks/usePendingBoard'
+import type { PendingSourceFiltersProps } from '../../types/PendingSourceFiltersProps'
 
-export const PendingSourceFilters = ({
-  model,
-}: {
-  model: ReturnType<typeof usePendingBoard>
-}) => (
+export const PendingSourceFilters = ({ model }: PendingSourceFiltersProps) => (
   <div className="flex flex-wrap gap-2">
     {model.query.data?.sources.map((source) => (
       <button

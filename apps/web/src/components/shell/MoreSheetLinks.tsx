@@ -1,16 +1,10 @@
 import { Link } from '@tanstack/react-router'
-import type { RefObject } from 'react'
 
+import type { MoreSheetLinksProps } from '../../types/MoreSheetLinksProps'
 import { NavIcon } from './NavIcon'
 import { NAV_ITEMS } from './navItems'
 
-export const MoreSheetLinks = ({
-  first,
-  onClose,
-}: {
-  first: RefObject<HTMLAnchorElement | null>
-  onClose: () => void
-}) => (
+export const MoreSheetLinks = ({ first, onClose }: MoreSheetLinksProps) => (
   <>
     {NAV_ITEMS.filter((item) =>
       ['/atrium', '/brain', '/clips', '/system'].includes(item.to),

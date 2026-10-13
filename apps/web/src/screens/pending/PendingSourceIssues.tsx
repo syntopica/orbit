@@ -1,10 +1,6 @@
-import type { PendingView } from '@orbit/contract'
+import type { PendingSourceIssuesProps } from '../../types/PendingSourceIssuesProps'
 
-export const PendingSourceIssues = ({
-  sources,
-}: {
-  sources: PendingView['sources']
-}) => {
+export const PendingSourceIssues = ({ sources }: PendingSourceIssuesProps) => {
   const failures = sources.filter((source) => source.status !== 'ok')
   if (failures.length === 0) return null
   return (

@@ -1,8 +1,5 @@
-import type { RefObject } from 'react'
-import type { Texture } from 'three'
-
 import { orbitColorToken } from '../../geometry/orbitColorToken'
-import type { CardModel } from '../../types/CardModel'
+import type { OrbitSatellitesProps } from '../../types/OrbitSatellitesProps'
 import { OrbitSatellite3d } from './OrbitSatellite3d'
 import { OrbitTrail } from './OrbitTrail'
 
@@ -12,13 +9,7 @@ export const OrbitSatellites = ({
   light,
   styles,
   texture,
-}: {
-  readonly cards: readonly CardModel[]
-  readonly labels: readonly RefObject<HTMLAnchorElement | null>[]
-  readonly light: boolean
-  readonly styles: CSSStyleDeclaration
-  readonly texture: Texture
-}) =>
+}: OrbitSatellitesProps) =>
   cards.map((card, index) => {
     const label = labels[index]
     if (!label) return null

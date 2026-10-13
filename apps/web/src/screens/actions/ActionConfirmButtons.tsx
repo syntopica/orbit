@@ -1,16 +1,12 @@
 import { useDialogFocus } from '../../hooks/useDialogFocus'
+import type { ActionConfirmButtonsProps } from '../../types/ActionConfirmButtonsProps'
 
 export const ActionConfirmButtons = ({
   action,
   close,
   confirm,
   sending,
-}: {
-  action: string
-  close: () => void
-  confirm: () => Promise<void>
-  sending: boolean
-}) => {
+}: ActionConfirmButtonsProps) => {
   const cancelRef = useDialogFocus()
   return (
     <div className="flex justify-end gap-2">

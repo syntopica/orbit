@@ -1,10 +1,12 @@
 import type { OrbitLabelInput } from '../types/OrbitLabelInput'
+import type { Point } from '../types/Point'
+import type { ViewportSize } from '../types/ViewportSize'
 
 export const orbitLabelDirection = (
   point: OrbitLabelInput,
   points: readonly OrbitLabelInput[],
-  viewport: { readonly width: number; readonly height: number },
-): { x: number; y: number } => {
+  viewport: ViewportSize,
+): Point => {
   let nearest: OrbitLabelInput | null = null
   let nearestDistance = Infinity
   for (const other of points) {

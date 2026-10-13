@@ -1,14 +1,10 @@
-import type { PendingView } from '@orbit/contract'
-
+import type { PendingSectionListProps } from '../../types/PendingSectionListProps'
 import { PendingItemRow } from './PendingItemRow'
 
 export const PendingSectionList = ({
   section,
   items,
-}: {
-  section: string | null
-  items: PendingView['items']
-}) => (
+}: PendingSectionListProps) => (
   <div className="space-y-1.5">
     {section !== null ? (
       <h3 className="text-muted text-sm font-medium">{section}</h3>

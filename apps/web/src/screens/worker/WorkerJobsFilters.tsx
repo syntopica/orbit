@@ -1,10 +1,6 @@
-import type { useWorkerJobsScreen } from '../../hooks/useWorkerJobsScreen'
+import type { WorkerJobsFiltersProps } from '../../types/WorkerJobsFiltersProps'
 
-export const WorkerJobsFilters = ({
-  model,
-}: {
-  model: ReturnType<typeof useWorkerJobsScreen>
-}) => (
+export const WorkerJobsFilters = ({ model }: WorkerJobsFiltersProps) => (
   <form
     onSubmit={model.apply}
     className="border-line bg-panel grid gap-3 rounded-xl border p-4 sm:grid-cols-4"

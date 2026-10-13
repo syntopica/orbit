@@ -1,4 +1,5 @@
 import { useActionRun } from '../../hooks/useActionRun'
+import type { ActionButtonProps } from '../../types/ActionButtonProps'
 import { ActionConfirmDialog } from './ActionConfirmDialog'
 import { ActionRunLink } from './ActionRunLink'
 
@@ -7,12 +8,7 @@ export const ActionButton = ({
   action,
   label,
   path,
-}: {
-  target: string
-  action: string
-  label: string
-  path: string
-}) => {
+}: ActionButtonProps) => {
   const model = useActionRun(path)
   return (
     <span className="inline-flex items-center gap-2">

@@ -1,11 +1,14 @@
 import type { OrbitLabelBox } from '../types/OrbitLabelBox'
 import type { OrbitLabelInput } from '../types/OrbitLabelInput'
+import type { OrbitLabelOffset } from '../types/OrbitLabelOffset'
+import type { Point } from '../types/Point'
+import type { ViewportSize } from '../types/ViewportSize'
 
 export const orbitLabelCandidate = (
   point: OrbitLabelInput,
-  viewport: { readonly width: number; readonly height: number },
-  direction: { readonly x: number; readonly y: number },
-  offset: { readonly radial: number; readonly tangent: number },
+  viewport: ViewportSize,
+  direction: Point,
+  offset: OrbitLabelOffset,
 ): OrbitLabelBox => {
   const ux = direction.x
   const uy = direction.y

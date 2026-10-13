@@ -1,11 +1,11 @@
 import { formatCount } from '../../formatters/formatCount'
 import { formatTrendChange } from '../../formatters/formatTrendChange'
 import { summarizeTrendLine } from '../../selectors/summarizeTrendLine'
-import type { TrendModel } from '../../types/TrendModel'
+import type { TrendSummaryProps } from '../../types/TrendSummaryProps'
 
 // Each line's current value and its change, so the chart below explains a
 // movement instead of only drawing it.
-export const TrendSummary = ({ model }: { model: TrendModel }) => (
+export const TrendSummary = ({ model }: TrendSummaryProps) => (
   <dl className="flex flex-wrap gap-x-8 gap-y-2">
     {model.lines.map((line) => {
       const summary = summarizeTrendLine(line.values)

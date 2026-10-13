@@ -1,16 +1,11 @@
-import type { StepUpPrompt } from '../types/StepUpPrompt'
+import type { StepUpTokenFormProps } from '../types/StepUpTokenFormProps'
 
 export const StepUpTokenForm = ({
   model,
   inputLabel,
   submitLabel,
   onAccepted,
-}: {
-  model: StepUpPrompt
-  inputLabel: string
-  submitLabel: string
-  onAccepted?: () => void
-}) => (
+}: StepUpTokenFormProps) => (
   <form
     onSubmit={(event) => {
       model.submit(event, onAccepted)

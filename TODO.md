@@ -52,8 +52,14 @@ This repository is public: entries describe engine behaviour only.
 Filed by `~/p/bin/daily`; one bullet per finding, updated in place while it
 repeats.
 
-- [ ] <!-- daily-tasks:BROKEN --> **BROKEN** (first seen 2026-10-13, last seen
-      2026-10-13): dependencies moved forward (59 deps, pnpm) with build
-      failing, 5 errors. Fix forward; the round never downgrades. Decisive line:
-      `src/hooks/useGraphHighlight.ts(24,7): error TS2345: Argument of type '"edgeReducer"' is not assignable to parameter of type 'keyof Settings'.`.
-      Re-run: `bash ~/p/bin/daily/ncu-update-repo.sh ~/p/orbit /tmp/logs`.
+## Dependencies
+
+- [ ] `@react-sigma/core` 5.0.6 declares `sigma` `^3.0.2` as a peer, but the app
+      runs on sigma 4. `SigmaContainer` hands its `settings` prop to the Sigma
+      constructor as the options object, so the app passes Sigma 4 options
+      (`settings` and `styles`) through that prop (`src/graph/sigmaOptions.ts`),
+      and the library's own typings still describe Sigma 3 settings. Smallest
+      next step: replace `SigmaContainer` and the four hooks the app uses
+      (`useSigma`, `useLoadGraph`, `useRegisterEvents`, `useCamera`) with a
+      small local binding, or move to a `@react-sigma/core` release that
+      supports sigma 4, then drop the prop workaround.

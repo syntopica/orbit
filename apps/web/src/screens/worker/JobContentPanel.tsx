@@ -1,10 +1,9 @@
-import type { WorkerJobDetail } from '@orbit/contract'
-
 import { StepUpTokenForm } from '../../components/StepUpTokenForm'
 import { useJobContentPanel } from '../../hooks/useJobContentPanel'
+import type { JobContentPanelProps } from '../../types/JobContentPanelProps'
 import { RevealedJobContent } from './RevealedJobContent'
 
-export const JobContentPanel = ({ job }: { job: WorkerJobDetail }) => {
+export const JobContentPanel = ({ job }: JobContentPanelProps) => {
   const model = useJobContentPanel(job)
   const stored = job.hasInput || job.hasOutput
   return (

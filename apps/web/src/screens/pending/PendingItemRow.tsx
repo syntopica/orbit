@@ -1,6 +1,5 @@
-import type { PendingView } from '@orbit/contract'
-
 import { PENDING_STATE_TONES } from '../../labels/pendingStateTones'
+import type { PendingItemRowProps } from '../../types/PendingItemRowProps'
 import { PendingPlainText } from './PendingPlainText'
 import { PendingRef } from './PendingRef'
 import { PendingTitle } from './PendingTitle'
@@ -9,11 +8,7 @@ import { PendingTitleLinks } from './PendingTitleLinks'
 // One dense row: the state in a fixed first column so titles align, the
 // title cut by CSS (two lines on a phone, one on a desktop) and wrapped in
 // full once the row is open.
-export const PendingItemRow = ({
-  item,
-}: {
-  item: PendingView['items'][number]
-}) => (
+export const PendingItemRow = ({ item }: PendingItemRowProps) => (
   <details className="group/item min-w-0">
     <summary className="hover:bg-line/30 grid cursor-pointer list-none grid-cols-[5rem_minmax(0,1fr)] items-center gap-3 px-3 py-1.5 text-sm [&::-webkit-details-marker]:hidden">
       <span

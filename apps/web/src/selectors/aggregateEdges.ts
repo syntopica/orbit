@@ -1,4 +1,5 @@
 import { edgeSize } from '../charts/edgeSize'
+import type { AggregatedEdge } from '../types/AggregatedEdge'
 import type { SceneEdge } from '../types/SceneEdge'
 
 // Each link between two drawn nodes once, whichever way it points; links
@@ -8,10 +9,7 @@ export const aggregateEdges = (
   edges: readonly (readonly [number, number])[],
   drawnAs: (index: number) => string | null,
 ): readonly SceneEdge[] => {
-  const counts = new Map<
-    string,
-    { source: string; target: string; n: number }
-  >()
+  const counts = new Map<string, AggregatedEdge>()
   for (const [from, to] of edges) {
     const a = drawnAs(from)
     const b = drawnAs(to)

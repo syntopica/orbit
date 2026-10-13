@@ -1,8 +1,9 @@
 import { splitUrls } from '../../selectors/splitUrls'
+import type { PendingTitleLinksProps } from '../../types/PendingTitleLinksProps'
 
 // The title sits in the row's <summary>, where a link would nest inside the
 // toggle; its addresses are linked here, in the opened row, instead.
-export const PendingTitleLinks = ({ title }: { title: string }) => {
+export const PendingTitleLinks = ({ title }: PendingTitleLinksProps) => {
   const urls = splitUrls(title).filter((segment) => segment.url)
   if (urls.length === 0) return null
   return (

@@ -1,14 +1,7 @@
 import { useOrbitTrail } from '../../hooks/useOrbitTrail'
+import type { OrbitTrailProps } from '../../types/OrbitTrailProps'
 
-export const OrbitTrail = ({
-  color,
-  index,
-  light,
-}: {
-  readonly color: string
-  readonly index: number
-  readonly light: boolean
-}) => {
+export const OrbitTrail = ({ color, index, light }: OrbitTrailProps) => {
   const group = useOrbitTrail(index)
   return (
     <group ref={group}>

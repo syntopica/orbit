@@ -1,12 +1,7 @@
-import type { WorkerJobDetail } from '@orbit/contract'
-
+import type { AttemptWaterfallProps } from '../../types/AttemptWaterfallProps'
 import { AttemptWaterfallRow } from './AttemptWaterfallRow'
 
-export const AttemptWaterfall = ({
-  attempts,
-}: {
-  attempts: WorkerJobDetail['attemptDetails']
-}) => {
+export const AttemptWaterfall = ({ attempts }: AttemptWaterfallProps) => {
   const first = Math.min(...attempts.map((attempt) => attempt.startedAt))
   const last = Math.max(
     ...attempts.map((attempt) => attempt.endedAt ?? attempt.startedAt),

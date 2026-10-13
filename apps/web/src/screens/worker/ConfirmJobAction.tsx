@@ -2,6 +2,7 @@ import { ConfirmDialogFrame } from '../../components/ConfirmDialogFrame'
 import { StepUpTokenForm } from '../../components/StepUpTokenForm'
 import { useConfirmJobAction } from '../../hooks/useConfirmJobAction'
 import { useDialogFocus } from '../../hooks/useDialogFocus'
+import type { ConfirmJobActionProps } from '../../types/ConfirmJobActionProps'
 import { ConfirmJobButtons } from './ConfirmJobButtons'
 
 export const ConfirmJobAction = ({
@@ -9,12 +10,7 @@ export const ConfirmJobAction = ({
   action,
   close,
   confirm,
-}: {
-  id: string
-  action: 'cancel' | 'retry' | 'ack'
-  close: () => void
-  confirm: () => Promise<void>
-}) => {
+}: ConfirmJobActionProps) => {
   const model = useConfirmJobAction(close, confirm)
   const cancelRef = useDialogFocus()
   return (

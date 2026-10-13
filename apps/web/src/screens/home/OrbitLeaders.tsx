@@ -1,14 +1,6 @@
-import type { RefObject } from 'react'
+import type { OrbitLeadersProps } from '../../types/OrbitLeadersProps'
 
-import type { CardModel } from '../../types/CardModel'
-
-export const OrbitLeaders = ({
-  cards,
-  leaders,
-}: {
-  readonly cards: readonly CardModel[]
-  readonly leaders: readonly RefObject<SVGPathElement | null>[]
-}) => (
+export const OrbitLeaders = ({ cards, leaders }: OrbitLeadersProps) => (
   <svg className="orbit-leaders" aria-hidden="true" focusable="false">
     <defs>
       <marker

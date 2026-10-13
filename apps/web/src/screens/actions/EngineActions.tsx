@@ -1,9 +1,10 @@
 import { useEngineActions } from '../../hooks/useEngineActions'
+import type { EngineActionsProps } from '../../types/EngineActionsProps'
 import { ActionButton } from './ActionButton'
 
 // Inline in the screen header: a run is one click and a confirmation away,
 // and an engine has a handful of actions at most.
-export const EngineActions = ({ engine }: { engine: 'brain' | 'clips' }) => {
+export const EngineActions = ({ engine }: EngineActionsProps) => {
   const actions = useEngineActions(engine)
   if (actions.length === 0) return null
   return (

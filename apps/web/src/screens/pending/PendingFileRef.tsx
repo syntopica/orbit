@@ -1,10 +1,6 @@
-import type { PendingView } from '@orbit/contract'
+import type { PendingFileRefProps } from '../../types/PendingFileRefProps'
 
-export const PendingFileRef = ({
-  reference,
-}: {
-  reference: Extract<PendingView['items'][number]['ref'], object>
-}) => {
+export const PendingFileRef = ({ reference }: PendingFileRefProps) => {
   const label = `${reference.file}:${String(reference.line)}`
   return (
     <div className="flex flex-wrap items-center gap-2 text-sm">

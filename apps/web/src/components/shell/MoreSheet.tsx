@@ -1,16 +1,9 @@
-import type { RefObject } from 'react'
-
 import { useMoreSheetFocus } from '../../hooks/useMoreSheetFocus'
 import { useMoreSheetKeyboard } from '../../hooks/useMoreSheetKeyboard'
+import type { MoreSheetProps } from '../../types/MoreSheetProps'
 import { MoreSheetLinks } from './MoreSheetLinks'
 
-export const MoreSheet = ({
-  onClose,
-  trigger,
-}: {
-  onClose: () => void
-  trigger: RefObject<HTMLButtonElement | null>
-}) => {
+export const MoreSheet = ({ onClose, trigger }: MoreSheetProps) => {
   const first = useMoreSheetFocus(trigger)
   const dialog = useMoreSheetKeyboard(onClose)
   return (

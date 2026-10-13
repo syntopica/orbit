@@ -1,16 +1,11 @@
-import type { ReactNode } from 'react'
+import type { ConfirmDialogFrameProps } from '../types/ConfirmDialogFrameProps'
 
 export const ConfirmDialogFrame = ({
   headingId,
   title,
   close,
   children,
-}: {
-  headingId: string
-  title: string
-  close: () => void
-  children: ReactNode
-}) => (
+}: ConfirmDialogFrameProps) => (
   <div>
     <button
       type="button"

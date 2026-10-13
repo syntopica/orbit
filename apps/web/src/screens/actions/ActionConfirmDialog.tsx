@@ -1,7 +1,7 @@
 import { ConfirmDialogFrame } from '../../components/ConfirmDialogFrame'
 import { StepUpTokenForm } from '../../components/StepUpTokenForm'
 import { actionDescription } from '../../formatters/actionDescription'
-import type { StepUpPrompt } from '../../types/StepUpPrompt'
+import type { ActionConfirmDialogProps } from '../../types/ActionConfirmDialogProps'
 import { ActionConfirmButtons } from './ActionConfirmButtons'
 
 export const ActionConfirmDialog = ({
@@ -12,15 +12,7 @@ export const ActionConfirmDialog = ({
   error,
   sending,
   stepUp,
-}: {
-  target: string
-  action: string
-  close: () => void
-  confirm: () => Promise<void>
-  error: boolean
-  sending: boolean
-  stepUp: StepUpPrompt
-}) => {
+}: ActionConfirmDialogProps) => {
   return (
     <ConfirmDialogFrame
       headingId="action-confirm-heading"

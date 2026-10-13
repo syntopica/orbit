@@ -1,14 +1,10 @@
-import type { usePendingBoard } from '../../hooks/usePendingBoard'
+import type { PendingFiltersProps } from '../../types/PendingFiltersProps'
 import { PendingSearchInput } from './PendingSearchInput'
 import { PendingSourceFilters } from './PendingSourceFilters'
 import { PendingStateFilters } from './PendingStateFilters'
 
 // Search first; the per-source chips stay folded unless one is selected.
-export const PendingFilters = ({
-  model,
-}: {
-  model: ReturnType<typeof usePendingBoard>
-}) => {
+export const PendingFilters = ({ model }: PendingFiltersProps) => {
   if (model.query.data === undefined) return null
   return (
     <section aria-label="Pending filters" className="space-y-3">

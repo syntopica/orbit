@@ -9,6 +9,20 @@ result and the evidence. Active work lives in `TODO.md`.
 
 ### October
 
+- 2026-10-13 [x] **Dependencies:** the 2026-10-13 daily round moved 59
+  dependencies to their latest versions and the pre-push gate refused the push.
+  Fixed forward on the new versions, nothing downgraded or pinned.
+  - Result: sigma 4 no longer has `setSetting('nodeReducer' | 'edgeReducer')`, a
+    generic `Settings`, `hidden` or `forceLabel`, so the graph styling moved to
+    Sigma 4 styles (labels, edge colour, sizes) and the hover highlight to node
+    and edge `isHighlighted` state read by style rules.
+    `eslint-plugin-code-policy` 0.8.0 now flags anonymous object types that
+    0.7.4 did not (the server linted clean at the commit before the upgrade), so
+    46 server and 71 web shapes were extracted into named types, one per file.
+  - Evidence: `pnpm gate` exit 0 (lint, type-check, tests, knip, dupes, audit
+    and 62/62 Playwright specs); `pnpm lint` 0 problems in server, web and
+    contract.
+
 - 2026-10-11 [~] The root `gate` and `e2e` scripts queue behind a host admission
   wrapper (item 1 stays open in `TODO.md`). Decided 2026-10-11 (owner via Codex
   adjudication): one heavy suite per host, two test workers each. When

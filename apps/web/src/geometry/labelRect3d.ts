@@ -2,6 +2,7 @@ import type { Camera, Object3D } from 'three'
 import { Vector3 } from 'three'
 
 import type { LabelRect3d } from '../types/LabelRect3d'
+import type { ViewportSize } from '../types/ViewportSize'
 import { CAMERA_FOV_3D } from './cameraFov3d'
 
 // The screen box of a label sprite anchored at its bottom centre and drawn
@@ -9,7 +10,7 @@ import { CAMERA_FOV_3D } from './cameraFov3d'
 export const labelRect3d = (
   sprite: Object3D,
   camera: Camera,
-  view: { readonly width: number; readonly height: number },
+  view: ViewportSize,
 ): LabelRect3d | null => {
   const ndc = new Vector3().copy(sprite.position).project(camera)
   if (ndc.z > 1) return null

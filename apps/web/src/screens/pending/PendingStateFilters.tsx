@@ -1,11 +1,7 @@
-import type { usePendingBoard } from '../../hooks/usePendingBoard'
 import { PENDING_STATES } from '../../labels/pendingStates'
+import type { PendingStateFiltersProps } from '../../types/PendingStateFiltersProps'
 
-export const PendingStateFilters = ({
-  model,
-}: {
-  model: ReturnType<typeof usePendingBoard>
-}) => {
+export const PendingStateFilters = ({ model }: PendingStateFiltersProps) => {
   const states = PENDING_STATES
   return (
     <div className="flex flex-wrap gap-2">

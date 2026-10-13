@@ -1,18 +1,11 @@
-import type { RefObject } from 'react'
-
-import type { useConfirmJobAction } from '../../hooks/useConfirmJobAction'
+import type { ConfirmJobButtonsProps } from '../../types/ConfirmJobButtonsProps'
 
 export const ConfirmJobButtons = ({
   model,
   cancelRef,
   close,
   action,
-}: {
-  model: ReturnType<typeof useConfirmJobAction>
-  cancelRef: RefObject<HTMLButtonElement | null>
-  close: () => void
-  action: string
-}) => (
+}: ConfirmJobButtonsProps) => (
   <div className="flex gap-3">
     <button
       ref={cancelRef}

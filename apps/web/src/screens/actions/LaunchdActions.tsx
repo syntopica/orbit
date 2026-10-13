@@ -1,7 +1,7 @@
-import type { LaunchdRow } from '../../types/LaunchdRow'
+import type { LaunchdActionsProps } from '../../types/LaunchdActionsProps'
 import { ActionButton } from './ActionButton'
 
-export const LaunchdActions = ({ row }: { row: LaunchdRow }) => (
+export const LaunchdActions = ({ row }: LaunchdActionsProps) => (
   <div className="flex flex-wrap gap-2">
     {row.actions.map((action) => (
       <ActionButton

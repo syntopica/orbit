@@ -1,15 +1,8 @@
 import { COMPONENT_LABELS } from '../../labels/componentLabels'
-import type { HistoryRange } from '../../types/HistoryRange'
-import type { LaunchdRowGroup } from '../../types/LaunchdRowGroup'
+import type { LaunchdGroupProps } from '../../types/LaunchdGroupProps'
 import { LaunchdRowView } from './LaunchdRowView'
 
-export const LaunchdGroup = ({
-  group,
-  range,
-}: {
-  group: LaunchdRowGroup
-  range: HistoryRange
-}) => (
+export const LaunchdGroup = ({ group, range }: LaunchdGroupProps) => (
   <section aria-label={COMPONENT_LABELS[group.component]} className="space-y-3">
     <h2 className="text-muted text-sm font-semibold uppercase">
       {COMPONENT_LABELS[group.component]}

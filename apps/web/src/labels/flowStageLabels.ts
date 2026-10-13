@@ -1,10 +1,8 @@
 import type { FlowStageId } from '@orbit/contract'
+import type { FlowStageLabel } from '../types/FlowStageLabel'
 
 // Plain-language explanations for the side panel (spec 3.3, 7 item 3).
-export const FLOW_STAGE_LABELS: Record<
-  FlowStageId,
-  { readonly title: string; readonly explanation: string }
-> = {
+export const FLOW_STAGE_LABELS: Record<FlowStageId, FlowStageLabel> = {
   archive: {
     title: 'Archive',
     explanation:

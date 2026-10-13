@@ -1,6 +1,5 @@
-import type { PendingView } from '@orbit/contract'
-
 import { formatStateCounts } from '../../formatters/formatStateCounts'
+import type { PendingSourceSectionProps } from '../../types/PendingSourceSectionProps'
 import { PendingSectionList } from './PendingSectionList'
 
 export const PendingSourceSection = ({
@@ -8,12 +7,7 @@ export const PendingSourceSection = ({
   items,
   open,
   onOpenChange,
-}: {
-  source: PendingView['sources'][number]
-  items: PendingView['items']
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}) => {
+}: PendingSourceSectionProps) => {
   if (items.length === 0) return null
   const sections = [...new Set(items.map((item) => item.section))]
   return (

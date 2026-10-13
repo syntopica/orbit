@@ -1,6 +1,7 @@
 import { parseInlineMarkdown } from '../../selectors/parseInlineMarkdown'
+import type { PendingTitleProps } from '../../types/PendingTitleProps'
 
-export const PendingTitle = ({ text }: { text: string }) => (
+export const PendingTitle = ({ text }: PendingTitleProps) => (
   <>
     {parseInlineMarkdown(text).map((segment) =>
       segment.code ? (

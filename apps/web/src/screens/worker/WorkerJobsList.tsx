@@ -1,14 +1,10 @@
 import { formatClock } from '../../formatters/formatClock'
 import { formatJobCount } from '../../formatters/formatJobCount'
-import type { useWorkerJobsScreen } from '../../hooks/useWorkerJobsScreen'
+import type { WorkerJobsListProps } from '../../types/WorkerJobsListProps'
 import { WorkerJobsRows } from './WorkerJobsRows'
 import { WorkerJobsTable } from './WorkerJobsTable'
 
-export const WorkerJobsList = ({
-  model,
-}: {
-  model: ReturnType<typeof useWorkerJobsScreen>
-}) => {
+export const WorkerJobsList = ({ model }: WorkerJobsListProps) => {
   const data = model.jobs.data
   if (data === undefined) return null
   return (

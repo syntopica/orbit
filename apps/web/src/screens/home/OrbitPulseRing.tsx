@@ -1,13 +1,6 @@
-import type { Ref } from 'react'
-import type { Mesh } from 'three'
+import type { OrbitPulseRingProps } from '../../types/OrbitPulseRingProps'
 
-export const OrbitPulseRing = ({
-  color,
-  ref,
-}: {
-  readonly color: string
-  readonly ref: Ref<Mesh>
-}) => (
+export const OrbitPulseRing = ({ color, ref }: OrbitPulseRingProps) => (
   <mesh ref={ref}>
     <ringGeometry args={[0.27, 0.29, 48]} />
     <meshBasicMaterial

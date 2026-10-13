@@ -1,11 +1,10 @@
-import type { WorkerJobDetail } from '@orbit/contract'
-
 import { formatJobResult } from '../../formatters/formatJobResult'
 import { resultSummaryItems } from '../../selectors/resultSummaryItems'
+import type { JobResultPanelProps } from '../../types/JobResultPanelProps'
 import { LabelledValueList } from './LabelledValueList'
 
 // Metadata only, so it needs no reveal: the output body stays in Content.
-export const JobResultPanel = ({ job }: { job: WorkerJobDetail }) => (
+export const JobResultPanel = ({ job }: JobResultPanelProps) => (
   <section
     aria-label="Result"
     className="border-line bg-panel space-y-3 rounded-xl border p-4"

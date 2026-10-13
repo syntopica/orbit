@@ -1,19 +1,13 @@
-import type { WorkerJobDetail } from '@orbit/contract'
-
 import { formatAttemptSpan } from '../../formatters/formatAttemptSpan'
 import { formatAttemptUsage } from '../../formatters/formatAttemptUsage'
+import type { AttemptWaterfallRowProps } from '../../types/AttemptWaterfallRowProps'
 
 export const AttemptWaterfallRow = ({
   attempt,
   first,
   last,
   span,
-}: {
-  attempt: WorkerJobDetail['attemptDetails'][number]
-  first: number
-  last: number
-  span: number
-}) => {
+}: AttemptWaterfallRowProps) => {
   const left = ((attempt.startedAt - first) / span) * 100
   const width = Math.max(
     2,

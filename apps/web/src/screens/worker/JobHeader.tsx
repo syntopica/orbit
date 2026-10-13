@@ -1,9 +1,8 @@
-import type { WorkerJobDetail } from '@orbit/contract'
-
 import { jobSummaryItems } from '../../selectors/jobSummaryItems'
+import type { JobHeaderProps } from '../../types/JobHeaderProps'
 import { LabelledValueList } from './LabelledValueList'
 
-export const JobHeader = ({ job }: { job: WorkerJobDetail }) => (
+export const JobHeader = ({ job }: JobHeaderProps) => (
   <header className="space-y-3">
     <h1 className="font-mono text-2xl font-semibold break-all">{job.id}</h1>
     <p className="text-muted flex flex-wrap gap-x-4 text-sm">

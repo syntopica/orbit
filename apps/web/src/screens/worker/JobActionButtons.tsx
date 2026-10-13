@@ -1,11 +1,7 @@
-import type { useWorkerJobActions } from '../../hooks/useWorkerJobActions'
+import type { JobActionButtonsProps } from '../../types/JobActionButtonsProps'
 
 // Retry is the recovery and leads; acknowledge only clears the failure.
-export const JobActionButtons = ({
-  model,
-}: {
-  model: ReturnType<typeof useWorkerJobActions>
-}) => (
+export const JobActionButtons = ({ model }: JobActionButtonsProps) => (
   <div className="flex flex-wrap gap-3">
     {model.cancelable ? (
       <button

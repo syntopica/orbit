@@ -1,10 +1,6 @@
-export const ActionRunLink = ({
-  id,
-  state,
-}: {
-  id: string | null
-  state: 'started' | 'succeeded' | 'failed' | 'interrupted' | undefined
-}) => {
+import type { ActionRunLinkProps } from '../../types/ActionRunLinkProps'
+
+export const ActionRunLink = ({ id, state }: ActionRunLinkProps) => {
   if (id === null) return null
   const suffix = state === 'succeeded' || state === 'failed' ? '-complete' : ''
   return (

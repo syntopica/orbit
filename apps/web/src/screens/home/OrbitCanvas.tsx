@@ -1,8 +1,7 @@
 import { Canvas } from '@react-three/fiber'
-import type { RefObject } from 'react'
 
 import { useOrbitGlowTexture } from '../../hooks/useOrbitGlowTexture'
-import type { CardModel } from '../../types/CardModel'
+import type { OrbitCanvasProps } from '../../types/OrbitCanvasProps'
 import { OrbitCamera } from './OrbitCamera'
 import { OrbitCore } from './OrbitCore'
 import { OrbitDust } from './OrbitDust'
@@ -15,12 +14,7 @@ export const OrbitCanvas = ({
   labels,
   leaders,
   visible,
-}: {
-  readonly cards: readonly CardModel[]
-  readonly labels: readonly RefObject<HTMLAnchorElement | null>[]
-  readonly leaders: readonly RefObject<SVGPathElement | null>[]
-  readonly visible: boolean
-}) => {
+}: OrbitCanvasProps) => {
   const styles = getComputedStyle(document.documentElement)
   const accent = styles.getPropertyValue('--color-accent').trim()
   const light = matchMedia('(prefers-color-scheme: light)').matches
