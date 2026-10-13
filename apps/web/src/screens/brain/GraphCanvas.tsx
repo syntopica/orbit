@@ -26,7 +26,7 @@ export const GraphCanvas = ({
     >
       <GraphLoader graph={graph} />
       <GraphEvents onSelect={onSelect} onHover={setHovered} />
-      <GraphHighlight graph={graph} centre={hovered} palette={palette} />
+      <GraphHighlight graph={graph} centre={hovered} />
       <GraphFocus animate={animate} graph={graph} />
     </SigmaContainer>
   )

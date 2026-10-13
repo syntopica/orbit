@@ -31,7 +31,8 @@ export const fakeReactSigma = {
   sigma: {
     getGraph: () => fakeReactSigma.loaded.at(-1),
     getContainer: () => fakeReactSigma.container,
-    setSetting: vi.fn(),
+    setNodesState: vi.fn(),
+    setEdgesState: vi.fn(),
     getDimensions: () => ({ width: 800, height: 600 }),
     graphToViewport: (point: Coordinates) => ({
       x: point.x * 600 + 400,

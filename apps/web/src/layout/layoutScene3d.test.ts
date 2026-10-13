@@ -1,17 +1,16 @@
-import Graph from 'graphology'
 import { describe, expect, it } from 'vitest'
 
 import { dimColor } from '../charts/dimColor'
 import { edgePositions3d } from '../geometry/edgePositions3d'
 import { nodeRadius3d } from '../geometry/nodeRadius3d'
 import { sceneExtent3d } from '../geometry/sceneExtent3d'
-import { edgeHighlighter } from '../graph/edgeHighlighter'
-import { nodeHighlighter } from '../graph/nodeHighlighter'
+import { edgeColor } from '../graph/edgeColor'
+import { edgeVisibility } from '../graph/edgeVisibility'
+import { nodeFadeColor } from '../graph/nodeFadeColor'
+import { nodeLabelVisibility } from '../graph/nodeLabelVisibility'
 import { labelledNodes3d } from '../selectors/labelledNodes3d'
 import { litNodes } from '../selectors/litNodes'
 import { sceneNeighbours } from '../selectors/sceneNeighbours'
-import type { GraphEdgeAttributes } from '../types/GraphEdgeAttributes'
-import type { GraphNodeAttributes } from '../types/GraphNodeAttributes'
 import type { GraphScene } from '../types/GraphScene'
 import { layoutScene3d } from './layoutScene3d'
 
@@ -82,31 +81,89 @@ describe('3D hover and labels', () => {
 })
 
 describe('2D highlight reducers', () => {
-  const graph = new Graph<GraphNodeAttributes, GraphEdgeAttributes>({
-    type: 'undirected',
+  const nodeState = (isHighlighted: boolean) => ({
+    isHovered: false,
+    isLabelHovered: false,
+    isHidden: false,
+    isHighlighted,
+    isDragged: false,
   })
-  for (const { id, ...attributes } of scene.nodes) graph.addNode(id, attributes)
-  graph.addEdge('a', 'b', { color: '#line00', size: 1 })
-  graph.addEdge('b', 'c', { color: '#line00', size: 1 })
-  it('keeps the hovered neighbourhood and fades the rest', () => {
-    const reduce = nodeHighlighter(graph, 'a')
-    const data = graph.getNodeAttributes('b')
-    expect(reduce('b', data)).toMatchObject({ forceLabel: true, zIndex: 1 })
-    expect(reduce('c', graph.getNodeAttributes('c'))).toMatchObject({
-      color: '#1234561a',
-      label: null,
-    })
+  const edgeState = (isHighlighted: boolean) => ({
+    isHovered: false,
+    isLabelHovered: false,
+    isHidden: false,
+    isHighlighted,
+    parallelIndex: 0,
+    parallelCount: 1,
+  })
+  const graphState = (hasHighlighted: boolean) => ({
+    isIdle: true,
+    isPanning: false,
+    isZooming: false,
+    isDragging: false,
+    hasHovered: false,
+    hasHighlighted,
+  })
+  const attributes = {
+    label: 'a',
+    x: 0,
+    y: 0,
+    size: 1,
+    color: '#123456',
+    forceLabel: false,
+  }
+  it('keeps the highlighted neighbourhood and fades the rest', () => {
+    const fade = (isHighlighted: boolean) =>
+      nodeFadeColor(attributes, nodeState(isHighlighted), graphState(true))
+    expect(fade(true)).toBe('#123456')
+    expect(fade(false)).toBe('#1234561a')
     expect(dimColor('rgb(1, 2, 3)')).toBe('rgb(1, 2, 3)')
+    const label = (isHighlighted: boolean) =>
+      nodeLabelVisibility(
+        attributes,
+        nodeState(isHighlighted),
+        graphState(true),
+      )
+    expect(label(true)).toBe('visible')
+    expect(label(false)).toBe('hidden')
   })
-  it('shows only the hovered node edges, in the accent', () => {
-    const reduce = edgeHighlighter(graph, 'a', '#accent')
-    const [first, second] = graph.edges()
-    expect(reduce(first ?? '', { color: '#line00', size: 1 })).toMatchObject({
-      color: '#accent',
-    })
-    expect(reduce(second ?? '', { color: '#line00', size: 1 })).toMatchObject({
-      hidden: true,
-    })
+  it('restyles nothing while no node is highlighted', () => {
+    expect(nodeFadeColor(attributes, nodeState(false), graphState(false))).toBe(
+      '#123456',
+    )
+    expect(
+      nodeLabelVisibility(attributes, nodeState(false), graphState(false)),
+    ).toBe('auto')
+    expect(
+      nodeLabelVisibility(
+        { ...attributes, forceLabel: true },
+        nodeState(false),
+        graphState(false),
+      ),
+    ).toBe('visible')
+    expect(
+      edgeVisibility(
+        { color: '#line00', size: 1 },
+        edgeState(false),
+        graphState(false),
+      ),
+    ).toBe('visible')
+  })
+  it('shows only the highlighted edges, in the accent', () => {
+    const visibility = (isHighlighted: boolean) =>
+      edgeVisibility(
+        { color: '#line00', size: 1 },
+        edgeState(isHighlighted),
+        graphState(true),
+      )
+    expect(visibility(true)).toBe('visible')
+    expect(visibility(false)).toBe('hidden')
+    expect(
+      edgeColor('#accent')({ color: '#line00', size: 1 }, edgeState(true)),
+    ).toBe('#accent')
+    expect(
+      edgeColor('#accent')({ color: '#line00', size: 1 }, edgeState(false)),
+    ).toBe('#line00')
   })
   it('keeps big spheres apart however close they start', () => {
     // Eleven community-sized spheres stacked near one point, as an opened

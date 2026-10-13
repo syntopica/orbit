@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { sigmaSettings } from '../graph/sigmaSettings'
+import { sigmaOptions } from '../graph/sigmaOptions'
 import type { GraphPalette } from '../types/GraphPalette'
 
 export const useGraphSettings = (palette: GraphPalette) =>
-  useMemo(() => sigmaSettings(palette), [palette])
+  useMemo(() => sigmaOptions(palette), [palette])
