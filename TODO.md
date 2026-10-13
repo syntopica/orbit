@@ -46,3 +46,14 @@ This repository is public: entries describe engine behaviour only.
   one (the original commands are `gate:run` and `e2e:run`; CI and hosts without
   the wrapper run them directly). Remaining: compare the `timeout` rate before
   and after over a few days of `at=` stamps.
+
+## Daily round
+
+Filed by `~/p/bin/daily`; one bullet per finding, updated in place while it
+repeats.
+
+- [ ] <!-- daily-tasks:BROKEN --> **BROKEN** (first seen 2026-10-13, last seen
+      2026-10-13): dependencies moved forward (59 deps, pnpm) with build
+      failing, 5 errors. Fix forward; the round never downgrades. Decisive line:
+      `src/hooks/useGraphHighlight.ts(24,7): error TS2345: Argument of type '"edgeReducer"' is not assignable to parameter of type 'keyof Settings'.`.
+      Re-run: `bash ~/p/bin/daily/ncu-update-repo.sh ~/p/orbit /tmp/logs`.
