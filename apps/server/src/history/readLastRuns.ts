@@ -1,4 +1,5 @@
 import type { DatabaseSync } from 'node:sqlite'
+import type { LastRunRow } from '../types/LastRunRow'
 
 // Observations are written on change; a run is an observation whose run
 // count is above the one before it for the same label.
@@ -14,7 +15,7 @@ export const readLastRuns = (
   )
   const runs = new Map<string, number>()
   for (const label of labels) {
-    const row = statement.get(label) as { at: number | null } | undefined
+    const row = statement.get(label) as LastRunRow | undefined
     if (typeof row?.at === 'number') runs.set(label, row.at)
   }
   return runs

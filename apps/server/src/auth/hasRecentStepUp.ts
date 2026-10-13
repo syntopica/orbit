@@ -1,5 +1,6 @@
 import type { DatabaseSync } from 'node:sqlite'
 
+import type { StepUpRow } from '../types/StepUpRow'
 import { hashSecret } from './hashSecret'
 
 export const hasRecentStepUp = (
@@ -9,7 +10,7 @@ export const hasRecentStepUp = (
 ): boolean => {
   const row = db
     .prepare('SELECT step_up_at FROM sessions WHERE hash = ? AND expires > ?')
-    .get(hashSecret(session), now) as { step_up_at: number | null } | undefined
+    .get(hashSecret(session), now) as StepUpRow | undefined
   return (
     row?.step_up_at !== null &&
     row?.step_up_at !== undefined &&

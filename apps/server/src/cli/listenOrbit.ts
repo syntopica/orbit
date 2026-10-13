@@ -1,5 +1,6 @@
-import type { Server } from 'node:http'
-
+import type { BuiltHandlerHolder } from '../types/BuiltHandlerHolder'
+import type { OrbitListenPorts } from '../types/OrbitListenPorts'
+import type { OrbitListenResult } from '../types/OrbitListenResult'
 import type { RequestHandler } from '../types/RequestHandler'
 import { listenLoopback } from './listenLoopback'
 import { listenRemotePort } from './listenRemotePort'
@@ -8,10 +9,10 @@ import { listenRemotePort } from './listenRemotePort'
 // serving the one handler built for the port really bound. A remote port that
 // cannot be bound closes the first listener before the failure is rethrown.
 export const listenOrbit = async (
-  ports: { readonly port: number; readonly remotePort?: number | undefined },
+  ports: OrbitListenPorts,
   makeHandler: (actualPort: number) => RequestHandler,
-): Promise<{ servers: Server[]; port: number }> => {
-  const built: { handler?: RequestHandler } = {}
+): Promise<OrbitListenResult> => {
+  const built: BuiltHandlerHolder = {}
   const primary = await listenLoopback(
     ports.port,
     (actual) => (built.handler = makeHandler(actual)),

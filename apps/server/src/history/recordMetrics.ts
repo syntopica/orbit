@@ -1,5 +1,6 @@
 import type { Snapshot } from '@orbit/contract'
 import type { DatabaseSync } from 'node:sqlite'
+import type { MetricValueRow } from '../types/MetricValueRow'
 
 export const recordMetrics = (db: DatabaseSync, snapshot: Snapshot): void => {
   const last = db.prepare(
@@ -10,7 +11,7 @@ export const recordMetrics = (db: DatabaseSync, snapshot: Snapshot): void => {
   )
   for (const metric of snapshot.metrics) {
     const prior = last.get(snapshot.component, metric.key) as
-      { value: number } | undefined
+      MetricValueRow | undefined
     if (prior?.value !== metric.value) {
       insert.run(
         snapshot.component,

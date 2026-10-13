@@ -1,5 +1,6 @@
 import { ProcessError } from '../process/ProcessError'
 import type { SlotQueue } from '../types/SlotQueue'
+import type { SlotWaiter } from '../types/SlotWaiter'
 
 // FIFO slots: a waiter whose signal aborts is refused with `timeout` at once
 // and skipped when a slot frees; one that starts drops its abort listener.
@@ -7,10 +8,7 @@ import type { SlotQueue } from '../types/SlotQueue'
 // `lagging` at once, so work that never settles cannot grow the queue.
 export const createSlotQueue = (slots: number, maxWaiting = 8): SlotQueue => {
   let running = 0
-  const waiting: {
-    readonly signal: AbortSignal
-    readonly start: () => void
-  }[] = []
+  const waiting: SlotWaiter[] = []
   return {
     acquire: async (signal) => {
       if (running < slots) {

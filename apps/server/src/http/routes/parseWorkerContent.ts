@@ -1,9 +1,10 @@
 import { parseWorkerJson } from '../../adapters/worker/parseWorkerJson'
 import { workerJobContentReportSchema } from '../../adapters/worker/workerJobContentReportSchema'
+import type { WorkerContentSummary } from '../../types/WorkerContentSummary'
 
 export const parseWorkerContent = (
   body: string,
-): { input?: unknown; output?: unknown } | null => {
+): WorkerContentSummary | null => {
   try {
     return parseWorkerJson(body, workerJobContentReportSchema)
   } catch {

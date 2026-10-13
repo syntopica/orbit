@@ -1,4 +1,5 @@
 import type { DatabaseSync } from 'node:sqlite'
+import type { RollupHourRow } from '../types/RollupHourRow'
 
 // Rolls up every complete hour since the newest rollup (at least the last
 // two, or every sample when none exists), so hours left unrolled while the
@@ -8,7 +9,7 @@ export const rollupHours = (db: DatabaseSync, now: number): void => {
   const currentHour = Math.floor(now / hourMs)
   const newest = db
     .prepare('SELECT max(hour) AS hour FROM metric_rollups')
-    .get() as { hour: number | null }
+    .get() as RollupHourRow
   const fromHour =
     newest.hour === null ? 0 : Math.min(currentHour - 2, newest.hour)
   db.prepare(

@@ -6,22 +6,20 @@ import type {
 } from '@orbit/contract'
 
 import type { Hub } from '../types/Hub'
+import type { HubOptions } from '../types/HubOptions'
+import type { SentSnapshotEntry } from '../types/SentSnapshotEntry'
 import { createEventPublisher } from './createEventPublisher'
 import { createRing } from './createRing'
 import { createSnapshotPublisher } from './createSnapshotPublisher'
 import { deliverToListeners } from './deliverToListeners'
 
-export const createHub = (options: {
-  ringSize: number
-  recentEvents: number
-  firstId: number
-}): Hub => {
+export const createHub = (options: HubOptions): Hub => {
   if (!Number.isInteger(options.ringSize) || options.ringSize < 1)
     throw new Error('ringSize must be a positive integer')
   let nextId = options.firstId
   const ring = createRing(options.ringSize)
   const current = new Map<ComponentId, Snapshot>()
-  const sent = new Map<ComponentId, { hash: string; at: number }>()
+  const sent = new Map<ComponentId, SentSnapshotEntry>()
   const events: EventMessage[] = []
   const listeners = new Set<(message: StreamMessage) => void>()
   const send = (message: StreamMessage): void => {

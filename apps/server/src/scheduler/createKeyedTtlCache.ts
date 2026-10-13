@@ -1,3 +1,5 @@
+import type { TtlEntry } from '../types/TtlEntry'
+
 // Per-key detail cache (spec 5.4): each key is held for the adapter's
 // cadence, the oldest key is evicted past `maxKeys`, calls in flight for one
 // key share a load, and a failure is never cached.
@@ -6,7 +8,7 @@ export const createKeyedTtlCache = <T>(
   now: () => number,
   maxKeys: number,
 ): ((key: string, load: () => Promise<T>) => Promise<T>) => {
-  const held = new Map<string, { readonly value: T; readonly at: number }>()
+  const held = new Map<string, TtlEntry<T>>()
   const flights = new Map<string, Promise<T>>()
   return async (key, load) => {
     const entry = held.get(key)

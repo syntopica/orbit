@@ -1,7 +1,8 @@
 import { createServerHub } from '../hub/createServerHub'
 import { createPollerRegistry } from '../scheduler/createPollerRegistry'
-import type { EngineRunner } from '../types/EngineRunner'
 import type { OrbitState } from '../types/OrbitState'
+import type { StartServerOptions } from '../types/StartServerOptions'
+import type { StartServerResult } from '../types/StartServerResult'
 import { assertWebRoot } from './assertWebRoot'
 import { buildHandler } from './buildHandler'
 import { buildScheduler } from './buildScheduler'
@@ -13,12 +14,8 @@ import { startHistory } from './startHistory'
 // failure after listening tears the same things down before it is rethrown.
 export const startServer = async (
   state: OrbitState,
-  options: {
-    webRoot: string
-    signal: AbortSignal
-    engines: Readonly<Record<string, EngineRunner>>
-  },
-): Promise<{ port: number }> => {
+  options: StartServerOptions,
+): Promise<StartServerResult> => {
   await assertWebRoot(options.webRoot)
   const hub = createServerHub()
   const poller = createPollerRegistry()

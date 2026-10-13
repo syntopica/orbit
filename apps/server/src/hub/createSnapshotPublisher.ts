@@ -1,15 +1,11 @@
-import type { ComponentId, Snapshot, StreamMessage } from '@orbit/contract'
+import type { Snapshot } from '@orbit/contract'
 
+import type { SnapshotPublisherDeps } from '../types/SnapshotPublisherDeps'
 import { snapshotHash } from './snapshotHash'
 import { withoutEvents } from './withoutEvents'
 
 export const createSnapshotPublisher =
-  (deps: {
-    current: Map<ComponentId, Snapshot>
-    sent: Map<ComponentId, { hash: string; at: number }>
-    send: (message: StreamMessage) => void
-    nextId: () => number
-  }): ((snapshot: Snapshot) => void) =>
+  (deps: SnapshotPublisherDeps): ((snapshot: Snapshot) => void) =>
   (snapshot) => {
     const stored = withoutEvents(snapshot)
     deps.current.set(snapshot.component, stored)

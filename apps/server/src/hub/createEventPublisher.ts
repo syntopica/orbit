@@ -1,12 +1,8 @@
-import type { EventMessage, OrbitEvent, StreamMessage } from '@orbit/contract'
+import type { EventMessage, OrbitEvent } from '@orbit/contract'
+import type { EventPublisherDeps } from '../types/EventPublisherDeps'
 
 export const createEventPublisher =
-  (deps: {
-    events: EventMessage[]
-    recentEvents: number
-    send: (message: StreamMessage) => void
-    nextId: () => number
-  }): ((event: OrbitEvent) => void) =>
+  (deps: EventPublisherDeps): ((event: OrbitEvent) => void) =>
   (event) => {
     const message: EventMessage = { type: 'event', id: deps.nextId(), event }
     deps.events.push(message)

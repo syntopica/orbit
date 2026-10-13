@@ -1,6 +1,7 @@
 import type { DatabaseSync } from 'node:sqlite'
 
 import type { Invitation } from '../types/Invitation'
+import type { InvitationRow } from '../types/InvitationRow'
 import { AUTH_DURATIONS } from './authDurations'
 import { createSession } from './createSession'
 import { hashSecret } from './hashSecret'
@@ -17,7 +18,7 @@ export const redeemInvitation = (
       .prepare(
         'SELECT secret_hash AS hash, failures FROM invitations WHERE id = ? AND used = 0 AND expires > ?',
       )
-      .get(invitation.id, now) as { hash: string; failures: number } | undefined
+      .get(invitation.id, now) as InvitationRow | undefined
     let session: string | null = null
     if (
       row !== undefined &&

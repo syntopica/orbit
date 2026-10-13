@@ -1,12 +1,9 @@
 import type { Adapter } from '../../types/Adapter'
-import type { EngineRunner } from '../../types/EngineRunner'
+import type { BrainAdapterDeps } from '../../types/BrainAdapterDeps'
 import { readBrainChecks } from './readBrainChecks'
 import { summarizeBrain } from './summarizeBrain'
 
-export const createBrainAdapter = (deps: {
-  readonly run: EngineRunner
-  readonly cadenceMs: number
-}): Adapter => ({
+export const createBrainAdapter = (deps: BrainAdapterDeps): Adapter => ({
   id: 'brain',
   cadenceMs: deps.cadenceMs,
   // Two sequential engine reads, each up to its engine's `timeoutMs` (20 s at

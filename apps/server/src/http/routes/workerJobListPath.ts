@@ -1,9 +1,11 @@
+import type { WorkerJobListPathError } from '../../types/WorkerJobListPathError'
+import type { WorkerJobListPathOk } from '../../types/WorkerJobListPathOk'
 import { isIdentifier } from '../../workerView/isIdentifier'
 import { isStateList } from './isStateList'
 
 export const workerJobListPath = (
   query: Record<string, string>,
-): { path: string } | { error: 'bad_request' | 'bad_cursor' } => {
+): WorkerJobListPathOk | WorkerJobListPathError => {
   const params = new URLSearchParams()
   for (const name of ['queue', 'state', 'producer'] as const) {
     const value = query[name]

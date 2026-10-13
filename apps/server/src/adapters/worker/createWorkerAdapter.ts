@@ -1,11 +1,12 @@
 import type { Adapter } from '../../types/Adapter'
 import type { WorkerAdapterDeps } from '../../types/WorkerAdapterDeps'
+import type { WorkerSeenIds } from '../../types/WorkerSeenIds'
 import { fetchWorkerStatus } from './fetchWorkerStatus'
 import { summarizeWorker } from './summarizeWorker'
 import { workerEvents } from './workerEvents'
 
 export const createWorkerAdapter = (deps: WorkerAdapterDeps): Adapter => {
-  let seen: { failures: Set<string>; cooldowns: Set<string> } | null = null
+  let seen: WorkerSeenIds | null = null
   return {
     id: 'worker',
     cadenceMs: deps.cadenceMs,

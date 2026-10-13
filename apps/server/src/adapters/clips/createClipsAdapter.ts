@@ -1,6 +1,5 @@
 import type { Adapter } from '../../types/Adapter'
-import type { EngineRunner } from '../../types/EngineRunner'
-import type { LatestClipsDocuments } from '../../types/LatestClipsDocuments'
+import type { ClipsAdapterDeps } from '../../types/ClipsAdapterDeps'
 import { backlogHealth } from '../backlogHealth'
 import { clipsOldestOver } from './clipsOldestOver'
 import { readClipsDocuments } from './readClipsDocuments'
@@ -8,12 +7,7 @@ import { summarizeClips } from './summarizeClips'
 
 // The snapshot keeps counts only; the whole read, items included, goes to
 // `latest` for the detail route and the pending board.
-export const createClipsAdapter = (deps: {
-  readonly run: EngineRunner
-  readonly cadenceMs: number
-  readonly oldestDays?: number | undefined
-  readonly latest?: LatestClipsDocuments | undefined
-}): Adapter => ({
+export const createClipsAdapter = (deps: ClipsAdapterDeps): Adapter => ({
   id: 'clips',
   cadenceMs: deps.cadenceMs,
   // Two sequential engine reads, each up to its engine's `timeoutMs` (20 s at

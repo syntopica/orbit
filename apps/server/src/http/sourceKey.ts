@@ -1,11 +1,10 @@
 import type { HttpBindings } from '@hono/node-server'
 import type { Context } from 'hono'
+import type { SourceKeyEnv } from '../types/SourceKeyEnv'
 import { INVALID_SOURCE_KEY } from './invalidSourceKey'
 import { MAX_SOURCE_KEY_LENGTH } from './maxSourceKeyLength'
 
-export const sourceKey = (
-  c: Context<{ Bindings: HttpBindings }, string>,
-): string => {
+export const sourceKey = (c: Context<SourceKeyEnv, string>): string => {
   const forwarded = c.req.header('X-Forwarded-For')?.split(',').at(-1)?.trim()
   if (forwarded !== undefined && forwarded !== '') {
     return forwarded.length > MAX_SOURCE_KEY_LENGTH

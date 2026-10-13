@@ -1,15 +1,13 @@
 import type { OrbitEvent } from '@orbit/contract'
 
 import { toSafeRef } from '../../refs/toSafeRef'
+import type { WorkerSeenIds } from '../../types/WorkerSeenIds'
 import type { WorkerStatus } from '../../types/WorkerStatus'
 
 // The worker's free-text `error` is never copied: only closed values and
 // filtered ids enter the stream (spec 6.6).
 export const workerEvents = (
-  seen: {
-    readonly failures: ReadonlySet<string>
-    readonly cooldowns: ReadonlySet<string>
-  } | null,
+  seen: WorkerSeenIds | null,
   status: WorkerStatus,
   now: Date,
 ): OrbitEvent[] => {

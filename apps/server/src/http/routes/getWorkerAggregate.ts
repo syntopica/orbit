@@ -1,8 +1,7 @@
-import type { WorkerCosts, WorkerQuality } from '@orbit/contract'
 import type { Handler } from 'hono'
 
-import type { DetailPool } from '../../types/DetailPool'
 import type { OrbitEnv } from '../../types/OrbitEnv'
+import type { WorkerAggregateOptions } from '../../types/WorkerAggregateOptions'
 
 export const getWorkerAggregate =
   <Report>({
@@ -11,13 +10,7 @@ export const getWorkerAggregate =
     now,
     ranges,
     convert,
-  }: {
-    read: ((days: number, signal: AbortSignal) => Promise<Report>) | null
-    pool: DetailPool
-    now: () => number
-    ranges: ReadonlyMap<string, number>
-    convert: (report: Report, at: number) => WorkerCosts | WorkerQuality
-  }): Handler<OrbitEnv, string> =>
+  }: WorkerAggregateOptions<Report>): Handler<OrbitEnv, string> =>
   async (c) => {
     const days = ranges.get(c.req.query('range') ?? '')
     if (days === undefined) return c.json({ error: 'bad_request' }, 400)

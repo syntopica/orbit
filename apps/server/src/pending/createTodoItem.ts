@@ -1,14 +1,11 @@
 import type { PendingView } from '@orbit/contract'
+import type { TodoItemValues } from '../types/TodoItemValues'
 
 export const createTodoItem = (
   source: string,
   file: string,
   line: number,
-  values: {
-    state: 'open' | 'partial' | 'blocked'
-    title: string
-    section: string | null
-  },
+  values: TodoItemValues,
 ): PendingView['items'][number] => ({
   id: `${source}:${String(line)}`,
   source,

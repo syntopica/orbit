@@ -3,6 +3,7 @@ import type { DatabaseSync } from 'node:sqlite'
 
 import type { ActionRun } from '../types/ActionRun'
 import type { ActionStore } from '../types/ActionStore'
+import type { ActiveActionEntry } from '../types/ActiveActionEntry'
 import type { Hub } from '../types/Hub'
 import type { LiveActionRun } from '../types/LiveActionRun'
 import { ensureActionRunsTable } from './ensureActionRunsTable'
@@ -22,10 +23,7 @@ export const createActionStore = (
   const save = (run: ActionRun): void => {
     saveActionRun(db, run)
   }
-  const active = new Map<
-    string,
-    { startedAt: number; controller: AbortController }
-  >()
+  const active = new Map<string, ActiveActionEntry>()
   const history: ActionRun[] = loadActionRuns(db)
   return {
     start: (input) => {

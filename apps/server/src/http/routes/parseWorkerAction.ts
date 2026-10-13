@@ -1,10 +1,9 @@
 import { parseWorkerJson } from '../../adapters/worker/parseWorkerJson'
 import { workerJobActionReportSchema } from '../../adapters/worker/workerJobActionReportSchema'
+import type { WorkerActionSummary } from '../../types/WorkerActionSummary'
 import { isIdentifier } from '../../workerView/isIdentifier'
 
-export const parseWorkerAction = (
-  body: string,
-): { id: string; state: string; retryOf?: string } | null => {
+export const parseWorkerAction = (body: string): WorkerActionSummary | null => {
   try {
     const report = parseWorkerJson(body, workerJobActionReportSchema)
     if (

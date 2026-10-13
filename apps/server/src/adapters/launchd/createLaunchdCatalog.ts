@@ -2,12 +2,13 @@ import { ProcessError } from '../../process/ProcessError'
 import type { LaunchdAdapterDeps } from '../../types/LaunchdAdapterDeps'
 import type { LaunchdCatalog } from '../../types/LaunchdCatalog'
 import type { LaunchdSchedule } from '../../types/LaunchdSchedule'
+import type { LaunchdScheduleCacheEntry } from '../../types/LaunchdScheduleCacheEntry'
 import { readSchedule } from './readSchedule'
 
 export const createLaunchdCatalog = (
   deps: LaunchdAdapterDeps,
 ): LaunchdCatalog => {
-  const cache = new Map<string, { schedule: LaunchdSchedule; at: number }>()
+  const cache = new Map<string, LaunchdScheduleCacheEntry>()
   const scheduleOf = async (
     plist: string,
     signal: AbortSignal,
