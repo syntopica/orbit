@@ -1,0 +1,10 @@
+{
+  "tadu": 2,
+  "id": "t-50de5e59-b647-4bca-a653-ee30fa6549f2",
+  "title": "Frozen installation passes, but pnpm gate timed out while the existing heavy-suite load guard deferred execution",
+  "state": "blocked",
+  "category": "dependency-upgrade-verification-2026-10-22",
+  "type": "untriaged",
+  "priority": "untriaged",
+  "blocker": "Next: rerun pnpm gate when the guarded machine workload permits it; do not bypass the guard. The raw audit retains one high braces advisory. Evidence: the per-repository command ledger in `~/p/docs/dependency-upgrade-2026-10-22.json`; local logs are preserved under `~/p/.daily/dependency-upgrade-20261022/`."
+}

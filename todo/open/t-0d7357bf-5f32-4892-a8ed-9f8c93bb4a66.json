@@ -1,0 +1,19 @@
+{
+  "tadu": 2,
+  "id": "t-0d7357bf-5f32-4892-a8ed-9f8c93bb4a66",
+  "title": "`@react-sigma/core` 5.0.6 declares `sigma` `^3.0.2` as a peer, but the app",
+  "state": "pending",
+  "category": "dependencies",
+  "type": "untriaged",
+  "priority": "untriaged",
+  "notes": [
+    "    runs on sigma 4. `SigmaContainer` hands its `settings` prop to the Sigma",
+    "    constructor as the options object, so the app passes Sigma 4 options",
+    "    (`settings` and `styles`) through that prop (`src/graph/sigmaOptions.ts`),",
+    "    and the library's own typings still describe Sigma 3 settings. Smallest",
+    "    next step: replace `SigmaContainer` and the four hooks the app uses",
+    "    (`useSigma`, `useLoadGraph`, `useRegisterEvents`, `useCamera`) with a",
+    "    small local binding, or move to a `@react-sigma/core` release that",
+    "    supports sigma 4, then drop the prop workaround."
+  ]
+}
