@@ -1,11 +1,12 @@
 {
   "tadu": 2,
   "id": "t-4d16ee4e-8d0a-4fbb-9974-03a79e033007",
-  "title": "1. Engine read timeouts (brain and clips reads time out together every few",
+  "title": "Compare engine read timeout rate before and after the heavy-suite gate and orbit restart, using engine-run at= stamps",
   "state": "in_progress",
   "category": "reliability-plan-2026-10-04-in-this-order",
-  "type": "untriaged",
-  "priority": "untriaged",
+  "type": "chore",
+  "priority": "low",
+  "kind": "task",
   "notes": [
     "minutes; the Clips screen can stay on loading): every engine command logs",
     "`engine-run <engine> <subcommand> <ms> <outcome> concurrent=<n> load=<1-min> at=<ISO end time>`;",
@@ -45,6 +46,7 @@
     "scripts run through a `heavy-suite` admission wrapper when the host provides",
     "one (the original commands are `gate:run` and `e2e:run`; CI and hosts without",
     "the wrapper run them directly). Remaining: compare the `timeout` rate before",
-    "and after over a few days of `at=` stamps."
+    "and after over a few days of `at=` stamps.",
+    "2026-11-24 audit: all code work landed and is verified in git (8ff6d0d per-engine timeout and 45 s budget, d4f3aea /api/clips last-good fallback, 7117952 restart record; package.json gate and e2e run through heavy-suite, which exists at ~/.local/bin/heavy-suite). Only the measurement is left: count engine-run timeout lines in the orbit log before vs after 2026-10-11 and close if the rate fell or host starvation is confirmed. Orbit log path not found cheaply, so not measured. Owner decision on pausing other sessions and containers is unrecorded."
   ]
 }

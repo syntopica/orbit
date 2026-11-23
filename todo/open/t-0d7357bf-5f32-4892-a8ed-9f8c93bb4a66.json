@@ -1,11 +1,12 @@
 {
   "tadu": 2,
   "id": "t-0d7357bf-5f32-4892-a8ed-9f8c93bb4a66",
-  "title": "`@react-sigma/core` 5.0.6 declares `sigma` `^3.0.2` as a peer, but the app",
+  "title": "Brain graph: finish moving to @react-sigma/core 6.0.0 (sigma 4 peer) by renaming the SigmaContainer settings prop to options",
   "state": "pending",
   "category": "dependencies",
-  "type": "untriaged",
-  "priority": "untriaged",
+  "type": "chore",
+  "priority": "normal",
+  "kind": "task",
   "notes": [
     "    runs on sigma 4. `SigmaContainer` hands its `settings` prop to the Sigma",
     "    constructor as the options object, so the app passes Sigma 4 options",
@@ -14,6 +15,7 @@
     "    next step: replace `SigmaContainer` and the four hooks the app uses",
     "    (`useSigma`, `useLoadGraph`, `useRegisterEvents`, `useCamera`) with a",
     "    small local binding, or move to a `@react-sigma/core` release that",
-    "    supports sigma 4, then drop the prop workaround."
+    "    supports sigma 4, then drop the prop workaround.",
+    "2026-11-24 audit: partial. HEAD still has @react-sigma/core 5.0.6 and sigma 4.0.0; the working tree has an UNCOMMITTED bump to @react-sigma/core 6.0.0 (peer sigma ^4.0.0, lockfile updated) and sigma 4.0.3, so the peer mismatch is resolved by that bump once committed. Left: 6.0.0 SigmaContainer takes `options` (node_modules/@react-sigma/core/lib/components/SigmaContainer.d.ts), but apps/web/src/screens/brain/GraphCanvas.tsx still passes `settings={settings}` from useGraphSettings, so Sigma options would be ignored or fail typecheck. Next: change the prop to options, run typecheck and Brain tests, commit with the bump. Not run here (audit only)."
   ]
 }
