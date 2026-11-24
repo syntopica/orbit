@@ -1,3 +1,4 @@
+import type { HttpBindings } from '@hono/node-server'
 import { Hono } from 'hono'
 
 import { markStepUp } from '../../auth/markStepUp'
@@ -6,6 +7,9 @@ import type { OrbitEnv } from '../../types/OrbitEnv'
 import { requireStepUp } from './requireStepUp'
 
 const LOCAL = '127.0.0.1:8790'
+
+const bindingsFor = (localPort: number) =>
+  ({ incoming: { socket: { localPort } } }) as unknown as HttpBindings
 
 const setup = () => {
   let now = 1_790_000_000_000
@@ -74,9 +78,7 @@ describe('requireStepUp', () => {
       app.request(
         'http://x/act',
         { method: 'POST', headers: { Host: LOCAL, Cookie: test.cookie } },
-        localPort === undefined
-          ? undefined
-          : { incoming: { socket: { localPort } } },
+        localPort === undefined ? undefined : bindingsFor(localPort),
       )
     expect((await post(8790)).status).toBe(200)
     expect((await post(8791)).status).toBe(403)
@@ -89,7 +91,7 @@ describe('requireStepUp', () => {
     const response = await app.request(
       'http://x/act',
       { method: 'POST', headers: { Host: LOCAL, Cookie: test.cookie } },
-      { incoming: { socket: { localPort: test.deps.guard.port } } },
+      bindingsFor(test.deps.guard.port),
     )
     expect(response.status).toBe(403)
   })

@@ -24,8 +24,8 @@ export const StageButton = ({
     }}
     className="border-line bg-panel hover:border-muted aria-pressed:border-accent flex w-full flex-col items-start gap-1 rounded-xl border p-3 text-left"
   >
-    <span className="font-medium">{FLOW_STAGE_LABELS[stage.id].title}</span>
-    <StateBadge state={stage.state} />
+    <span className="font-medium">{FLOW_STAGE_LABELS[stage.id].title}</span>{' '}
+    <StateBadge state={stage.state} />{' '}
     {stage.backlog === null ? null : (
       <span className="text-muted text-xs tabular-nums">
         {formatCount(stage.backlog.value)} {METRIC_LABELS[stage.backlog.key]}

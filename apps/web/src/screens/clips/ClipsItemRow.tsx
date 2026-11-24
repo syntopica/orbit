@@ -43,9 +43,9 @@ export const ClipsItemRow = ({ item, now }: ClipsItemRowProps) => (
         to="/worker/jobs/$id"
         params={{ id }}
         aria-label={`${CLIPS_LABELS.workerJob} ${id}`}
-        className="text-accent font-mono underline"
+        className="text-accent inline-block max-w-[9ch] truncate align-bottom font-mono underline"
       >
-        {shortenId(id)}
+        {id}
       </Link>
     ))}
     {item.pages.map((page) => (

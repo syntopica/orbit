@@ -21,7 +21,7 @@ export const GraphCanvas = ({
   const [hovered, setHovered] = useHoveredNode()
   return (
     <SigmaContainer
-      settings={settings}
+      options={settings}
       className="pointer-events-auto size-full"
     >
       <GraphLoader graph={graph} />

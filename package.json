@@ -15,12 +15,12 @@
     "gate:run": "pnpm -r --workspace-concurrency=1 run gate:pkg && pnpm format:check && pnpm secrets:check && pnpm e2e"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.3",
-    "@commitlint/config-conventional": "^21.2.3",
-    "@axe-core/playwright": "^4.13.0",
-    "@playwright/test": "^1.64.0",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
     "@syntopica/prettier-config": "^0.3.0",
-    "lefthook": "^2.2.1",
+    "lefthook": "^2.2.2",
     "prettier": "^3.9.10",
     "prettier-plugin-css-order": "^2.2.0",
     "prettier-plugin-organize-imports": "^4.3.0",

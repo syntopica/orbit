@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router'
 
-import { shortenId } from '../../formatters/shortenId'
 import type { JobIdLinkProps } from '../../types/JobIdLinkProps'
 
 export const JobIdLink = ({ id }: JobIdLinkProps) => (
@@ -9,8 +8,8 @@ export const JobIdLink = ({ id }: JobIdLinkProps) => (
     params={{ id }}
     aria-label={id}
     title={id}
-    className="text-accent font-mono underline"
+    className="text-accent inline-block max-w-[9ch] truncate align-bottom font-mono underline"
   >
-    {shortenId(id)}
+    {id}
   </Link>
 )
