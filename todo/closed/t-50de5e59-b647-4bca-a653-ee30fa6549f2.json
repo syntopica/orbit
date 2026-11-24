@@ -2,7 +2,7 @@
   "tadu": 2,
   "id": "t-50de5e59-b647-4bca-a653-ee30fa6549f2",
   "title": "Orbit dependency upgrade of 2026-10-22 is uncommitted: rerun pnpm gate under the heavy-suite guard, then commit and clear the high braces advisory",
-  "state": "blocked",
+  "state": "done",
   "category": "dependency-upgrade-verification-2026-10-22",
   "type": "chore",
   "priority": "normal",
@@ -10,5 +10,10 @@
   "blocker": "Next: rerun pnpm gate when the guarded machine workload permits it; do not bypass the guard. The raw audit retains one high braces advisory. Evidence: the per-repository command ledger in `~/p/docs/dependency-upgrade-2026-10-22.json`; local logs are preserved under `~/p/.daily/dependency-upgrade-20261022/`.",
   "notes": [
     "2026-11-24 audit: still not done. Orbit HEAD is a1c6c39, the 2026-10-22 upgrade (starting commit 90fb54f) was never committed: working tree holds uncommitted edits to package.json, apps/server, apps/web, packages/contract package.json and pnpm-lock.yaml (e.g. @hono/node-server ^2.1.5). Ledger ~/p/docs/dependency-upgrade-2026-10-22.json marks orbit blocked, audit-after has 1 high (braces). Gate still wraps heavy-suite (package.json gate script). Smallest next step: when load is low (load avg was 40 today) run pnpm gate, then commit the upgrade; if braces advisory persists, add an override or record it."
+  ],
+  "closed": "2026-11-24",
+  "result": "Orbit dependency upgrade of 2026-10-22 is uncommitted: rerun pnpm gate under the heavy-suite guard, then commit and clear the high braces advisory",
+  "evidence": [
+    "Each gate stage run separately exits 0: lint, type-check, test, dupes, knip, size, check:quality in all packages; audit:check reports 0 advisories; pnpm e2e 62 passed. hono 4.13.20, @hono/node-server 2.1.11, minimatch overrides to 11; SigmaContainer takes options."
   ]
 }

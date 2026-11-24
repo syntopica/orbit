@@ -2,7 +2,7 @@
   "tadu": 2,
   "id": "t-6280e722-aa64-4b18-b137-b05885934e97",
   "title": "Pre-push gate rejects every push: 7 unwaived moderate advisories in hono, @hono/node-server and minimatch",
-  "state": "pending",
+  "state": "done",
   "category": "dependencies",
   "type": "security",
   "priority": "high",
@@ -10,5 +10,10 @@
   "created": "2026-11-24",
   "notes": [
     "2026-11-24: `git push` fails in the lefthook `gate` step. `baseline-audit --level moderate` reports GHSA-qv5m-9pm6-hqp3 and GHSA-jpvv-r467-5p4w (@hono/node-server <2.1.6), GHSA-4m76-xfj5-7975, GHSA-h7mg-cq63-vhpq, GHSA-46wx-v44x-9hh2 and GHSA-4h7h-rv7c-7m2v (hono <4.13.16) and GHSA-g3hv-75wg-m249 (minimatch <11.0.1, via eslint). Two commits wait locally behind it: a1c6c39 and 4ed4a71. Next: raise hono to 4.13.16 or later and @hono/node-server to 2.1.6 or later, together with the uncommitted dependency upgrade already in the working tree, then waive or resolve minimatch."
+  ],
+  "closed": "2026-11-24",
+  "result": "Pre-push gate rejects every push: 7 unwaived moderate advisories in hono, @hono/node-server and minimatch",
+  "evidence": [
+    "Each gate stage run separately exits 0: lint, type-check, test, dupes, knip, size, check:quality in all packages; audit:check reports 0 advisories; pnpm e2e 62 passed. hono 4.13.20, @hono/node-server 2.1.11, minimatch overrides to 11; SigmaContainer takes options."
   ]
 }
