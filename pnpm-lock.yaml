@@ -224,14 +224,14 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
       '@syntopica/eslint-config':
-        specifier: ^0.10.0
-        version: 0.10.0(930f8880544533016aa4f94d65a49db3)
+        specifier: ^0.10.1
+        version: 0.10.1(219a3d3b9f8ee2defed988c5de6c85a1)
       '@syntopica/prettier-config':
         specifier: ^0.3.0
         version: 0.3.0(prettier-plugin-css-order@2.2.0(postcss@8.5.31)(prettier@3.9.10))(prettier-plugin-organize-imports@4.3.0(@typescript/typescript6@6.0.2)(prettier@3.9.10))(prettier-plugin-tailwindcss@0.8.1(prettier-plugin-css-order@2.2.0(postcss@8.5.31)(prettier@3.9.10))(prettier-plugin-organize-imports@4.3.0(@typescript/typescript6@6.0.2)(prettier@3.9.10))(prettier@3.9.10))(prettier@3.9.10)
       '@syntopica/quality-config':
-        specifier: ^0.15.0
-        version: 0.15.0(@commitlint/config-conventional@21.2.4)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.7.0)(knip@6.42.1)(oxlint@1.89.0)
+        specifier: ^0.16.0
+        version: 0.16.0(@commitlint/config-conventional@21.2.4)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.7.0)(knip@6.42.1)(oxlint@1.89.0)
       '@syntopica/tsconfig':
         specifier: ^0.3.1
         version: 0.3.1
@@ -266,8 +266,8 @@ importers:
         specifier: ^4.4.5
         version: 4.4.5(eslint-plugin-import@2.32.0)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
       eslint-plugin-code-policy:
-        specifier: ^0.9.0
-        version: 0.9.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
+        specifier: ^0.9.1
+        version: 0.9.1(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       eslint-plugin-import:
         specifier: ^2.32.0
         version: 2.32.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-import-resolver-typescript@4.4.5)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
@@ -417,14 +417,14 @@ importers:
         specifier: ^14.2.0
         version: 14.2.0(size-limit@14.2.0)
       '@syntopica/eslint-config':
-        specifier: ^0.10.0
-        version: 0.10.0(930f8880544533016aa4f94d65a49db3)
+        specifier: ^0.10.1
+        version: 0.10.1(219a3d3b9f8ee2defed988c5de6c85a1)
       '@syntopica/prettier-config':
         specifier: ^0.3.0
         version: 0.3.0(prettier-plugin-css-order@2.2.0(postcss@8.5.31)(prettier@3.9.10))(prettier-plugin-organize-imports@4.3.0(@typescript/typescript6@6.0.2)(prettier@3.9.10))(prettier-plugin-tailwindcss@0.8.1(prettier-plugin-css-order@2.2.0(postcss@8.5.31)(prettier@3.9.10))(prettier-plugin-organize-imports@4.3.0(@typescript/typescript6@6.0.2)(prettier@3.9.10))(prettier@3.9.10))(prettier@3.9.10)
       '@syntopica/quality-config':
-        specifier: ^0.15.0
-        version: 0.15.0(@commitlint/config-conventional@21.2.4)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.7.0)(knip@6.42.1)(oxlint@1.89.0)
+        specifier: ^0.16.0
+        version: 0.16.0(@commitlint/config-conventional@21.2.4)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.7.0)(knip@6.42.1)(oxlint@1.89.0)
       '@syntopica/tsconfig':
         specifier: ^0.3.1
         version: 0.3.1
@@ -474,8 +474,8 @@ importers:
         specifier: ^7.2.0
         version: 7.2.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-import-resolver-typescript@4.4.5)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
       eslint-plugin-code-policy:
-        specifier: ^0.9.0
-        version: 0.9.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
+        specifier: ^0.9.1
+        version: 0.9.1(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       eslint-plugin-import:
         specifier: ^2.32.0
         version: 2.32.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-import-resolver-typescript@4.4.5)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
@@ -583,14 +583,14 @@ importers:
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
       '@syntopica/eslint-config':
-        specifier: ^0.10.0
-        version: 0.10.0(930f8880544533016aa4f94d65a49db3)
+        specifier: ^0.10.1
+        version: 0.10.1(219a3d3b9f8ee2defed988c5de6c85a1)
       '@syntopica/prettier-config':
         specifier: ^0.3.0
         version: 0.3.0(prettier-plugin-css-order@2.2.0(postcss@8.5.31)(prettier@3.9.10))(prettier-plugin-organize-imports@4.3.0(@typescript/typescript6@6.0.2)(prettier@3.9.10))(prettier-plugin-tailwindcss@0.8.1(prettier-plugin-css-order@2.2.0(postcss@8.5.31)(prettier@3.9.10))(prettier-plugin-organize-imports@4.3.0(@typescript/typescript6@6.0.2)(prettier@3.9.10))(prettier@3.9.10))(prettier@3.9.10)
       '@syntopica/quality-config':
-        specifier: ^0.15.0
-        version: 0.15.0(@commitlint/config-conventional@21.2.4)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.7.0)(knip@6.42.1)(oxlint@1.89.0)
+        specifier: ^0.16.0
+        version: 0.16.0(@commitlint/config-conventional@21.2.4)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.7.0)(knip@6.42.1)(oxlint@1.89.0)
       '@syntopica/tsconfig':
         specifier: ^0.3.1
         version: 0.3.1
@@ -619,8 +619,8 @@ importers:
         specifier: ^4.4.5
         version: 4.4.5(eslint-plugin-import@2.32.0)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
       eslint-plugin-code-policy:
-        specifier: ^0.9.0
-        version: 0.9.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
+        specifier: ^0.9.1
+        version: 0.9.1(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       eslint-plugin-import:
         specifier: ^2.32.0
         version: 2.32.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-import-resolver-typescript@4.4.5)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
@@ -2001,8 +2001,8 @@ packages:
   '@sonarsource/analyzer-commons-configurations@2.31.0-5284':
     resolution: {integrity: sha512-ruk3blMs9BE9RNSp9LPpWZAIjxJmq4Cp00E3cELIHz7Kym3WxdWGRlKOMYLRQ5tJg/de7jN5AtEElY3bGIfTcw==}
 
-  '@syntopica/eslint-config@0.10.0':
-    resolution: {integrity: sha512-hjdNw263EhNpm+S+szccGHyFHQ0JBTuP4paV5b2zCmi+7HfyFi4MF8UrM9qVRhy8SUTH1Xu1+JaSZm2TybZyuQ==}
+  '@syntopica/eslint-config@0.10.1':
+    resolution: {integrity: sha512-uBR0dgme3I04bEDAQjXnh3Rtfyo/IAHCWkrLZzngxHAFkJVxFdXMPOVhLeTob+M/2GWtZzJBrxJFSajGaWhCRg==}
     engines: {node: '>=20'}
     peerDependencies:
       '@eslint/markdown': '>=8.0.0'
@@ -2080,8 +2080,8 @@ packages:
       prettier-plugin-tailwindcss:
         optional: true
 
-  '@syntopica/quality-config@0.15.0':
-    resolution: {integrity: sha512-T7ypqElIAjd/0v9+o7Y28rttHFWY40GXmqMLYlETiFNRw/vwIDy5gHrT+7E4AP4cBA4eJpdWnrSZqWBMcXZhiQ==}
+  '@syntopica/quality-config@0.16.0':
+    resolution: {integrity: sha512-IsOU5wW/NcrjNE273xZpHhr4u8nfbVCUhmfpBCXew6uTlynOBa0w94lEzFJ4E2wGnuJTAerC3g0DTlEXemaPgA==}
     engines: {node: '>=22'}
     hasBin: true
     peerDependencies:
@@ -3557,8 +3557,8 @@ packages:
     peerDependencies:
       eslint: '>=6.0.0'
 
-  eslint-plugin-code-policy@0.9.0:
-    resolution: {integrity: sha512-e61A5x3HP9mffJwPbMRnshBermqTGG+huKXN29EkTryDjqYSUtJVnfod1HKXRGAnxBE7tnysSKNEs4rPzUzJoQ==}
+  eslint-plugin-code-policy@0.9.1:
+    resolution: {integrity: sha512-LmmWocP3xJCWHUcrhHLcx0nlRM2uvpmpwDoA7TZU5PdQfKw1vhIcY9rzL7H5j6r+8KUf2NCKgSLks9InD2yA1A==}
     engines: {node: '>=20'}
     peerDependencies:
       eslint: '>=9.0.0'
@@ -3614,6 +3614,10 @@ packages:
 
   eslint-plugin-security@4.2.0:
     resolution: {integrity: sha512-LL5jbxRzlNv0vkSyBtbO7qAPofqd3xlseAFTDevyDTMmScjBrLv2/VkQ7ZFQxBaFYsa3dhpE7NcV+JkwJ9l6RQ==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  eslint-plugin-security@4.2.1:
+    resolution: {integrity: sha512-iF95SSqdSUVTvB7srNXoNeTQIqwfALTn9nmoqJyixSIKqEydlW01Cqb7xNveqE4Zd6YWBoQICQ4FH9NkR1byDg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   eslint-plugin-sonarjs@4.2.2:
@@ -7083,18 +7087,19 @@ snapshots:
 
   '@sonarsource/analyzer-commons-configurations@2.31.0-5284': {}
 
-  '@syntopica/eslint-config@0.10.0(930f8880544533016aa4f94d65a49db3)':
+  '@syntopica/eslint-config@0.10.1(219a3d3b9f8ee2defed988c5de6c85a1)':
     dependencies:
       '@eslint/js': 10.0.1(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
+      '@typescript-eslint/eslint-plugin': 8.73.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       '@vitest/eslint-plugin': 1.6.27(@typescript-eslint/eslint-plugin@8.73.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)(vitest@5.0.5)
       eslint: 10.15.0(jiti@2.7.0)(supports-color@7.2.0)
       eslint-config-prettier: 10.1.8(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
       eslint-import-resolver-typescript: 4.4.5(eslint-plugin-import@2.32.0)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
-      eslint-plugin-code-policy: 0.9.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
+      eslint-plugin-code-policy: 0.9.1(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint-import-resolver-typescript@4.4.5)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
       eslint-plugin-promise: 7.3.0(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
       eslint-plugin-regexp: 3.3.1(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
-      eslint-plugin-security: 4.2.0
+      eslint-plugin-security: 4.2.1
       eslint-plugin-sonarjs: 4.2.2(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
       eslint-plugin-testing-library: 7.16.2(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       eslint-plugin-unused-imports: 4.4.1(@typescript-eslint/eslint-plugin@8.73.0(@typescript-eslint/parser@8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2))(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))
@@ -7110,7 +7115,6 @@ snapshots:
       eslint-plugin-unicorn: 78.0.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)
       globals: 17.13.0
     transitivePeerDependencies:
-      - '@typescript-eslint/eslint-plugin'
       - '@typescript-eslint/parser'
       - '@typescript/native'
       - eslint-import-resolver-webpack
@@ -7133,7 +7137,7 @@ snapshots:
     optionalDependencies:
       prettier-plugin-tailwindcss: 0.8.1(prettier-plugin-css-order@2.2.0(postcss@8.5.31)(prettier@3.9.10))(prettier-plugin-organize-imports@4.3.0(prettier@3.9.10)(typescript@7.0.2))(prettier@3.9.10)
 
-  '@syntopica/quality-config@0.15.0(@commitlint/config-conventional@21.2.4)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.7.0)(knip@6.42.1)(oxlint@1.89.0)':
+  '@syntopica/quality-config@0.16.0(@commitlint/config-conventional@21.2.4)(@typescript/typescript6@6.0.2)(dependency-cruiser@18.7.0)(knip@6.42.1)(oxlint@1.89.0)':
     dependencies:
       tinyglobby: 0.2.17
       typescript: '@typescript/typescript6@6.0.2'
@@ -8612,7 +8616,7 @@ snapshots:
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-code-policy@0.9.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2):
+  eslint-plugin-code-policy@0.9.1(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2):
     dependencies:
       '@typescript-eslint/utils': 8.73.0(@typescript/typescript6@6.0.2)(eslint@10.15.0(jiti@2.7.0)(supports-color@7.2.0))(supports-color@7.2.0)(typescript@7.0.2)
       eslint: 10.15.0(jiti@2.7.0)(supports-color@7.2.0)
@@ -8724,6 +8728,10 @@ snapshots:
       scslre: 0.3.0
 
   eslint-plugin-security@4.2.0:
+    dependencies:
+      safe-regex: 2.1.1
+
+  eslint-plugin-security@4.2.1:
     dependencies:
       safe-regex: 2.1.1
 
